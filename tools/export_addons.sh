@@ -23,11 +23,15 @@ if [ -z "${ADDONS_JSON}" ]; then
   exit 0
 fi
 
-echo "${ADDONS_JSON}" | jq -r '.data[].slug' | while read -r SLUG; do
-  [ -z "${SLUG}" ] && continue
-  echo "[export_addons] dumper ${SLUG}"
-  # Full info om add-on (inkl. versjon, tilstand, oppdatering etc.)
-  ha addons info "${SLUG}" --raw-json > "${STATE_DIR}/${SLUG}.info.json" || true
+# Plukk alle slug-felt i hele strukturen, fjern duplikater og tomme
+echo "$ADDONS_JSON" \
+| jq -r '.. | objects | .slug? // empty' \
+| sort -u \
+| while read -r SLUG; do
+  [ -z "$SLUG" ] && continue
+  echo "[export_addons] dumper $SLUG"
+  mkdir -p "${STATE_DIR:-/config/addon_state}"
+  ha addons info "$SLUG" --raw-json > "${STATE_DIR:-/config/addon_state}/${SLUG}.info.json" || true
 done
 
 # 3) Lag en indeks-fil med tidspunkt
