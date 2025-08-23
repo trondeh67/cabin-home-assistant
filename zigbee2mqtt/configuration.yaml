@@ -1,0 +1,24 @@
+version: 4
+mqtt:
+  base_topic: zigbee2mqtt
+  server: mqtt://core-mosquitto:1883
+  user: mqtt
+  password: mqtt_pwd
+serial:
+  port: >-
+    /dev/serial/by-id/usb-Itead_Sonoff_Zigbee_3.0_USB_Dongle_Plus_V2_7c0f6149cb49ef119229c98cff00cc63-if00-port0
+  adapter: ezsp
+  baudrate: 115200
+  rtscts: true
+advanced:
+  log_level: info
+  channel: 11
+  network_key: GENERATE
+  pan_id: GENERATE
+  ext_pan_id: GENERATE
+frontend:
+  enabled: true
+  port: 8099
+homeassistant:
+  enabled: true
+onboarding: true

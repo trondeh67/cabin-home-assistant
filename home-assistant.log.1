@@ -1,0 +1,775 @@
+2025-08-20 16:18:37.887 WARNING (SyncWorker_0) [homeassistant.loader] We found a custom integration hacs which has not been tested by Home Assistant. This component might cause stability problems, be sure to disable it if you experience issues with Home Assistant
+2025-08-20 16:18:42.343 WARNING (MainThread) [homeassistant.components.light] light.testdimmer (<class 'homeassistant.components.mqtt.light.schema_json.MqttLightJson'>) does not report a color mode, this will stop working in Home Assistant Core 2025.3, please create a bug report at https://github.com/home-assistant/core/issues?q=is%3Aopen+is%3Aissue+label%3A%22integration%3A+mqtt%22
+2025-08-20 16:18:42.346 WARNING (MainThread) [homeassistant.components.light] light.stue_dimmer (<class 'homeassistant.components.mqtt.light.schema_json.MqttLightJson'>) does not report a color mode, this will stop working in Home Assistant Core 2025.3, please create a bug report at https://github.com/home-assistant/core/issues?q=is%3Aopen+is%3Aissue+label%3A%22integration%3A+mqtt%22
+2025-08-20 16:18:43.310 WARNING (MainThread) [homeassistant.components.netatmo] Webhook not registered - https and port 443 is required to register the webhook
+2025-08-20 16:28:38.230 ERROR (MainThread) [homeassistant.components.hassio.handler] Client error on /info request Cannot connect to host 172.30.32.2:80 ssl:default [Connect call failed ('172.30.32.2', 80)]
+2025-08-20 16:28:38.230 ERROR (MainThread) [homeassistant.components.hassio.handler] Client error on /core/info request Cannot connect to host 172.30.32.2:80 ssl:default [Connect call failed ('172.30.32.2', 80)]
+2025-08-20 16:28:38.231 ERROR (MainThread) [homeassistant.components.hassio.handler] Client error on /supervisor/info request Cannot connect to host 172.30.32.2:80 ssl:default [Connect call failed ('172.30.32.2', 80)]
+2025-08-20 16:28:38.231 ERROR (MainThread) [homeassistant.components.hassio.handler] Client error on /os/info request Cannot connect to host 172.30.32.2:80 ssl:default [Connect call failed ('172.30.32.2', 80)]
+2025-08-20 16:28:38.231 ERROR (MainThread) [homeassistant.components.hassio.coordinator] Error fetching hassio data: Error on Supervisor API: 
+2025-08-20 16:28:38.642 ERROR (MainThread) [homeassistant.components.hassio.handler] Client error on /info request Cannot connect to host 172.30.32.2:80 ssl:default [Connect call failed ('172.30.32.2', 80)]
+2025-08-20 16:28:38.643 ERROR (MainThread) [homeassistant.components.hassio.handler] Client error on /host/info request Cannot connect to host 172.30.32.2:80 ssl:default [Connect call failed ('172.30.32.2', 80)]
+2025-08-20 16:28:38.643 ERROR (MainThread) [homeassistant.components.hassio.handler] Client error on /core/info request Cannot connect to host 172.30.32.2:80 ssl:default [Connect call failed ('172.30.32.2', 80)]
+2025-08-20 16:28:38.643 ERROR (MainThread) [homeassistant.components.hassio.handler] Client error on /supervisor/info request Cannot connect to host 172.30.32.2:80 ssl:default [Connect call failed ('172.30.32.2', 80)]
+2025-08-20 16:28:38.644 ERROR (MainThread) [homeassistant.components.hassio.handler] Client error on /os/info request Cannot connect to host 172.30.32.2:80 ssl:default [Connect call failed ('172.30.32.2', 80)]
+2025-08-20 16:28:38.644 ERROR (MainThread) [homeassistant.components.hassio.handler] Client error on /network/info request Cannot connect to host 172.30.32.2:80 ssl:default [Connect call failed ('172.30.32.2', 80)]
+2025-08-20 16:28:38.644 WARNING (MainThread) [homeassistant.components.hassio] Can't read Supervisor data: 
+2025-08-21 04:58:02.019 WARNING (MainThread) [homeassistant.components.zha.backup] No ZHA gateway exists, skipping coordinator backup
+2025-08-21 07:06:19.211 ERROR (MainThread) [homeassistant] Error doing job: Task exception was never retrieved (None)
+Traceback (most recent call last):
+  File "/usr/src/homeassistant/homeassistant/helpers/update_coordinator.py", line 280, in _handle_refresh_interval
+    await self._async_refresh(log_failures=True, scheduled=True)
+  File "/usr/src/homeassistant/homeassistant/helpers/update_coordinator.py", line 491, in _async_refresh
+    self.async_update_listeners()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/usr/src/homeassistant/homeassistant/helpers/update_coordinator.py", line 190, in async_update_listeners
+    update_callback()
+    ~~~~~~~~~~~~~~~^^
+  File "/usr/src/homeassistant/homeassistant/helpers/update_coordinator.py", line 571, in _handle_coordinator_update
+    self.async_write_ha_state()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/usr/src/homeassistant/homeassistant/helpers/entity.py", line 1026, in async_write_ha_state
+    self._async_write_ha_state()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/usr/src/homeassistant/homeassistant/helpers/entity.py", line 1151, in _async_write_ha_state
+    self.__async_calculate_state()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/usr/src/homeassistant/homeassistant/helpers/entity.py", line 1088, in __async_calculate_state
+    state = self._stringify_state(available)
+  File "/usr/src/homeassistant/homeassistant/helpers/entity.py", line 1032, in _stringify_state
+    if (state := self.state) is None:
+                 ^^^^^^^^^^
+  File "/usr/src/homeassistant/homeassistant/components/binary_sensor/__init__.py", line 200, in state
+    if (is_on := self.is_on) is None:
+                 ^^^^^^^^^^
+  File "/usr/src/homeassistant/homeassistant/components/verisure/binary_sensor.py", line 123, in is_on
+    return self.coordinator.data["broadband"]["isBroadbandConnected"]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: list indices must be integers or slices, not str
+2025-08-21 07:07:19.194 ERROR (MainThread) [homeassistant] Error doing job: Task exception was never retrieved (None)
+Traceback (most recent call last):
+  File "/usr/src/homeassistant/homeassistant/helpers/update_coordinator.py", line 280, in _handle_refresh_interval
+    await self._async_refresh(log_failures=True, scheduled=True)
+  File "/usr/src/homeassistant/homeassistant/helpers/update_coordinator.py", line 491, in _async_refresh
+    self.async_update_listeners()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/usr/src/homeassistant/homeassistant/helpers/update_coordinator.py", line 190, in async_update_listeners
+    update_callback()
+    ~~~~~~~~~~~~~~~^^
+  File "/usr/src/homeassistant/homeassistant/helpers/update_coordinator.py", line 571, in _handle_coordinator_update
+    self.async_write_ha_state()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/usr/src/homeassistant/homeassistant/helpers/entity.py", line 1026, in async_write_ha_state
+    self._async_write_ha_state()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/usr/src/homeassistant/homeassistant/helpers/entity.py", line 1151, in _async_write_ha_state
+    self.__async_calculate_state()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/usr/src/homeassistant/homeassistant/helpers/entity.py", line 1088, in __async_calculate_state
+    state = self._stringify_state(available)
+  File "/usr/src/homeassistant/homeassistant/helpers/entity.py", line 1032, in _stringify_state
+    if (state := self.state) is None:
+                 ^^^^^^^^^^
+  File "/usr/src/homeassistant/homeassistant/components/binary_sensor/__init__.py", line 200, in state
+    if (is_on := self.is_on) is None:
+                 ^^^^^^^^^^
+  File "/usr/src/homeassistant/homeassistant/components/verisure/binary_sensor.py", line 123, in is_on
+    return self.coordinator.data["broadband"]["isBroadbandConnected"]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: list indices must be integers or slices, not str
+2025-08-21 07:08:19.683 ERROR (MainThread) [homeassistant.components.automation.alarm_paskrudd_skru_av_alt_lys] Alarm påskrudd - skru av alt lys: Error executing script. Invalid data for call_service at pos 1: must contain at least one of entity_id, device_id, area_id, floor_id, label_id.
+2025-08-21 07:08:19.683 ERROR (MainThread) [homeassistant.components.automation.alarm_paskrudd_skru_av_alt_lys] Error while executing automation automation.alarm_paskrudd_skru_av_alt_lys: must contain at least one of entity_id, device_id, area_id, floor_id, label_id.
+2025-08-21 07:59:49.579 ERROR (MainThread) [homeassistant.components.hassio.handler] Client error on /ingress/validate_session request 401, message='Attempt to decode JSON with unexpected mimetype: text/plain; charset=utf-8', url='http://172.30.32.2/ingress/validate_session'
+2025-08-21 07:59:49.579 ERROR (MainThread) [homeassistant.components.hassio] Failed to to call /ingress/validate_session - 
+2025-08-21 09:14:35.254 ERROR (MainThread) [homeassistant.components.hassio] Failed to to call /addons/local_xcomfort/install - Docker build failed for local/amd64-addon-xcomfort:3 (exit code 1). Build output:
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 397B done
+#1 WARN: InvalidDefaultArgInFrom: Default value for ARG $BUILD_FROM results in empty or invalid base image name (line 2)
+#1 DONE 0.0s
+
+#2 [internal] load metadata for ghcr.io/home-assistant/amd64-base:latest
+#2 DONE 0.5s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [ 1/11] FROM ghcr.io/home-assistant/amd64-base:latest@sha256:4bb7a73f643f07416573cb892396a76e2663bc7ac127d475f1f3a0b950a58e15
+#4 DONE 0.0s
+
+#5 [ 7/11] RUN apk add py3-pip
+#5 CACHED
+
+#6 [ 2/11] RUN mkdir /app
+#6 CACHED
+
+#7 [ 5/11] RUN apk add git
+#7 CACHED
+
+#8 [ 3/11] RUN mkdir /app/mqtt
+#8 CACHED
+
+#9 [ 4/11] WORKDIR /app
+#9 CACHED
+
+#10 [ 6/11] RUN apk add python3
+#10 CACHED
+
+#11 [ 8/11] RUN git clone https://github.com/olekenneth/pyXcomfort.git
+#11 CACHED
+
+#12 [internal] load build context
+#12 transferring context: 2B done
+#12 DONE 0.0s
+
+#13 [10/11] COPY mqtt/ /app/mqtt/
+#13 ERROR: failed to calculate checksum of ref d146ef76-b3f7-48ec-b68c-8b5c363395a7::g9xm6tpooe3nbwqawptzwot7r: "/mqtt": not found
+
+#14 [ 9/11] RUN pip3 install ./pyXcomfort
+#14 CANCELED
+------
+ > [10/11] COPY mqtt/ /app/mqtt/:
+------
+
+ [33m2 warnings found (use docker --debug to expand):
+[0m - InvalidDefaultArgInFrom: Default value for ARG $BUILD_FROM results in empty or invalid base image name (line 2)
+ - LegacyKeyValueFormat: "ENV key=value" should be used instead of legacy "ENV key value" format (line 4)
+Dockerfile:15
+--------------------
+  13 |     RUN pip3 install ./pyXcomfort
+  14 |     
+  15 | >>> COPY mqtt/ /app/mqtt/
+  16 |     RUN python3 -m pip install -r mqtt/requirements.txt
+  17 |     
+--------------------
+ERROR: failed to build: failed to solve: failed to compute cache key: failed to calculate checksum of ref d146ef76-b3f7-48ec-b68c-8b5c363395a7::g9xm6tpooe3nbwqawptzwot7r: "/mqtt": not found
+
+2025-08-21 09:17:14.020 ERROR (MainThread) [homeassistant.components.hassio] Failed to to call /addons/local_xcomfort/install - Docker build failed for local/amd64-addon-xcomfort:3 (exit code 1). Build output:
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 397B done
+#1 WARN: InvalidDefaultArgInFrom: Default value for ARG $BUILD_FROM results in empty or invalid base image name (line 2)
+#1 DONE 0.0s
+
+#2 [internal] load metadata for ghcr.io/home-assistant/amd64-base:latest
+#2 DONE 0.3s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [ 1/11] FROM ghcr.io/home-assistant/amd64-base:latest@sha256:4bb7a73f643f07416573cb892396a76e2663bc7ac127d475f1f3a0b950a58e15
+#4 DONE 0.0s
+
+#5 [ 4/11] WORKDIR /app
+#5 CACHED
+
+#6 [ 3/11] RUN mkdir /app/mqtt
+#6 CACHED
+
+#7 [ 2/11] RUN mkdir /app
+#7 CACHED
+
+#8 [ 5/11] RUN apk add git
+#8 CACHED
+
+#9 [ 6/11] RUN apk add python3
+#9 CACHED
+
+#10 [ 7/11] RUN apk add py3-pip
+#10 CACHED
+
+#11 [ 8/11] RUN git clone https://github.com/olekenneth/pyXcomfort.git
+#11 CACHED
+
+#12 [internal] load build context
+#12 transferring context: 2B done
+#12 DONE 0.0s
+
+#13 [10/11] COPY mqtt/ /app/mqtt/
+#13 ERROR: failed to calculate checksum of ref d146ef76-b3f7-48ec-b68c-8b5c363395a7::olz0bsjy70f4o5q1irk0g308p: "/mqtt": not found
+
+#14 [ 9/11] RUN pip3 install ./pyXcomfort
+#14 0.294 runc run failed: container process is already dead
+#14 CANCELED
+------
+ > [10/11] COPY mqtt/ /app/mqtt/:
+------
+
+ [33m2 warnings found (use docker --debug to expand):
+[0m - InvalidDefaultArgInFrom: Default value for ARG $BUILD_FROM results in empty or invalid base image name (line 2)
+ - LegacyKeyValueFormat: "ENV key=value" should be used instead of legacy "ENV key value" format (line 4)
+Dockerfile:15
+--------------------
+  13 |     RUN pip3 install ./pyXcomfort
+  14 |     
+  15 | >>> COPY mqtt/ /app/mqtt/
+  16 |     RUN python3 -m pip install -r mqtt/requirements.txt
+  17 |     
+--------------------
+ERROR: failed to build: failed to solve: failed to compute cache key: failed to calculate checksum of ref d146ef76-b3f7-48ec-b68c-8b5c363395a7::olz0bsjy70f4o5q1irk0g308p: "/mqtt": not found
+
+2025-08-21 09:19:43.899 ERROR (MainThread) [homeassistant.components.hassio] Failed to to call /addons/local_xcomfort/install - Docker build failed for local/amd64-addon-xcomfort:3 (exit code 1). Build output:
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 397B done
+#1 WARN: InvalidDefaultArgInFrom: Default value for ARG $BUILD_FROM results in empty or invalid base image name (line 2)
+#1 DONE 0.0s
+
+#2 [internal] load metadata for ghcr.io/home-assistant/amd64-base:latest
+#2 DONE 0.2s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [ 1/11] FROM ghcr.io/home-assistant/amd64-base:latest@sha256:4bb7a73f643f07416573cb892396a76e2663bc7ac127d475f1f3a0b950a58e15
+#4 DONE 0.0s
+
+#5 [ 2/11] RUN mkdir /app
+#5 CACHED
+
+#6 [ 5/11] RUN apk add git
+#6 CACHED
+
+#7 [ 4/11] WORKDIR /app
+#7 CACHED
+
+#8 [ 6/11] RUN apk add python3
+#8 CACHED
+
+#9 [ 3/11] RUN mkdir /app/mqtt
+#9 CACHED
+
+#10 [ 7/11] RUN apk add py3-pip
+#10 CACHED
+
+#11 [ 8/11] RUN git clone https://github.com/olekenneth/pyXcomfort.git
+#11 CACHED
+
+#12 [internal] load build context
+#12 transferring context: 2B done
+#12 DONE 0.0s
+
+#13 [10/11] COPY mqtt/ /app/mqtt/
+#13 ERROR: failed to calculate checksum of ref d146ef76-b3f7-48ec-b68c-8b5c363395a7::2pbfwy602d9y1tgcu6wj9fpnb: "/mqtt": not found
+
+#14 [ 9/11] RUN pip3 install ./pyXcomfort
+#14 0.218 runc run failed: container process is already dead
+#14 CANCELED
+------
+ > [10/11] COPY mqtt/ /app/mqtt/:
+------
+
+ [33m2 warnings found (use docker --debug to expand):
+[0m - InvalidDefaultArgInFrom: Default value for ARG $BUILD_FROM results in empty or invalid base image name (line 2)
+ - LegacyKeyValueFormat: "ENV key=value" should be used instead of legacy "ENV key value" format (line 4)
+Dockerfile:15
+--------------------
+  13 |     RUN pip3 install ./pyXcomfort
+  14 |     
+  15 | >>> COPY mqtt/ /app/mqtt/
+  16 |     RUN python3 -m pip install -r mqtt/requirements.txt
+  17 |     
+--------------------
+ERROR: failed to build: failed to solve: failed to compute cache key: failed to calculate checksum of ref d146ef76-b3f7-48ec-b68c-8b5c363395a7::2pbfwy602d9y1tgcu6wj9fpnb: "/mqtt": not found
+
+2025-08-21 09:23:49.084 ERROR (MainThread) [homeassistant.components.hassio] Failed to to call /addons/local_xcomfort/install - Docker build failed for local/amd64-addon-xcomfort:3 (exit code 1). Build output:
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 397B done
+#1 WARN: InvalidDefaultArgInFrom: Default value for ARG $BUILD_FROM results in empty or invalid base image name (line 2)
+#1 DONE 0.0s
+
+#2 [internal] load metadata for ghcr.io/home-assistant/amd64-base:latest
+#2 DONE 0.2s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [ 1/11] FROM ghcr.io/home-assistant/amd64-base:latest@sha256:4bb7a73f643f07416573cb892396a76e2663bc7ac127d475f1f3a0b950a58e15
+#4 DONE 0.0s
+
+#5 [ 5/11] RUN apk add git
+#5 CACHED
+
+#6 [ 3/11] RUN mkdir /app/mqtt
+#6 CACHED
+
+#7 [ 6/11] RUN apk add python3
+#7 CACHED
+
+#8 [ 7/11] RUN apk add py3-pip
+#8 CACHED
+
+#9 [ 2/11] RUN mkdir /app
+#9 CACHED
+
+#10 [ 4/11] WORKDIR /app
+#10 CACHED
+
+#11 [ 8/11] RUN git clone https://github.com/olekenneth/pyXcomfort.git
+#11 CACHED
+
+#12 [internal] load build context
+#12 transferring context: 2B done
+#12 DONE 0.0s
+
+#13 [10/11] COPY mqtt/ /app/mqtt/
+#13 ERROR: failed to calculate checksum of ref d146ef76-b3f7-48ec-b68c-8b5c363395a7::hgdl4rqvv9y4z1q541usk9idm: "/mqtt": not found
+
+#14 [ 9/11] RUN pip3 install ./pyXcomfort
+#14 0.230 runc run failed: container process is already dead
+#14 CANCELED
+------
+ > [10/11] COPY mqtt/ /app/mqtt/:
+------
+
+ [33m2 warnings found (use docker --debug to expand):
+[0m - InvalidDefaultArgInFrom: Default value for ARG $BUILD_FROM results in empty or invalid base image name (line 2)
+ - LegacyKeyValueFormat: "ENV key=value" should be used instead of legacy "ENV key value" format (line 4)
+Dockerfile:15
+--------------------
+  13 |     RUN pip3 install ./pyXcomfort
+  14 |     
+  15 | >>> COPY mqtt/ /app/mqtt/
+  16 |     RUN python3 -m pip install -r mqtt/requirements.txt
+  17 |     
+--------------------
+ERROR: failed to build: failed to solve: failed to compute cache key: failed to calculate checksum of ref d146ef76-b3f7-48ec-b68c-8b5c363395a7::hgdl4rqvv9y4z1q541usk9idm: "/mqtt": not found
+
+2025-08-21 09:44:32.930 ERROR (MainThread) [homeassistant.components.hassio] Failed to to call /store/addons/local_xcomfort - Addon local_xcomfort does not exist
+2025-08-21 09:44:35.933 ERROR (MainThread) [homeassistant.components.hassio] Failed to to call /store/addons/local_xcomfort - Addon local_xcomfort does not exist
+2025-08-21 09:51:41.064 ERROR (MainThread) [homeassistant.components.hassio.http] Client error on api app/entrypoint.js request Cannot connect to host 172.30.32.2:80 ssl:default [Connect call failed ('172.30.32.2', 80)]
+2025-08-21 09:51:42.627 ERROR (MainThread) [homeassistant.components.hassio.http] Client error on api app/entrypoint.js request Cannot connect to host 172.30.32.2:80 ssl:default [Connect call failed ('172.30.32.2', 80)]
+2025-08-21 10:00:00.219 ERROR (MainThread) [homeassistant.components.automation.low_battery_level_detection_notification_for_all_battery_sensors] Low battery level detection & notification for all battery sensors: Choose at step 1: default: Error executing script. Invalid data for call_service at pos 1: required key not provided @ data['message']
+2025-08-21 10:00:00.220 ERROR (MainThread) [homeassistant.components.automation.low_battery_level_detection_notification_for_all_battery_sensors] Low battery level detection & notification for all battery sensors: Error executing script. Invalid data for choose at pos 1: required key not provided @ data['message']
+2025-08-21 10:00:00.220 ERROR (MainThread) [homeassistant.components.automation.low_battery_level_detection_notification_for_all_battery_sensors] Error while executing automation automation.low_battery_level_detection_notification_for_all_battery_sensors: required key not provided @ data['message']
+2025-08-21 10:01:24.310 ERROR (MainThread) [homeassistant.components.hassio.handler] Client error on /ingress/validate_session request Cannot connect to host 172.30.32.2:80 ssl:default [Connect call failed ('172.30.32.2', 80)]
+2025-08-21 10:01:24.310 ERROR (MainThread) [homeassistant.components.hassio] Failed to to call /ingress/validate_session - 
+2025-08-21 10:01:24.317 ERROR (MainThread) [homeassistant.components.hassio.handler] Client error on /ingress/session request Cannot connect to host 172.30.32.2:80 ssl:default [Connect call failed ('172.30.32.2', 80)]
+2025-08-21 10:01:24.317 ERROR (MainThread) [homeassistant.components.hassio] Failed to to call /ingress/session - 
+2025-08-21 10:03:02.829 ERROR (MainThread) [homeassistant.components.hassio] Failed to to call /addons/local_xcomfort_go/install - Docker build failed for local/amd64-addon-xcomfort_go:0.1.0 (exit code 1). Build output:
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 406B done
+#1 WARN: InvalidDefaultArgInFrom: Default value for ARG $BUILD_FROM results in empty or invalid base image name (line 8)
+#1 WARN: UndefinedArgInFrom: FROM argument 'BUILD_FROM' is not declared (line 8)
+#1 DONE 0.0s
+
+ [33m2 warnings found (use docker --debug to expand):
+[0m - InvalidDefaultArgInFrom: Default value for ARG $BUILD_FROM results in empty or invalid base image name (line 8)
+ - UndefinedArgInFrom: FROM argument 'BUILD_FROM' is not declared (line 8)
+Dockerfile:8
+--------------------
+   6 |     
+   7 |     ARG BUILD_FROM
+   8 | >>> FROM $BUILD_FROM
+   9 |     RUN apk add --no-cache tzdata
+  10 |     COPY --from=build /out/xcomfortd-go /usr/local/bin/xcomfortd-go
+--------------------
+ERROR: failed to build: failed to solve: base name ($BUILD_FROM) should not be blank
+
+2025-08-21 10:07:15.293 ERROR (MainThread) [homeassistant.components.hassio] Failed to to call /addons/local_xcomfort_go/install - Docker build failed for local/amd64-addon-xcomfort_go:0.1.0 (exit code 1). Build output:
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 541B done
+#1 WARN: InvalidDefaultArgInFrom: Default value for ARG $BUILD_FROM results in empty or invalid base image name (line 12)
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/golang:1.22-alpine
+#2 ...
+
+#3 [internal] load metadata for ghcr.io/home-assistant/amd64-base:latest
+#3 DONE 0.3s
+
+#2 [internal] load metadata for docker.io/library/golang:1.22-alpine
+#2 DONE 0.5s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 2B done
+#4 DONE 0.0s
+
+#5 [stage-1 1/5] FROM ghcr.io/home-assistant/amd64-base:latest@sha256:4bb7a73f643f07416573cb892396a76e2663bc7ac127d475f1f3a0b950a58e15
+#5 DONE 0.0s
+
+#6 [build 1/4] FROM docker.io/library/golang:1.22-alpine@sha256:1699c10032ca2582ec89a24a1312d986a3f094aed3d5c1147b19880afe40e052
+#6 DONE 0.0s
+
+#7 [build 2/4] RUN apk add --no-cache git
+#7 CACHED
+
+#8 [stage-1 2/5] RUN apk add --no-cache tzdata
+#8 CACHED
+
+#9 [build 3/4] WORKDIR /src
+#9 CACHED
+
+#10 [internal] load build context
+#10 transferring context: 421B done
+#10 DONE 0.1s
+
+#11 [build 4/4] RUN git clone --depth 1 https://github.com/karloygard/xcomfortd-go .  && go build -o /out/xcomfortd-go .
+#11 0.150 Cloning into '.'...
+#11 1.256 go: downloading github.com/eclipse/paho.mqtt.golang v1.5.0
+#11 1.257 go: downloading github.com/google/gousb v1.1.3
+#11 1.257 go: downloading github.com/karalabe/hid v1.0.0
+#11 1.259 go: downloading github.com/pkg/errors v0.9.1
+#11 1.290 go: downloading github.com/urfave/cli/v2 v2.27.5
+#11 1.307 go: downloading golang.org/x/sync v0.10.0
+#11 1.308 go: downloading golang.org/x/text v0.21.0
+#11 1.372 go: downloading github.com/gorilla/websocket v1.5.3
+#11 1.374 go: downloading golang.org/x/net v0.33.0
+#11 4.068 go: downloading github.com/xrash/smetrics v0.0.0-20240521201337-686a1a2994c1
+#11 4.068 go: downloading github.com/cpuguy83/go-md2man/v2 v2.0.6
+#11 4.652 go: downloading github.com/russross/blackfriday/v2 v2.1.0
+#11 9.995 # github.com/google/gousb
+#11 9.995 /go/pkg/mod/github.com/google/gousb@v1.1.3/config.go:40:11: undefined: Milliamperes
+#11 9.995 /go/pkg/mod/github.com/google/gousb@v1.1.3/interface.go:46:8: undefined: Class
+#11 9.995 /go/pkg/mod/github.com/google/gousb@v1.1.3/interface.go:48:11: undefined: Class
+#11 9.995 /go/pkg/mod/github.com/google/gousb@v1.1.3/interface.go:50:11: undefined: Protocol
+#11 9.995 /go/pkg/mod/github.com/google/gousb@v1.1.3/endpoint.go:45:12: undefined: EndpointDirection
+#11 9.995 /go/pkg/mod/github.com/google/gousb@v1.1.3/endpoint.go:49:15: undefined: TransferType
+#11 9.995 /go/pkg/mod/github.com/google/gousb@v1.1.3/endpoint.go:55:14: undefined: IsoSyncType
+#11 9.995 /go/pkg/mod/github.com/google/gousb@v1.1.3/endpoint.go:57:12: undefined: UsageType
+#11 9.995 /go/pkg/mod/github.com/google/gousb@v1.1.3/device.go:94:10: undefined: libusbDevHandle
+#11 9.995 /go/pkg/mod/github.com/google/gousb@v1.1.3/usb.go:135:10: undefined: libusbContext
+#11 9.995 /go/pkg/mod/github.com/google/gousb@v1.1.3/usb.go:135:10: too many errors
+#11 ERROR: process "/bin/sh -c git clone --depth 1 https://github.com/karloygard/xcomfortd-go .  && go build -o /out/xcomfortd-go ." did not complete successfully: exit code: 1
+------
+ > [build 4/4] RUN git clone --depth 1 https://github.com/karloygard/xcomfortd-go .  && go build -o /out/xcomfortd-go .:
+9.995 /go/pkg/mod/github.com/google/gousb@v1.1.3/interface.go:46:8: undefined: Class
+9.995 /go/pkg/mod/github.com/google/gousb@v1.1.3/interface.go:48:11: undefined: Class
+9.995 /go/pkg/mod/github.com/google/gousb@v1.1.3/interface.go:50:11: undefined: Protocol
+9.995 /go/pkg/mod/github.com/google/gousb@v1.1.3/endpoint.go:45:12: undefined: EndpointDirection
+9.995 /go/pkg/mod/github.com/google/gousb@v1.1.3/endpoint.go:49:15: undefined: TransferType
+9.995 /go/pkg/mod/github.com/google/gousb@v1.1.3/endpoint.go:55:14: undefined: IsoSyncType
+9.995 /go/pkg/mod/github.com/google/gousb@v1.1.3/endpoint.go:57:12: undefined: UsageType
+9.995 /go/pkg/mod/github.com/google/gousb@v1.1.3/device.go:94:10: undefined: libusbDevHandle
+9.995 /go/pkg/mod/github.com/google/gousb@v1.1.3/usb.go:135:10: undefined: libusbContext
+9.995 /go/pkg/mod/github.com/google/gousb@v1.1.3/usb.go:135:10: too many errors
+------
+
+ [33m1 warning found (use docker --debug to expand):
+[0m - InvalidDefaultArgInFrom: Default value for ARG $BUILD_FROM results in empty or invalid base image name (line 12)
+Dockerfile:8
+--------------------
+   7 |     WORKDIR /src
+   8 | >>> RUN git clone --depth 1 https://github.com/karloygard/xcomfortd-go . \
+   9 | >>>  && go build -o /out/xcomfortd-go .
+  10 |     
+--------------------
+ERROR: failed to build: failed to solve: process "/bin/sh -c git clone --depth 1 https://github.com/karloygard/xcomfortd-go .  && go build -o /out/xcomfortd-go ." did not complete successfully: exit code: 1
+
+2025-08-21 10:13:03.535 ERROR (MainThread) [homeassistant.components.hassio] Failed to to call /addons/local_xcomfort_go/install - Docker build failed for local/amd64-addon-xcomfort_go:0.1.0 (exit code 1). Build output:
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 668B done
+#1 WARN: InvalidDefaultArgInFrom: Default value for ARG $BUILD_FROM results in empty or invalid base image name (line 13)
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/golang:1.22-alpine
+#2 DONE 0.4s
+
+#3 [internal] load metadata for ghcr.io/home-assistant/amd64-base:latest
+#3 DONE 0.5s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 2B done
+#4 DONE 0.0s
+
+#5 [stage-1 1/5] FROM ghcr.io/home-assistant/amd64-base:latest@sha256:4bb7a73f643f07416573cb892396a76e2663bc7ac127d475f1f3a0b950a58e15
+#5 DONE 0.0s
+
+#6 [build 1/5] FROM docker.io/library/golang:1.22-alpine@sha256:1699c10032ca2582ec89a24a1312d986a3f094aed3d5c1147b19880afe40e052
+#6 DONE 0.0s
+
+#7 [stage-1 2/5] RUN apk add --no-cache tzdata libusb eudev-libs
+#7 CACHED
+
+#8 [build 3/5] WORKDIR /src
+#8 CACHED
+
+#9 [build 2/5] RUN apk add --no-cache git libusb-dev eudev-dev pkgconfig build-base
+#9 CACHED
+
+#10 [build 4/5] RUN git clone --depth 1 https://github.com/karloygard/xcomfortd-go .
+#10 CACHED
+
+#11 [internal] load build context
+#11 transferring context: 421B done
+#11 DONE 0.0s
+
+#12 [build 5/5] RUN go build -ldflags="-w -s" -o /out/xcomfortd-go .
+#12 0.613 go: downloading github.com/eclipse/paho.mqtt.golang v1.5.0
+#12 0.613 go: downloading github.com/google/gousb v1.1.3
+#12 0.613 go: downloading github.com/karalabe/hid v1.0.0
+#12 0.615 go: downloading github.com/pkg/errors v0.9.1
+#12 0.616 go: downloading github.com/urfave/cli/v2 v2.27.5
+#12 0.635 go: downloading golang.org/x/sync v0.10.0
+#12 0.635 go: downloading golang.org/x/text v0.21.0
+#12 0.876 go: downloading golang.org/x/net v0.33.0
+#12 0.876 go: downloading github.com/gorilla/websocket v1.5.3
+#12 3.368 go: downloading github.com/cpuguy83/go-md2man/v2 v2.0.6
+#12 3.369 go: downloading github.com/xrash/smetrics v0.0.0-20240521201337-686a1a2994c1
+#12 3.825 go: downloading github.com/russross/blackfriday/v2 v2.1.0
+#12 9.383 # github.com/karalabe/hid
+#12 9.383 In file included from /go/pkg/mod/github.com/karalabe/hid@v1.0.0/libusb/libusb/os/linux_usbfs.c:43,
+#12 9.383                  from /go/pkg/mod/github.com/karalabe/hid@v1.0.0/hid_enabled.go:26:
+#12 9.383 /go/pkg/mod/github.com/karalabe/hid@v1.0.0/libusb/libusb/os/linux_usbfs.h:24:10: fatal error: linux/types.h: No such file or directory
+#12 9.383    24 | #include <linux/types.h>
+#12 9.383       |          ^~~~~~~~~~~~~~~
+#12 9.383 compilation terminated.
+#12 ERROR: process "/bin/sh -c go build -ldflags=\"-w -s\" -o /out/xcomfortd-go ." did not complete successfully: exit code: 1
+------
+ > [build 5/5] RUN go build -ldflags="-w -s" -o /out/xcomfortd-go .:
+3.368 go: downloading github.com/cpuguy83/go-md2man/v2 v2.0.6
+3.369 go: downloading github.com/xrash/smetrics v0.0.0-20240521201337-686a1a2994c1
+3.825 go: downloading github.com/russross/blackfriday/v2 v2.1.0
+9.383 # github.com/karalabe/hid
+9.383 In file included from /go/pkg/mod/github.com/karalabe/hid@v1.0.0/libusb/libusb/os/linux_usbfs.c:43,
+9.383                  from /go/pkg/mod/github.com/karalabe/hid@v1.0.0/hid_enabled.go:26:
+9.383 /go/pkg/mod/github.com/karalabe/hid@v1.0.0/libusb/libusb/os/linux_usbfs.h:24:10: fatal error: linux/types.h: No such file or directory
+9.383    24 | #include <linux/types.h>
+9.383       |          ^~~~~~~~~~~~~~~
+9.383 compilation terminated.
+------
+
+ [33m1 warning found (use docker --debug to expand):
+[0m - InvalidDefaultArgInFrom: Default value for ARG $BUILD_FROM results in empty or invalid base image name (line 13)
+Dockerfile:10
+--------------------
+   8 |     WORKDIR /src
+   9 |     RUN git clone --depth 1 https://github.com/karloygard/xcomfortd-go .
+  10 | >>> RUN go build -ldflags="-w -s" -o /out/xcomfortd-go .
+  11 |     
+  12 |     # Stage 2: runtime basert på HA-base
+--------------------
+ERROR: failed to build: failed to solve: process "/bin/sh -c go build -ldflags=\"-w -s\" -o /out/xcomfortd-go ." did not complete successfully: exit code: 1
+
+2025-08-21 10:26:10.793 ERROR (MainThread) [homeassistant.components.hassio] Failed to to call /addons/local_xcomfort_go/rebuild - Version changed, use Update instead Rebuild
+2025-08-21 10:26:17.862 ERROR (MainThread) [homeassistant.components.hassio] Failed to to call /addons/local_xcomfort_go/rebuild - Version changed, use Update instead Rebuild
+2025-08-21 11:43:24.277 ERROR (MainThread) [homeassistant.components.hassio] Failed to to call /ingress/validate_session - System is not ready with state: setup
+2025-08-21 11:43:24.286 ERROR (MainThread) [homeassistant.components.hassio] Failed to to call /ingress/session - System is not ready with state: setup
+2025-08-21 11:45:04.363 ERROR (MainThread) [homeassistant.components.hassio] Failed to to call /addons/local_xcomfort_go/options/validate - Addon local_xcomfort_go does not exist
+2025-08-21 11:45:10.236 ERROR (MainThread) [homeassistant.components.hassio] Failed to to call /store/addons/local_xcomfort_go - Addon local_xcomfort_go does not exist
+2025-08-21 11:52:06.887 ERROR (MainThread) [homeassistant.components.hassio.http] Client error on api addons/local_xcomfort_go2/logs/follow request Cannot connect to host 172.30.32.2:80 ssl:default [Connect call failed ('172.30.32.2', 80)]
+2025-08-21 12:17:15.172 ERROR (MainThread) [homeassistant.components.hassio.http] Client error on api addons/local_xcomfort_go2/logs/follow request Cannot connect to host 172.30.32.2:80 ssl:default [Connect call failed ('172.30.32.2', 80)]
+2025-08-21 12:35:54.208 ERROR (MainThread) [homeassistant.components.hassio.http] Client error on api addons/local_xcomfort_go2/logs/follow request Cannot connect to host 172.30.32.2:80 ssl:default [Connect call failed ('172.30.32.2', 80)]
+2025-08-21 12:35:57.006 WARNING (SyncWorker_5) [verisure] Unexpected error on 'https://automation02.verisure.com/auth/token' (ex=ConnectionError(MaxRetryError("HTTPSConnectionPool(host='automation02.verisure.com', port=443): Max retries exceeded with url: /auth/token (Caused by NewConnectionError('<urllib3.connection.HTTPSConnection object at 0x7fc7f46bc550>: Failed to establish a new connection: [Errno 101] Network unreachable'))")))
+2025-08-21 12:56:53.697 ERROR (MainThread) [homeassistant.components.hassio.http] Client error on api addons/local_xcomfort_go2/logs/follow request Response payload is not completed: <TransferEncodingError: 400, message='Not enough data to satisfy transfer length header.'>
+2025-08-21 12:56:53.764 ERROR (MainThread) [homeassistant.components.hassio.http] Client error on api addons/local_xcomfort_go2/logs/follow request Cannot connect to host 172.30.32.2:80 ssl:default [Connect call failed ('172.30.32.2', 80)]
+2025-08-21 12:57:23.284 ERROR (MainThread) [homeassistant.components.hassio.handler] Client error on /ingress/validate_session request Cannot connect to host 172.30.32.2:80 ssl:default [Connect call failed ('172.30.32.2', 80)]
+2025-08-21 12:57:23.284 ERROR (MainThread) [homeassistant.components.hassio] Failed to to call /ingress/validate_session - 
+2025-08-21 12:57:23.445 ERROR (MainThread) [homeassistant.components.hassio.handler] Client error on /ingress/session request Cannot connect to host 172.30.32.2:80 ssl:default [Connect call failed ('172.30.32.2', 80)]
+2025-08-21 12:57:23.445 ERROR (MainThread) [homeassistant.components.hassio] Failed to to call /ingress/session - 
+2025-08-21 12:57:38.141 ERROR (MainThread) [homeassistant.components.hassio.http] Client error on api app/entrypoint.js request Cannot connect to host 172.30.32.2:80 ssl:default [Connect call failed ('172.30.32.2', 80)]
+2025-08-21 12:57:42.111 ERROR (MainThread) [homeassistant.components.hassio.http] Client error on api app/entrypoint.js request Cannot connect to host 172.30.32.2:80 ssl:default [Connect call failed ('172.30.32.2', 80)]
+2025-08-21 12:57:44.969 ERROR (MainThread) [homeassistant.components.hassio.http] Client error on api app/entrypoint.js request Cannot connect to host 172.30.32.2:80 ssl:default [Connect call failed ('172.30.32.2', 80)]
+2025-08-21 12:57:53.467 ERROR (MainThread) [homeassistant.components.hassio.http] Client error on api app/entrypoint.js request Cannot connect to host 172.30.32.2:80 ssl:default [Connect call failed ('172.30.32.2', 80)]
+2025-08-21 12:57:55.141 ERROR (MainThread) [homeassistant.components.hassio.http] Client error on api app/entrypoint.js request Cannot connect to host 172.30.32.2:80 ssl:default [Connect call failed ('172.30.32.2', 80)]
+2025-08-21 12:57:57.293 ERROR (MainThread) [homeassistant.components.hassio.http] Client error on api addons/core_samba/icon request Cannot connect to host 172.30.32.2:80 ssl:default [Connect call failed ('172.30.32.2', 80)]
+2025-08-21 12:57:57.299 ERROR (MainThread) [homeassistant.components.hassio.http] Client error on api addons/45df7312_zigbee2mqtt/icon request Cannot connect to host 172.30.32.2:80 ssl:default [Connect call failed ('172.30.32.2', 80)]
+2025-08-21 12:57:57.301 ERROR (MainThread) [homeassistant.components.hassio.http] Client error on api addons/cb646a50_get/icon request Cannot connect to host 172.30.32.2:80 ssl:default [Connect call failed ('172.30.32.2', 80)]
+2025-08-21 12:57:57.303 ERROR (MainThread) [homeassistant.components.hassio.http] Client error on api addons/a0d7b954_ssh/icon request Cannot connect to host 172.30.32.2:80 ssl:default [Connect call failed ('172.30.32.2', 80)]
+2025-08-21 12:57:57.304 ERROR (MainThread) [homeassistant.components.hassio.http] Client error on api addons/core_ssh/icon request Cannot connect to host 172.30.32.2:80 ssl:default [Connect call failed ('172.30.32.2', 80)]
+2025-08-21 12:57:57.309 ERROR (MainThread) [homeassistant.components.hassio.http] Client error on api addons/core_mosquitto/icon request Cannot connect to host 172.30.32.2:80 ssl:default [Connect call failed ('172.30.32.2', 80)]
+2025-08-21 12:57:58.048 ERROR (MainThread) [homeassistant.components.hassio.http] Client error on api app/entrypoint.js request Cannot connect to host 172.30.32.2:80 ssl:default [Connect call failed ('172.30.32.2', 80)]
+2025-08-21 12:58:02.838 ERROR (MainThread) [homeassistant.components.hassio.handler] Client error on /backups request Cannot connect to host 172.30.32.2:80 ssl:default [Connect call failed ('172.30.32.2', 80)]
+2025-08-21 12:58:02.838 ERROR (MainThread) [homeassistant.components.hassio] Failed to to call /backups - 
+2025-08-21 12:58:02.838 ERROR (MainThread) [homeassistant.components.hassio.handler] Client error on /host/info request Cannot connect to host 172.30.32.2:80 ssl:default [Connect call failed ('172.30.32.2', 80)]
+2025-08-21 12:58:02.838 ERROR (MainThread) [homeassistant.components.hassio] Failed to to call /host/info - 
+2025-08-21 12:58:06.291 ERROR (MainThread) [homeassistant.components.hassio.handler] Client error on /host/info request Cannot connect to host 172.30.32.2:80 ssl:default [Connect call failed ('172.30.32.2', 80)]
+2025-08-21 12:58:06.292 ERROR (MainThread) [homeassistant.components.hassio] Failed to to call /host/info - 
+2025-08-21 12:58:10.491 ERROR (MainThread) [homeassistant.components.backup] Unexpected error for hassio.local: Error occurred connecting to supervisor
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.13/site-packages/aiohttp/connector.py", line 1268, in _wrap_create_connection
+    sock = await aiohappyeyeballs.start_connection(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/usr/local/lib/python3.13/site-packages/aiohappyeyeballs/impl.py", line 122, in start_connection
+    raise first_exception
+  File "/usr/local/lib/python3.13/site-packages/aiohappyeyeballs/impl.py", line 73, in start_connection
+    sock = await _connect_sock(
+           ^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/usr/local/lib/python3.13/site-packages/aiohappyeyeballs/impl.py", line 208, in _connect_sock
+    await loop.sock_connect(sock, address)
+  File "/usr/local/lib/python3.13/asyncio/selector_events.py", line 641, in sock_connect
+    return await fut
+           ^^^^^^^^^
+  File "/usr/local/lib/python3.13/asyncio/selector_events.py", line 681, in _sock_connect_cb
+    raise OSError(err, f'Connect call failed {address}')
+ConnectionRefusedError: [Errno 111] Connect call failed ('172.30.32.2', 80)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.13/site-packages/aiohasupervisor/client.py", line 120, in _request
+    response = await self.session.request(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "/usr/local/lib/python3.13/site-packages/aiohttp/client.py", line 770, in _request
+    resp = await handler(req)
+           ^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.13/site-packages/aiohttp/client.py", line 725, in _connect_and_send_request
+    conn = await self._connector.connect(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        req, traces=traces, timeout=real_timeout
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/usr/local/lib/python3.13/site-packages/aiohttp/connector.py", line 642, in connect
+    proto = await self._create_connection(req, traces, timeout)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.13/site-packages/aiohttp/connector.py", line 1209, in _create_connection
+    _, proto = await self._create_direct_connection(req, traces, timeout)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.13/site-packages/aiohttp/connector.py", line 1581, in _create_direct_connection
+    raise last_exc
+  File "/usr/local/lib/python3.13/site-packages/aiohttp/connector.py", line 1550, in _create_direct_connection
+    transp, proto = await self._wrap_create_connection(
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "/usr/local/lib/python3.13/site-packages/aiohttp/connector.py", line 1291, in _wrap_create_connection
+    raise client_error(req.connection_key, exc) from exc
+aiohttp.client_exceptions.ClientConnectorError: Cannot connect to host 172.30.32.2:80 ssl:default [Connect call failed ('172.30.32.2', 80)]
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/src/homeassistant/homeassistant/components/hassio/backup.py", line 212, in async_list_backups
+    backup_list = await self._client.backups.list()
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.13/site-packages/aiohasupervisor/backups.py", line 35, in list
+    result = await self._client.get("backups")
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.13/site-packages/aiohasupervisor/client.py", line 163, in get
+    return await self._request(
+           ^^^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+    )
+    ^
+  File "/usr/local/lib/python3.13/site-packages/aiohasupervisor/client.py", line 150, in _request
+    raise SupervisorConnectionError(
+        "Error occurred connecting to supervisor",
+    ) from err
+aiohasupervisor.exceptions.SupervisorConnectionError: Error occurred connecting to supervisor
+2025-08-21 12:58:12.078 ERROR (MainThread) [homeassistant.components.websocket_api.http.connection] [140495992581440] Unexpected exception
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.13/site-packages/aiohttp/connector.py", line 1268, in _wrap_create_connection
+    sock = await aiohappyeyeballs.start_connection(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/usr/local/lib/python3.13/site-packages/aiohappyeyeballs/impl.py", line 122, in start_connection
+    raise first_exception
+  File "/usr/local/lib/python3.13/site-packages/aiohappyeyeballs/impl.py", line 73, in start_connection
+    sock = await _connect_sock(
+           ^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/usr/local/lib/python3.13/site-packages/aiohappyeyeballs/impl.py", line 208, in _connect_sock
+    await loop.sock_connect(sock, address)
+  File "/usr/local/lib/python3.13/asyncio/selector_events.py", line 641, in sock_connect
+    return await fut
+           ^^^^^^^^^
+  File "/usr/local/lib/python3.13/asyncio/selector_events.py", line 681, in _sock_connect_cb
+    raise OSError(err, f'Connect call failed {address}')
+ConnectionRefusedError: [Errno 111] Connect call failed ('172.30.32.2', 80)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.13/site-packages/aiohasupervisor/client.py", line 120, in _request
+    response = await self.session.request(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "/usr/local/lib/python3.13/site-packages/aiohttp/client.py", line 770, in _request
+    resp = await handler(req)
+           ^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.13/site-packages/aiohttp/client.py", line 725, in _connect_and_send_request
+    conn = await self._connector.connect(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        req, traces=traces, timeout=real_timeout
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/usr/local/lib/python3.13/site-packages/aiohttp/connector.py", line 642, in connect
+    proto = await self._create_connection(req, traces, timeout)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.13/site-packages/aiohttp/connector.py", line 1209, in _create_connection
+    _, proto = await self._create_direct_connection(req, traces, timeout)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.13/site-packages/aiohttp/connector.py", line 1581, in _create_direct_connection
+    raise last_exc
+  File "/usr/local/lib/python3.13/site-packages/aiohttp/connector.py", line 1550, in _create_direct_connection
+    transp, proto = await self._wrap_create_connection(
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "/usr/local/lib/python3.13/site-packages/aiohttp/connector.py", line 1291, in _wrap_create_connection
+    raise client_error(req.connection_key, exc) from exc
+aiohttp.client_exceptions.ClientConnectorError: Cannot connect to host 172.30.32.2:80 ssl:default [Connect call failed ('172.30.32.2', 80)]
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/src/homeassistant/homeassistant/components/websocket_api/commands.py", line 264, in handle_call_service
+    response = await hass.services.async_call(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "/usr/src/homeassistant/homeassistant/core.py", line 2835, in async_call
+    response_data = await coro
+                    ^^^^^^^^^^
+  File "/usr/src/homeassistant/homeassistant/core.py", line 2878, in _execute_service
+    return await target(service_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/src/homeassistant/homeassistant/helpers/service.py", line 959, in _async_admin_handler
+    return await task
+           ^^^^^^^^^^
+  File "/usr/src/homeassistant/homeassistant/components/homeassistant/__init__.py", line 238, in async_handle_core_service
+    await stop_handler(hass, True)
+  File "/usr/src/homeassistant/homeassistant/components/hassio/__init__.py", line 492, in _async_stop
+    await supervisor_client.homeassistant.restart()
+  File "/usr/local/lib/python3.13/site-packages/aiohasupervisor/homeassistant.py", line 40, in restart
+    await self._client.post(
+        "core/restart", json=options.to_dict() if options else None
+    )
+  File "/usr/local/lib/python3.13/site-packages/aiohasupervisor/client.py", line 182, in post
+    return await self._request(
+           ^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "/usr/local/lib/python3.13/site-packages/aiohasupervisor/client.py", line 150, in _request
+    raise SupervisorConnectionError(
+        "Error occurred connecting to supervisor",
+    ) from err
+aiohasupervisor.exceptions.SupervisorConnectionError: Error occurred connecting to supervisor
+2025-08-21 12:58:16.041 ERROR (MainThread) [async_upnp_client.ssdp] Received error: [Errno 101] Network unreachable, transport: <_SelectorDatagramTransport fd=66 read=polling write=<idle, bufsize=0>>, socket: <asyncio.TransportSocket fd=66, family=2, type=2, proto=0, laddr=('0.0.0.0', 49117)>
+2025-08-21 12:58:16.042 ERROR (MainThread) [async_upnp_client.ssdp] Received error: [Errno 101] Network unreachable, transport: <_SelectorDatagramTransport fd=68 read=polling write=<idle, bufsize=0>>, socket: <asyncio.TransportSocket fd=68, family=10, type=2, proto=0, laddr=('::', 41202, 0, 0)>

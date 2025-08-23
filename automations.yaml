@@ -1,0 +1,49 @@
+- id: '1755095587104'
+  alias: Skru på lys i bod
+  description: ''
+  triggers:
+  - entity_id:
+    - binary_sensor.bod_dor_apning
+    to: 'on'
+    trigger: state
+  actions:
+  - target:
+      entity_id:
+      - light.testlys
+      - light.stue
+    action: light.turn_on
+    data: {}
+  - delay: 00:05:00
+  - target:
+      entity_id:
+      - light.testlys
+      - light.stue
+    action: light.turn_off
+    data: {}
+  mode: restart
+- id: '1755096364674'
+  alias: Alarm påskrudd - skru av alt lys
+  description: ''
+  triggers:
+  - device_id: 2cc859fc07f9ebc270774f733eb0ac5e
+    domain: alarm_control_panel
+    entity_id: 67d4879e58839cbc3062e2d548e9b112
+    type: armed_away
+    trigger: device
+  conditions: []
+  actions:
+  - action: light.turn_off
+    metadata: {}
+    data: {}
+  mode: single
+- id: '1755152263990'
+  alias: Low battery level detection & notification for all battery sensors
+  description: ''
+  use_blueprint:
+    path: sbyx/low-battery-level-detection-notification-for-all-battery-sensors.yaml
+    input:
+      actions:
+      - action: notify.send_message
+        metadata: {}
+        data: {}
+      threshold: 90

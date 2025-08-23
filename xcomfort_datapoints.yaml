@@ -1,0 +1,45 @@
+datapoints:
+  - id: 8389929   # Trykknapp
+    name: "Bryter Stue 1"
+  - id: 8401710   # Dimmeaktuator
+    name: "Dimmer stue 1"
+  - id: 8389834   # Trykknapp
+    name: "Bryter gang 1"
+  - id: 8389970   # Trykknapp
+    name: "Bryter gang 2"
+  - id: 8227752   # Dobbel trykknapp
+    name: "Bryter bad lys"
+  - id: 8389931   # Trykknapp
+    name: "Bryter bad vifte"
+  - id: 8403012   # Dimmeaktuator
+    name: "Dimmer kjøkken 1"
+  - id: 8402575   # Dimmeaktuator
+    name: "Dimmer gang 2"
+  - id: 8402717   # Dimmeaktuator
+    name: "Dimmer vindfang"
+  - id: 8403148   # Dimmeaktuator
+    name: "Dimmer vaskerom"
+  - id: 8402588   # Dimmeaktuator
+    name: "Dimmer gang 1"
+  - id: 8401806   # Dimmeaktuator
+    name: "Dimmer soverom 2"
+  - id: 8401713   # Dimmeaktuator
+    name: "Dimmer bad spot"
+  - id: 8401772   # Dimmeaktuator
+    name: "Dimmer soverom 3"
+  - id: 8402581   # Dimmeaktuator
+    name: "Dimmer bad speil"
+  - id: 8018165   # Dimmeaktuator
+    name: "Dimmer bod"
+  - id: 8402721   # Dimmeaktuator
+    name: "Dimmer spisestue 2"
+  - id: 8402593   # Dimmeaktuator
+    name: "Dimmer soverom 1"
+  - id: 8423529   # Sjalteaktuator
+    name: "Rele vifte"
+  - id: 8250804   # Dobbel trykknapp
+    name: "Bryter spisestue"
+  - id: 8389854   # Trykknapp
+    name: "Bryter kjøkken"
+  - id: 8389947   # Try
+

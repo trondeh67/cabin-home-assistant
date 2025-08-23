@@ -1,0 +1,29 @@
+# HA runtime
+.homekit.state
+.storage/
+deps/
+home-assistant_v2.db*
+*.log
+*.db-shm
+*.db-wal
+.cloud/
+.cloudbackup/
+.media/
+tmp/
+tts/
+.custom_components/__pycache__/
+__pycache__/
+
+# Secrets
+secrets.yaml
+*.key
+*.pem
+
+# Backups / uploads
+backup/
+uploads/
+
+# OS/Editor
+.DS_Store
+.vscode/
+.idea/
