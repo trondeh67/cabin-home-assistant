@@ -1,0 +1,2 @@
+#!/bin/sh
+exec /bin/busybox sh -c 'echo "[xcomfort] CLEAN minimal run"; sleep 3600'

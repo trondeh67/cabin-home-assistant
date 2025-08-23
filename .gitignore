@@ -27,3 +27,19 @@ uploads/
 .DS_Store
 .vscode/
 .idea/
+
+# HA add-on exports (beholdes i Git)
+# (la denne MAPPEN bli med i Git – den er ment å trackes)
+# Ingen ignore på addons_state/ – den SKAL med!
+
+# Kilde for lokale add-ons (kopi for Git)
+# Denne MAPPEN skal med i Git (ikke ignore)
+# addons_local/
+
+# HA add-on exports (beholdes i Git)
+# (la denne MAPPEN bli med i Git – den er ment å trackes)
+# Ingen ignore på addons_state/ – den SKAL med!
+
+# Kilde for lokale add-ons (kopi for Git)
+# Denne MAPPEN skal med i Git (ikke ignore)
+# addons_local/
