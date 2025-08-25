@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-08-23T21:20:35+02:00",
+  "timestamp": "2025-08-25T12:18:47+02:00",
   "addons": {
     "addons": [
       {
@@ -144,17 +144,17 @@
       },
       {
         "name": "XComfort HID to MQTT (Go)",
-        "slug": "local_xcomfort_go2",
+        "slug": "local_xcomfort_go",
         "description": "Eaton xComfort CKOZ-00/14 (HID) to MQTT via xcomfortd-go with HA discovery.",
         "advanced": false,
         "stage": "stable",
-        "version": "0.2.15",
-        "version_latest": "0.2.16",
-        "update_available": true,
+        "version": "0.1.20",
+        "version_latest": "0.1.20",
+        "update_available": false,
         "available": true,
         "detached": false,
         "homeassistant": null,
-        "state": "error",
+        "state": "started",
         "repository": "local",
         "build": true,
         "url": null,

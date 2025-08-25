@@ -1,2 +1,0 @@
-#!/bin/sh
-exec /bin/busybox sh -c 'echo "[xcomfort] minimal legacy run"; sleep 3600'

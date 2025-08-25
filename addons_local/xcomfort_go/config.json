@@ -1,7 +1,7 @@
 {
   "name": "XComfort HID to MQTT (Go)",
-  "slug": "xcomfort_go2",
-  "version": "0.2.16",
+  "slug": "xcomfort_go",
+  "version": "0.1.20",
   "description": "Eaton xComfort CKOZ-00/14 (HID) to MQTT via xcomfortd-go with HA discovery.",
   "arch": [
     "amd64",
