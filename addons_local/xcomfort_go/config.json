@@ -1,7 +1,7 @@
 {
   "name": "XComfort HID to MQTT (Go)",
   "slug": "xcomfort_go",
-  "version": "0.1.20",
+  "version": "0.1.21",
   "description": "Eaton xComfort CKOZ-00/14 (HID) to MQTT via xcomfortd-go with HA discovery.",
   "arch": [
     "amd64",
@@ -18,13 +18,11 @@
   "options": {
     "mqtt_url": "tcp://mqtt:mqtt_pwd@core-mosquitto:1883",
     "log_level": "info",
-    "extra_args": "",
-    "datapoint_file": "/config/xcomfort.dpl"
+    "extra_args": ""
   },
   "schema": {
     "mqtt_url": "str",
     "log_level": "list(info|debug|warn|error)",
-    "extra_args": "str?",
-    "datapoint_file": "str?"
+    "extra_args": "str?"
   }
 }
