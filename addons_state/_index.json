@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-09-03T16:14:25+02:00",
+  "timestamp": "2025-09-10T09:36:10+02:00",
   "addons": {
     "addons": [
       {
@@ -8,8 +8,8 @@
         "description": "An Open Source MQTT broker",
         "advanced": false,
         "stage": "stable",
-        "version": "6.5.1",
-        "version_latest": "6.5.1",
+        "version": "6.5.2",
+        "version_latest": "6.5.2",
         "update_available": false,
         "available": true,
         "detached": false,
@@ -48,8 +48,8 @@
         "description": "A supercharged SSH & Web Terminal access to your Home Assistant instance",
         "advanced": false,
         "stage": "stable",
-        "version": "21.0.2",
-        "version_latest": "21.0.2",
+        "version": "21.0.3",
+        "version_latest": "21.0.3",
         "update_available": false,
         "available": true,
         "detached": false,
@@ -168,8 +168,8 @@
         "description": "Zero config VPN for building secure networks",
         "advanced": false,
         "stage": "stable",
-        "version": "0.25.0",
-        "version_latest": "0.25.0",
+        "version": "0.26.0",
+        "version_latest": "0.26.0",
         "update_available": false,
         "available": true,
         "detached": false,
