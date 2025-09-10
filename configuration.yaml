@@ -1,6 +1,13 @@
-
 # Loads default set of integrations. Do not remove.
 default_config:
+
+lovelace:
+  mode: storage
+  dashboards:
+    tjukktommern-dashboard:
+      mode: yaml
+      filename: lovelace/hytte/tjukktommern.yaml
+      title: Tjukktømmern
 
 # Load frontend themes from the themes folder
 frontend:
@@ -9,3 +16,108 @@ frontend:
 automation: !include automations.yaml
 script: !include scripts.yaml
 scene: !include scenes.yaml
+
+logger:
+  default: warning
+  logs:
+    homeassistant.components.google_assistant_sdk: debug
+    homeassistant.components.application_credentials: debug
+    aiohttp.client: debug
+
+http:
+  use_x_forwarded_for: true
+  trusted_proxies:
+    - 127.0.0.1
+
+# ... alt over her beholdes som hos deg ...
+
+template:
+  # --- Systemversjoner ---
+  - sensor:
+      - name: "HA Core versjon"
+        unique_id: ha_core_version
+        icon: mdi:home-assistant
+        state: >
+          {{ state_attr('update.home_assistant_core_update', 'installed_version') or 'ukjent' }}
+
+      - name: "HA Supervisor versjon"
+        unique_id: ha_supervisor_version
+        icon: mdi:server
+        state: >
+          {{ state_attr('update.home_assistant_supervisor_update', 'installed_version') or 'ukjent' }}
+
+      - name: "HA OS versjon"
+        unique_id: ha_os_version
+        icon: mdi:chip
+        state: >
+          {{ state_attr('update.home_assistant_operating_system_update', 'installed_version') or 'ukjent' }}
+
+  # --- Uptime i dager ---
+  - sensor:
+      - name: "HA Uptime (dager)"
+        state: >
+          {% set t = states('sensor.ha_uptime') | float(0) %}
+          {{ (t / 24) | round(1) }} d
+
+  # --- Korrigerte kilder ---
+  - sensor:
+      - name: "Ute Netatmo (korr)"
+        unique_id: ute_netatmo_corr
+        unit_of_measurement: "°C"
+        device_class: temperature
+        state: >
+          {% set v = states('sensor.tjukktommern_inne_tjukktommern_ute_temperatur')|float(default=nan) %}
+          {% set off = states('input_number.ute_offset_netatmo')|float(0) %}
+          {{ (v + off) if v == v else 'unknown' }}
+
+      - name: "Ute Daikin (korr)"
+        unique_id: ute_daikin_corr
+        unit_of_measurement: "°C"
+        device_class: temperature
+        state: >
+          {% set v = states('sensor.daikinap86694_climatecontrol_outdoor_temperature')|float(default=nan) %}
+          {% set off = states('input_number.ute_offset_daikin')|float(0) %}
+          {{ (v + off) if v == v else 'unknown' }}
+
+  # --- Virtuell ute med heartbeat (trigger-basert template) ---
+  - trigger:
+      - platform: time_pattern
+        minutes: "/10"
+      - platform: state
+        entity_id:
+          - sensor.ute_netatmo_korr
+          - sensor.ute_daikin_korr
+    sensor:
+      - name: "Ute temperatur (virtuell)"
+        unique_id: ute_temp_virtual
+        unit_of_measurement: "°C"
+        device_class: temperature
+        availability: >
+          {{ has_value('sensor.ute_netatmo_korr') or has_value('sensor.ute_daikin_korr') }}
+        state: >
+          {% set n = states('sensor.ute_netatmo_korr')|float(default=nan) %}
+          {% set d = states('sensor.ute_daikin_korr')|float(default=nan) %}
+
+          {% set n_age = (now() - states.sensor.ute_netatmo_korr.last_changed).total_seconds()
+                          if states.sensor.ute_netatmo_korr is not none else 999999 %}
+          {% set d_age = (now() - states.sensor.ute_daikin_korr.last_changed).total_seconds()
+                          if states.sensor.ute_daikin_korr is not none else 999999 %}
+          {% set fresh_n = (n == n) and (n_age < 1800) %}
+          {% set fresh_d = (d == d) and (d_age < 1800) %}
+
+          {% if fresh_n and fresh_d %}
+            {% set diff = (n - d) | abs %}
+            {% set t1 = 1.2 %}
+            {% set t2 = 1.8 %}
+            {% set avg = (n + d) / 2 %}
+            {% set mn  = [n, d] | min %}
+            {% set w = ((diff - t1) / (t2 - t1)) %}
+            {% set w = 0 if w < 0 else (1 if w > 1 else w) %}
+            {{ ((1 - w) * avg + w * mn) | round(1) }}
+          {% elif fresh_n %}
+            {{ n | round(1) }}
+          {% elif fresh_d %}
+            {{ d | round(1) }}
+          {% else %}
+            unknown
+          {% endif %}

@@ -5,20 +5,84 @@ mqtt:
   user: mqtt
   password: mqtt_pwd
 serial:
-  port: >-
-    /dev/serial/by-id/usb-Itead_Sonoff_Zigbee_3.0_USB_Dongle_Plus_V2_7c0f6149cb49ef119229c98cff00cc63-if00-port0
-  adapter: ezsp
+  rtscts: false
+  port: /dev/ttyUSB0
+  adapter: ember
   baudrate: 115200
-  rtscts: true
 advanced:
-  log_level: info
+  log_level: debug
   channel: 11
-  network_key: GENERATE
-  pan_id: GENERATE
-  ext_pan_id: GENERATE
+  network_key:
+    - 85
+    - 86
+    - 23
+    - 193
+    - 198
+    - 48
+    - 224
+    - 37
+    - 199
+    - 227
+    - 70
+    - 103
+    - 178
+    - 57
+    - 126
+    - 110
+  pan_id: 54910
+  ext_pan_id:
+    - 83
+    - 243
+    - 231
+    - 54
+    - 35
+    - 128
+    - 55
+    - 2
 frontend:
   enabled: true
   port: 8099
 homeassistant:
   enabled: true
-onboarding: true
+groups:
+  '0':
+    friendly_name: Kjøkken_lys
+  '1':
+    friendly_name: Kjøkken_overskap
+  '2':
+    friendly_name: Stue
+  '3':
+    friendly_name: Stue 5x spott
+devices:
+  '0x8c8b48fffe4cc35a':
+    friendly_name: kjøkken_overskap_venstre
+  '0xb43522fffe7de134':
+    friendly_name: kjøkken_overskap_høyre
+  '0x6cfd22fffe7c2554':
+    friendly_name: stue_led_butterfly
+  '0x50325ffffe3b93ff':
+    friendly_name: stue_5X_spot_1
+  '0x50325ffffe35ddbd':
+    friendly_name: stue_5X_spot_4
+  '0xb4e3f9fffed8958f':
+    friendly_name: stue_5X_spot_5
+  '0x0c4314fffed0ed23':
+    friendly_name: stue_5X_spot_3
+  '0x0c4314fffebf6ff2':
+    friendly_name: stue_5X_spot_2
+  '0x94a081fffe662b58':
+    friendly_name: stue_leselampe_venstre
+  '0xf074bffffee17403':
+    friendly_name: stue_leselampe_høyre
+  '0x94a081fffe570159':
+    friendly_name: stue_lampe_ved_ovn
+  '0xc4d8c8fffeacc63d':
+    friendly_name: kjøkken_over_vask
+  '0x08b95ffffec5e728':
+    friendly_name: stue_fjernkontroll
+  '0x94a081fffe5760f1':
+    friendly_name: gang_maleribelysning
+  '0x00158d008afd6b45':
+    friendly_name: bod_temperaturmåler
+  '0xd44867fffefc2ce3':
+    friendly_name: bod_dørkontakt

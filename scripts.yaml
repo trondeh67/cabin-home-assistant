@@ -1,0 +1,71 @@
+lys_alt_av:
+  alias: Lys – alt av (robust m/xComfort)
+  mode: single
+  sequence:
+  - variables:
+      alle_lys: '{{ states.light | map(attribute=''entity_id'') | list }}'
+      xcomfort_lys: "{{ states.light\n   | selectattr('entity_id','match','^light\\\\.xc_')\n
+        \  | map(attribute='entity_id') | list }}\n"
+      andre_lys: '{{ alle_lys | reject(''in'', xcomfort_lys) | list }}'
+  - if:
+    - condition: template
+      value_template: '{{ andre_lys | length > 0 }}'
+    then:
+    - action: homeassistant.turn_off
+      target:
+        entity_id: '{{ andre_lys }}'
+      data:
+        transition: 1
+  - repeat:
+      for_each: '{{ xcomfort_lys }}'
+      sequence:
+      - variables:
+          lys: '{{ repeat.item }}'
+      - action: light.turn_off
+        target:
+          entity_id: '{{ lys }}'
+      - wait_template: '{{ is_state(lys, ''off'') }}'
+        timeout: 00:00:02
+        continue_on_timeout: true
+      - choose:
+        - conditions:
+          - condition: template
+            value_template: '{{ not is_state(lys, ''off'') }}'
+          sequence:
+          - action: light.turn_on
+            target:
+              entity_id: '{{ lys }}'
+            data:
+              brightness: 0
+          - wait_template: '{{ is_state(lys,''off'') or (state_attr(lys,''brightness'')|int(1))
+              == 0 }}'
+            timeout: 00:00:02
+            continue_on_timeout: true
+      - if:
+        - condition: template
+          value_template: '{{ not is_state(lys, ''off'') }}'
+        then:
+        - action: light.turn_off
+          target:
+            entity_id: '{{ lys }}'
+        - delay: 00:00:01
+  - variables:
+      fortsatt_pa: "{{ expand(xcomfort_lys) | selectattr('state','eq','on')\n   |
+        map(attribute='entity_id') | list }}\n"
+  - if:
+    - condition: template
+      value_template: '{{ fortsatt_pa | length > 0 }}'
+    then:
+    - action: persistent_notification.create
+      data:
+        title:
+lys_dagtid_avskrudd_alarm:
+  alias: Lys – dagtid/avskrudd alarm
+  mode: single
+  sequence:
+  - target:
+      entity_id:
+      - scene.velkommen_hjem
+      - scene.oppholdsrom_matlaging
+      - scene.stue_normal
+    action: scene.turn_on

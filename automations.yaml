@@ -2,24 +2,29 @@
   alias: Skru på lys i bod
   description: ''
   triggers:
-  - entity_id:
-    - binary_sensor.bod_dor_apning
+  - entity_id: binary_sensor.bod_dorkontakt_contact
     to: 'on'
     trigger: state
   actions:
   - target:
-      entity_id:
-      - light.testlys
-      - light.stue
+      area_id: bod
     action: light.turn_on
-    data: {}
   - delay: 00:05:00
+  - repeat:
+      count: 3
+      sequence:
+      - target:
+          area_id: bod
+        action: light.turn_off
+      - delay: '00:00:0.3'
+      - target:
+          area_id: bod
+        action: light.turn_on
+      - delay: '00:00:0.3'
+  - delay: 00:00:30
   - target:
-      entity_id:
-      - light.testlys
-      - light.stue
+      area_id: bod
     action: light.turn_off
-    data: {}
   mode: restart
 - id: '1755096364674'
   alias: Alarm påskrudd - skru av alt lys
@@ -32,9 +37,9 @@
     trigger: device
   conditions: []
   actions:
-  - action: light.turn_off
-    metadata: {}
-    data: {}
+  - sequence:
+    - action: script.lys_alt_av
+      data: {}
   mode: single
 - id: '1755152263990'
   alias: Low battery level detection & notification for all battery sensors
@@ -43,7 +48,59 @@
     path: sbyx/low-battery-level-detection-notification-for-all-battery-sensors.yaml
     input:
       actions:
-      - action: notify.send_message
+      - action: notify.mobile_app_sm_s928b
         metadata: {}
-        data: {}
+        data:
+          message: Lavt batterinivå
       threshold: 90
+- id: '1756886867339'
+  alias: Bryter Kjøkken Trykk Opp
+  description: ''
+  triggers:
+  - domain: mqtt
+    device_id: 914cdb659490b0dd4df545371e11ce76
+    type: button_short_release
+    subtype: button_1
+    trigger: device
+  conditions: []
+  actions:
+  - action: scene.turn_on
+    metadata: {}
+    data: {}
+    target:
+      entity_id: scene.oppholdsrom_matlaging
+  mode: single
+- id: '1757109258111'
+  alias: kjøkken.alt_av
+  description: ''
+  triggers:
+  - domain: mqtt
+    device_id: 914cdb659490b0dd4df545371e11ce76
+    type: button_short_release
+    subtype: button_2
+    trigger: device
+  conditions: []
+  actions:
+  - action: scene.turn_on
+    metadata: {}
+    data: {}
+    target:
+      entity_id: scene.kjokken_alt_av
+  mode: single
+- id: '1757193667498'
+  alias: Alarm deaktivert (inkl. via disarming)
+  triggers:
+  - entity_id: alarm_control_panel.verisure_alarm
+    from: armed_away
+    to: disarmed
+    trigger: state
+  - entity_id: alarm_control_panel.verisure_alarm
+    from: disarming
+    to: disarmed
+    trigger: state
+  conditions: []
+  actions:
+  - target:
+      entity_id: script.lys_dagtid_avskrudd_alarm
+    action: script.turn_on
+  mode: single

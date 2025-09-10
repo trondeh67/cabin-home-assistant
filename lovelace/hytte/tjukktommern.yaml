@@ -1,0 +1,314 @@
+title: TJUKKTØMMERN
+views:
+  - !include oppholdsrom.yaml
+
+  - title: Stue
+    path: stue
+    icon: mdi:sofa
+    cards:
+      - type: custom:mushroom-title-card
+        title: STUE
+      - type: vertical-stack
+        cards:
+          - type: custom:mushroom-title-card
+            title: LYSSCENER
+          - type: grid
+            columns: 3
+            square: false
+            cards:
+              - type: custom:mushroom-template-card
+                primary: Alt på
+                icon: mdi:lightbulb-group
+                tap_action:
+                  action: call-service
+                  service: scene.turn_on
+                  target:
+                    entity_id: scene.stue_alt_pa
+
+          - type: grid
+            columns: 2
+            square: false
+            cards:
+              - type: custom:mushroom-light-card
+                entity: light.stue_leselampe_venstre
+                show_brightness_control: false
+                collapsible_controls: false
+              - type: custom:mushroom-light-card
+                entity: light.stue_leselampe_hoyre
+                show_brightness_control: false
+                collapsible_controls: false
+              - type: custom:mushroom-light-card
+                entity: light.led_stue_butterfly
+                show_brightness_control: true
+                collapsible_controls: false
+              - type: custom:mushroom-light-card
+                entity: light.stue_5x_spott
+                show_brightness_control: true
+                collapsible_controls: false
+              - type: custom:mushroom-light-card
+                entity: light.lampe_ved_ovn
+                show_brightness_control: false
+                collapsible_controls: false
+
+  - title: Spisestue
+    path: spisestue
+    icon: mdi:silverware-fork-knife
+    cards:
+      - type: custom:mushroom-title-card
+        title: SPISESTUE
+      - type: vertical-stack
+        cards:
+          - type: custom:mushroom-title-card
+            title: LYS
+          - type: grid
+            columns: 1
+            square: false
+            cards:
+              - type: custom:auto-entities
+                card:
+                  type: grid
+                  columns: 2
+                  square: false
+                card_param: cards
+                filter:
+                  include:
+                    - area: Spisestue
+                      domain: light
+                      options:
+                        type: custom:mushroom-light-card
+                        show_brightness_control: true
+                show_empty: false
+
+  - title: Kjøkken
+    path: kjokken
+    icon: mdi:countertop-outline
+    cards:
+      - type: custom:mushroom-title-card
+        title: KJØKKEN
+      - type: custom:auto-entities
+        card:
+          type: grid
+          columns: 2
+          square: false
+        card_param: cards
+        filter:
+          include:
+            - area: Kjøkken
+              domain: light
+              options:
+                type: custom:mushroom-light-card
+                show_brightness_control: true
+        show_empty: false
+  - title: Bad
+    path: bad
+    icon: mdi:shower
+    cards:
+      - type: custom:mushroom-title-card
+        title: BAD
+      - type: custom:auto-entities
+        card:
+          type: grid
+          columns: 2
+          square: false
+        card_param: cards
+        filter:
+          include:
+            - area: Bad
+              domain: light
+              options:
+                type: custom:mushroom-light-card
+                show_brightness_control: true
+            - area: Bad
+              domain: switch
+              options:
+                type: custom:mushroom-entity-card
+                layout: horizontal
+                secondary_info: none
+                icon: mdi:fan
+        show_empty: false
+  - title: Soverom 1
+    path: soverom_1
+    icon: mdi:bed-king
+    cards:
+      - type: custom:mushroom-title-card
+        title: Soverom 1
+      - type: custom:auto-entities
+        card:
+          type: grid
+          columns: 2
+          square: false
+        card_param: cards
+        filter:
+          include:
+            - area: Soverom 1
+              domain: light
+              options:
+                type: custom:mushroom-light-card
+                show_brightness_control: true
+        show_empty: false
+  - title: Soverom 2
+    path: soverom_2
+    icon: mdi:bed-double
+    cards:
+      - type: custom:mushroom-title-card
+        title: Soverom 2
+      - type: custom:auto-entities
+        card:
+          type: grid
+          columns: 2
+          square: false
+        card_param: cards
+        filter:
+          include:
+            - area: Soverom 2
+              domain: light
+              options:
+                type: custom:mushroom-light-card
+                show_brightness_control: true
+        show_empty: false
+  - title: Soverom 3
+    path: soverom_3
+    icon: mdi:bed-single
+    cards:
+      - type: custom:mushroom-title-card
+        title: Soverom 3
+      - type: custom:auto-entities
+        card:
+          type: grid
+          columns: 2
+          square: false
+        card_param: cards
+        filter:
+          include:
+            - area: Soverom 3
+              domain: light
+              options:
+                type: custom:mushroom-light-card
+                show_brightness_control: true
+        show_empty: false
+  - title: Vaskerom
+    path: vaskerom
+    icon: mdi:washing-machine
+    cards:
+      - type: custom:mushroom-title-card
+        title: Vaskerom
+      - type: custom:auto-entities
+        card:
+          type: grid
+          columns: 2
+          square: false
+        card_param: cards
+        filter:
+          include:
+            - area: Vaskerom
+              domain: light
+              options:
+                type: custom:mushroom-light-card
+                show_brightness_control: true
+        show_empty: false
+  - title: Gang
+    path: gang
+    icon: mdi:walk
+    cards:
+      - type: custom:mushroom-title-card
+        title: Gang
+      - type: grid
+        columns: 2
+        square: false
+        cards:
+          - type: custom:mushroom-light-card
+            entity: light.dimmer_gang_1_dimmeaktuator
+            name: Taklys oppe
+            show_brightness_control: true
+            collapsible_controls: false
+          - type: custom:mushroom-light-card
+            entity: light.dimmer_gang_2_dimmeaktuator
+            name: Taklys nede
+            show_brightness_control: true
+            collapsible_controls: false
+          - type: custom:mushroom-light-card
+            entity: light.maleribelysning
+            name: Maleribelysning
+            show_brightness_control: false
+            collapsible_controls: false
+
+  - title: Vindfang
+    path: vindfang
+    icon: mdi:hanger
+    cards:
+      - type: custom:mushroom-title-card
+        title: Vindfang
+      - type: custom:auto-entities
+        card:
+          type: grid
+          columns: 2
+          square: false
+        card_param: cards
+        filter:
+          include:
+            - area: Vindfang
+              domain: light
+              options:
+                type: custom:mushroom-light-card
+                show_brightness_control: true
+  - title: Bod
+    path: bod
+    icon: mdi:door-closed
+    cards:
+      - type: custom:mushroom-title-card
+        title: Bod
+      - type: custom:auto-entities
+        card:
+          type: grid
+          columns: 2
+          square: false
+        card_param: cards
+        filter:
+          include:
+            - area: Bod
+              domain: light
+              options:
+                type: custom:mushroom-light-card
+                show_brightness_control: false
+                options:
+        # KLIMA
+      - type: custom:mushroom-title-card
+        title: Klima
+      - type: sensor
+        entity: sensor.bod_temperaturmaler_temperature
+        name: Bod temperatur
+        graph: line # viser liten graf
+        detail: 1 # grovere oppløsning (sparsom)
+        hours_to_show: 24 # justér (f.eks. 48/72)
+        unit: "°C" # valgfritt, hvis ikke allerede satt
+
+        show_empty: false
+  - title: Utendørs
+    path: utendørs
+    icon: mdi:sun-snowflake-variant
+    cards:
+      - type: custom:mushroom-title-card
+        title: Utendørs
+      - type: custom:auto-entities
+        card:
+          type: grid
+          columns: 2
+          square: false
+        card_param: cards
+        filter:
+          include:
+            - area: Utendørs
+              domain: light
+              options:
+                type: custom:mushroom-light-card
+                show_brightness_control: false
+            - area: Utendørs
+              domain: switch
+              options:
+                type: custom:mushroom-light-card
+                show_brightness_control: false
+                icon: mdi:lightbulb
+                #layout: vertical
+                #tap_action:
+                #  action: toggle
+        show_empty: false

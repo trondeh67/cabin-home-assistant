@@ -1,0 +1,234 @@
+title: Mobil
+path: mobil
+icon: mdi:cellphone
+# subview: true # åpner visningen uten faner – fin til mobil-hurtigpanel
+cards:
+  - type: custom:layout-card
+    layout_type: custom:vertical-layout # enkel, responsiv stabling
+    cards:
+      # Topplinje – chips for rask status/handling
+      - type: custom:mushroom-chips-card
+        alignment: start
+        chips:
+          - type: template
+            entity: alarm_control_panel.verisure_alarm
+            icon: >-
+              {% set s = states('alarm_control_panel.verisure_alarm') %}
+              {% if s == 'disarmed' %} mdi:home-account
+              {% elif s == 'armed_away' %} mdi:shield-lock
+              {% elif s == 'armed_home' %} mdi:shield-home
+              {% elif s in ['arming','pending'] %} mdi:progress-clock
+              {% elif s == 'triggered' %} mdi:alarm-light
+              {% else %} mdi:help-circle
+              {% endif %}
+            icon_color: >-
+              {% set s = states('alarm_control_panel.verisure_alarm') %}
+              {% if s == 'disarmed' %} green
+              {% elif s == 'armed_away' %} red
+              {% elif s == 'armed_home' %} amber
+              {% elif s in ['arming','pending'] %} amber
+              {% elif s == 'triggered' %} red
+              {% else %} grey
+              {% endif %}
+            content: >-
+              {% set s = states('alarm_control_panel.verisure_alarm') %}
+              {% if s == 'disarmed' %} Hjemme
+              {% elif s == 'armed_away' %} Borte
+              {% elif s == 'armed_home' %} Natt
+              {% elif s in ['arming','pending'] %} Pågår…
+              {% elif s == 'triggered' %} Utløst!
+              {% else %} Ukjent
+              {% endif %}
+            tap_action:
+              action: more-info # holder den ikke-interaktiv funksjonelt, men åpner status
+          - type: template
+            icon: mdi:weather-partly-cloudy
+            content: >
+              {% set t = states('sensor.ute_temperatur_virtuell')|float(default=nan) %}
+              {{ (t|round(0) ~ '°C') if t == t else '—°C' }}
+            tap_action:
+              action: more-info
+              entity: sensor.ute_temperatur_virtuell
+          - type: template
+            icon: >
+              {% set c = states('weather.forecast_home') %}
+              {% if c in ['sunny'] %}mdi:weather-sunny
+              {% elif c in ['clear-night'] %}mdi:weather-night
+              {% elif c in ['partlycloudy'] %}mdi:weather-partly-cloudy
+              {% elif c in ['cloudy','overcast'] %}mdi:weather-cloudy
+              {% elif c in ['rainy','pouring','lightning-rainy','exceptional'] %}mdi:weather-rainy
+              {% elif c in ['lightning'] %}mdi:weather-lightning
+              {% elif c in ['snowy','snowy-rainy'] %}mdi:weather-snowy
+              {% elif c in ['hail'] %}mdi:weather-hail
+              {% elif c in ['fog'] %}mdi:weather-fog
+              {% elif c in ['windy'] %}mdi:weather-windy
+              {% else %}mdi:weather-partly-cloudy
+              {% endif %}
+            content: >
+              {% set t = states('sensor.ute_temperatur_virtuell')|float(default=nan) %}
+              {{ 'Yr: ' ~ (t|round(0) ~ '°C') if t == t else 'Yr: NA°C' }}
+            tap_action:
+              action: more-info
+              entity: weather.forecast_home
+
+      # KLIMA – kompakt styring + graf
+      - type: custom:mushroom-title-card
+        title: Klima stue
+      - type: horizontal-stack
+        cards:
+          - type: custom:mushroom-climate-card
+            entity: climate.daikinap86694
+            hvac_modes: [heat, cool, heat_cool, "off"]
+            show_temperature_control: true
+            collapsible_controls: true
+            fill_container: true
+          - type: custom:mini-graph-card
+            name: Temp 24t
+            entities:
+              - entity: sensor.tjukktommern_inne_temperatur
+            hours_to_show: 24
+            points_per_hour: 4
+            show:
+              name: true
+              icon: false
+              state: true
+              labels: false
+            line_width: 2
+
+      # LYS – sceneknapper og “kun lys som er PÅ”
+      - type: custom:mushroom-title-card
+        title: Lys & scener
+      - type: grid
+        columns: 3
+        square: false
+        cards:
+          - type: custom:mushroom-template-card
+            primary: Normal
+            icon: mdi:lightbulb-group
+            tap_action:
+              action: call-service
+              service: script.lys_dagtid_avskrudd_alarm
+          - type: custom:mushroom-template-card
+            primary: Dempet
+            icon: mdi:weather-sunset
+            tap_action:
+              action: call-service
+              service: scene.turn_on
+              target: { entity_id: scene.oppholdsrom_kveld_dempet }
+          - type: custom:mushroom-template-card
+            primary: Nattlys
+            icon: mdi:lightbulb-night
+            tap_action:
+              action: call-service
+              service: scene.turn_on
+              target: { entity_id: scene.oppholdsrom_nattlys }
+          - type: custom:mushroom-template-card
+            primary: Alt av
+            icon: mdi:lightbulb-off
+            icon_color: red
+            tap_action:
+              action: call-service
+              service: script.lys_alt_av
+
+      - type: custom:auto-entities
+        card:
+          type: grid
+          columns: 2
+          square: false
+        card_param: cards
+        filter:
+          include:
+            - area: Stue
+              domain: light
+              state: "on"
+              options:
+                type: custom:mushroom-light-card
+                use_light_color: true
+                show_brightness_control: true
+                collapsible_controls: true
+            - area: gang
+              domain: light
+              state: "on"
+              options:
+                type: custom:mushroom-light-card
+                use_light_color: true
+                show_brightness_control: true
+                collapsible_controls: true
+            - area: kjokken
+              domain: light
+              state: "on"
+              options:
+                type: custom:mushroom-light-card
+                use_light_color: true
+                show_brightness_control: true
+                collapsible_controls: true
+            - area: spisestue
+              domain: light
+              state: "on"
+              options:
+                type: custom:mushroom-light-card
+                use_light_color: true
+                show_brightness_control: true
+                collapsible_controls: true
+
+        sort:
+          method: name
+        show_empty: false
+
+      # DØRER/VINDUER – vis KUN hvis åpne (støyfritt på mobil)
+      - type: custom:mushroom-title-card
+        title: Åpne dører/vinduer
+      - type: custom:auto-entities
+        card:
+          type: grid
+          columns: 2
+          square: false
+        card_param: cards
+        filter:
+          include:
+            - domain: binary_sensor
+              attributes:
+                device_class: door
+              state: "on"
+              options:
+                type: custom:mushroom-entity-card
+                name: ""
+            - domain: binary_sensor
+              attributes:
+                device_class: window
+              state: "on"
+              options:
+                type: custom:mushroom-entity-card
+                name: ""
+            - domain: binary_sensor
+              attributes:
+                device_class: opening
+              state: "on"
+              options:
+                type: custom:mushroom-entity-card
+                name: ""
+        show_empty: false
+
+      # SISTE – systemstatus
+      - type: custom:mushroom-title-card
+        title: System
+      - type: grid
+        columns: 2
+        square: false
+        cards:
+          - type: custom:mushroom-entity-card
+            entity: sensor.ha_core_versjon
+            name: HA versjon
+          - type: custom:mushroom-entity-card
+            entity: sensor.ha_uptime_dager
+            name: Uptime
+
+    card_mod:
+      style: |
+        /* Globale mobiljusteringer for hele viewet */
+        :host {
+          --mush-card-primary-font-size: 16px;
+          --mush-card-secondary-font-size: 13px;
+          --mush-spacing: 10px;
+          --ha-card-border-radius: 16px;
+        }
