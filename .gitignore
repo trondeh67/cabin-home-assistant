@@ -1,45 +1,42 @@
-# HA runtime
-.homekit.state
+# HA runtime og database
 .storage/
-deps/
 home-assistant_v2.db*
-*.log
 *.db-shm
 *.db-wal
+*.db
+*.log*
 .cloud/
-.cloudbackup/
-.media/
+deps/
+media/
 tmp/
 tts/
-.custom_components/__pycache__/
-__pycache__/
 
-# Secrets
+# Zigbee/Z2M artefakter
+zigbee.db
+zigbee*.db*
+zigbee2mqtt/database.db*
+zigbee2mqtt/state.json
+zigbee2mqtt/coordinator_backup.json
+
+# HACS nedlastinger (vanlig å ignorere)
+www/community/**
+
+# Python cache
+custom_components/**/__pycache__/
+**/__pycache__/
+
+# Addons (behold lokale addons)
+addons/
+!addons/local/
+
+# Backups og nøkler
+backup/
 secrets.yaml
 *.key
 *.pem
 
-# Backups / uploads
-backup/
+# Diverse
 uploads/
-
-# OS/Editor
 .DS_Store
 .vscode/
 .idea/
-
-# HA add-on exports (beholdes i Git)
-# (la denne MAPPEN bli med i Git – den er ment å trackes)
-# Ingen ignore på addons_state/ – den SKAL med!
-
-# Kilde for lokale add-ons (kopi for Git)
-# Denne MAPPEN skal med i Git (ikke ignore)
-# addons_local/
-
-# HA add-on exports (beholdes i Git)
-# (la denne MAPPEN bli med i Git – den er ment å trackes)
-# Ingen ignore på addons_state/ – den SKAL med!
-
-# Kilde for lokale add-ons (kopi for Git)
-# Denne MAPPEN skal med i Git (ikke ignore)
-# addons_local/
