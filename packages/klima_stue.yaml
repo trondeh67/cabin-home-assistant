@@ -1,0 +1,213 @@
+homeassistant:
+  customize:
+    sensor.stue_target_pumpesettpunkt:
+      friendly_name: "Stue: beregnet setpunkt til varmepumpe (Daikin)"
+
+# ====== Tuning / grenser ======
+input_number:
+  stue_onsket_temp:
+    name: "Stue: ønsket temp (sittehøyde)"
+    min: 15
+    max: 24
+    step: 0.5
+    unit_of_measurement: "°C"
+    icon: mdi:thermometer
+
+  stue_base_offset_a:
+    name: "Stue offset base a"
+    min: -2
+    max: 4
+    step: 0.1
+    icon: mdi:tune-variant
+
+  stue_kulde_slope_b:
+    name: "Stue offset kuldeslope b (°C pr °C under terskel)"
+    min: 0
+    max: 0.5
+    step: 0.01
+    icon: mdi:chart-spline
+
+  stue_kulde_terskel:
+    name: "Stue offset kulde-terskel (°C)"
+    min: -10
+    max: 25
+    step: 1
+    icon: mdi:snowflake-thermometer
+
+  stue_kp:
+    name: "Stue P-forsterkning (Kp)"
+    min: 0
+    max: 1
+    step: 0.05
+    icon: mdi:alpha-p-box
+
+  stue_min_setpunkt:
+    name: "Stue min setpunkt (Daikin)"
+    min: 15
+    max: 22
+    step: 0.5
+    unit_of_measurement: "°C"
+
+  stue_max_setpunkt:
+    name: "Stue max setpunkt (Daikin)"
+    min: 22
+    max: 30
+    step: 0.5
+    unit_of_measurement: "°C"
+
+  stue_setpunkt_endringsgrense:
+    name: "Maks endring per justering"
+    min: 0.5
+    max: 3
+    step: 0.5
+    unit_of_measurement: "°C"
+
+input_boolean:
+  stue_klima_hold:
+    name: "Stue klima HOLD (pause regulering)"
+    icon: mdi:pause-octagon
+
+# ====== Beregninger ======
+template:
+  - sensor:
+      - name: "Stue target pumpesettpunkt"
+        unique_id: stue_target_pumpesettpunkt
+        unit_of_measurement: "°C"
+        state: >
+          {% set desired = states('input_number.stue_onsket_temp')|float(21.5) %}
+          {% set Tin = states('sensor.stue_temperatur_virtuell')|float(default=desired) %}
+          {% set Tout = states('sensor.ute_temperatur_virtuell')|float(10.0) %}
+
+          {# Feed-forward #}
+          {% set a  = states('input_number.stue_base_offset_a')|float(1.0) %}
+          {% set b  = states('input_number.stue_kulde_slope_b')|float(0.10) %}
+          {% set Tt = states('input_number.stue_kulde_terskel')|float(15.0) %}
+          {% set cold = max(0, Tt - Tout) %}
+          {% set offset_ff = a + b * cold %}
+
+          {# Svakt P-ledd #}
+          {% set Kp = states('input_number.stue_kp')|float(0.30) %}
+          {% set error = desired - Tin %}
+          {% set corr = Kp * error %}
+
+          {% set raw_target = desired + offset_ff + corr %}
+
+          {# Begrensning #}
+          {% set tmin = states('input_number.stue_min_setpunkt')|float(18.0) %}
+          {% set tmax = states('input_number.stue_max_setpunkt')|float(28.0) %}
+          {% set clamped = [tmax, [tmin, raw_target]|max]|min %}
+
+          {{ clamped | round(1) }}
+
+      - name: "Stue temperaturfeil"
+        unique_id: stue_temp_error
+        unit_of_measurement: "°C"
+        state: >
+          {{ (states('input_number.stue_onsket_temp')|float(21.5)
+              - states('sensor.stue_temperatur_virtuell')|float(21.5)) | round(2) }}
+
+# ====== Antisjattering (rate limit) ======
+timer:
+  stue_klima_cooldown:
+    duration: "00:10:00"
+
+# ====== Regulering mot Daikin ======
+automation:
+  - id: stue_klima_regulering_daikin
+    alias: "Stue klima – reguler settpunkt på Daikin"
+    mode: restart
+    trigger:
+      # Heartbeat
+      - platform: time_pattern
+        minutes: "/5"
+
+      # Endring i relevante sensorer
+      - platform: state
+        entity_id:
+          - sensor.stue_target_pumpesettpunkt
+          - sensor.stue_temperatur_virtuell
+          - sensor.ute_temperatur_virtuell # NB: riktig navn
+          - input_number.stue_onsket_temp
+
+      # Kryssing UNDER ønsket temp (med hysterese)
+      - platform: template
+        value_template: >
+          {{ states('sensor.stue_temperatur_virtuell')|float(9999)
+            < (states('input_number.stue_onsket_temp')|float - 0.05) }}
+
+      # Kryssing OVER ønsket temp (med hysterese)
+      - platform: template
+        value_template: >
+          {{ states('sensor.stue_temperatur_virtuell')|float(-9999)
+            > (states('input_number.stue_onsket_temp')|float + 0.05) }}
+
+    condition:
+      - condition: state
+        entity_id: input_boolean.stue_klima_hold
+        state: "off"
+      - condition: template
+        value_template: "{{ states('sensor.stue_target_pumpesettpunkt')|float(none) is not none }}"
+      - condition: template
+        value_template: "{{ states('climate.daikinap86694') not in ['unavailable','unknown'] }}"
+      - condition: template
+        value_template: "{{ is_state('timer.stue_klima_cooldown','idle') }}"
+    action:
+      - variables:
+          daikin: "climate.daikinap86694"
+          target: "{{ states('sensor.stue_target_pumpesettpunkt')|float(22.0) }}"
+          current_set: >
+            {% set t = state_attr('climate.daikinap86694','temperature') %}
+            {{ (t if t is number else states('sensor.stue_target_pumpesettpunkt')|float(22.0))|float }}
+          max_step: "{{ states('input_number.stue_setpunkt_endringsgrense')|float(1.0) }}"
+          min_effective_delta: 0.2
+      - variables:
+          delta: "{{ target - current_set }}"
+          next_set: >
+            {% if (delta | abs) <= max_step %}
+              {{ target }}
+            {% else %}
+              {{ (current_set + max_step) if (delta > 0) else (current_set - max_step) }}
+            {% endif %}
+      - choose:
+          - conditions:
+              - condition: template
+                value_template: "{{ (target - current_set) | abs >= min_effective_delta }}"
+            sequence:
+              - if:
+                  - condition: template
+                    value_template: "{{ states(daikin) != 'heat' }}"
+                then:
+                  - service: climate.set_hvac_mode
+                    target: { entity_id: "{{ daikin }}" }
+                    data: { hvac_mode: heat }
+              - service: climate.set_temperature
+                target: { entity_id: "{{ daikin }}" }
+                data:
+                  temperature: "{{ next_set | round(1) }}"
+              - event: stue_klima_sett_ok
+                event_data:
+                  from: "{{ current_set | round(1) }}"
+                  to: "{{ next_set | round(1) }}"
+              - service: logbook.log
+                data:
+                  name: "Stue klima (Daikin)"
+                  message: >
+                    "Endrer setpunkt fra {{ current_set|round(1) }} → {{ next_set|round(1) }}
+                    (target: {{ target|round(1) }}, delta: {{ (target-current_set)|round(2) }})"
+                  entity_id: climate.daikinap86694
+
+          - conditions:
+              - condition: template
+                value_template: "{{ (target - current_set) | abs < min_effective_delta }}"
+            sequence:
+              - service: logbook.log
+                data:
+                  name: "Stue klima (Daikin)"
+                  message: >
+                    "Ingen endring: current {{ current_set|round(1) }}≈target {{ target|round(1) }}
+                    (terskel: {{ min_effective_delta }})"
+                  entity_id: climate.daikinap86694
+
+      # Hvis condition blokkerer, logg *hvorfor*
+    trace:
+      stored_traces: 10
