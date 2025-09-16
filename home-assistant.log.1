@@ -1,6 +1,74 @@
-2025-09-10 09:31:08.467 WARNING (SyncWorker_0) [homeassistant.loader] We found a custom integration daikin_onecta which has not been tested by Home Assistant. This component might cause stability problems, be sure to disable it if you experience issues with Home Assistant
-2025-09-10 09:31:08.467 WARNING (SyncWorker_0) [homeassistant.loader] We found a custom integration hacs which has not been tested by Home Assistant. This component might cause stability problems, be sure to disable it if you experience issues with Home Assistant
-2025-09-10 09:31:08.468 WARNING (SyncWorker_0) [homeassistant.loader] We found a custom integration google_assistant_sdk_custom which has not been tested by Home Assistant. This component might cause stability problems, be sure to disable it if you experience issues with Home Assistant
-2025-09-10 09:31:11.692 ERROR (MainThread) [pydaikin.daikin_brp084] Error communicating with device: 404, message='Not Found', url='http://192.168.10.54/dsiot/multireq'
-2025-09-10 09:31:12.970 WARNING (MainThread) [homeassistant.components.light] light.testdimmer (<class 'homeassistant.components.mqtt.light.schema_json.MqttLightJson'>) does not report a color mode, this will stop working in Home Assistant Core 2025.3, please create a bug report at https://github.com/home-assistant/core/issues?q=is%3Aopen+is%3Aissue+label%3A%22integration%3A+mqtt%22
-2025-09-10 09:31:53.362 WARNING (MainThread) [homeassistant.components.mqtt.light.schema_json] Invalid color mode 'color_temp' received for entity light.kjokken_zb_lys
+2025-09-15 15:10:38.642 WARNING (SyncWorker_0) [homeassistant.loader] We found a custom integration daikin_onecta which has not been tested by Home Assistant. This component might cause stability problems, be sure to disable it if you experience issues with Home Assistant
+2025-09-15 15:10:38.642 WARNING (SyncWorker_0) [homeassistant.loader] We found a custom integration hacs which has not been tested by Home Assistant. This component might cause stability problems, be sure to disable it if you experience issues with Home Assistant
+2025-09-15 15:10:38.643 WARNING (SyncWorker_0) [homeassistant.loader] We found a custom integration google_assistant_sdk_custom which has not been tested by Home Assistant. This component might cause stability problems, be sure to disable it if you experience issues with Home Assistant
+2025-09-15 15:10:42.020 ERROR (MainThread) [pydaikin.daikin_brp084] Error communicating with device: Server disconnected
+2025-09-15 15:10:43.533 WARNING (MainThread) [homeassistant.components.light] light.testdimmer (<class 'homeassistant.components.mqtt.light.schema_json.MqttLightJson'>) does not report a color mode, this will stop working in Home Assistant Core 2025.3, please create a bug report at https://github.com/home-assistant/core/issues?q=is%3Aopen+is%3Aissue+label%3A%22integration%3A+mqtt%22
+2025-09-15 15:10:47.049 ERROR (MainThread) [homeassistant.helpers.event] Error while processing template: Template<template=({% set t = states('sensor.ute_temperatur_virtuell')|float(default=nan) %} {{ (t|round(0) ~ '°C') if t == t else '—°C' }}) renders=2>
+Traceback (most recent call last):
+  File "/usr/src/homeassistant/homeassistant/helpers/template.py", line 641, in async_render
+    render_result = _render_with_context(self.template, compiled, **kwargs)
+  File "/usr/src/homeassistant/homeassistant/helpers/template.py", line 2977, in _render_with_context
+    return template.render(**kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/usr/local/lib/python3.13/site-packages/jinja2/environment.py", line 1295, in render
+    self.environment.handle_exception()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/usr/local/lib/python3.13/site-packages/jinja2/environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "<template>", line 1, in top-level template code
+jinja2.exceptions.UndefinedError: 'nan' is undefined
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/src/homeassistant/homeassistant/helpers/template.py", line 758, in async_render_to_info
+    render_info._result = self.async_render(  # noqa: SLF001
+                          ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+        variables, strict=strict, log_fn=log_fn, **kwargs
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/usr/src/homeassistant/homeassistant/helpers/template.py", line 643, in async_render
+    raise TemplateError(err) from err
+homeassistant.exceptions.TemplateError: UndefinedError: 'nan' is undefined
+2025-09-15 15:10:47.817 ERROR (MainThread) [homeassistant.helpers.event] Error while processing template: Template<template=({% set v = states('sensor.daikinap86694_climatecontrol_outdoor_temperature') %} {{ v|float(10.0) }}
+{% set off = states('input_number.ute_offset_daikin') | float(0) %} {{ (v + off) if v == v else 'unknown' }}) renders=2>
+Traceback (most recent call last):
+  File "/usr/src/homeassistant/homeassistant/helpers/template.py", line 641, in async_render
+    render_result = _render_with_context(self.template, compiled, **kwargs)
+  File "/usr/src/homeassistant/homeassistant/helpers/template.py", line 2977, in _render_with_context
+    return template.render(**kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/usr/local/lib/python3.13/site-packages/jinja2/environment.py", line 1295, in render
+    self.environment.handle_exception()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/usr/local/lib/python3.13/site-packages/jinja2/environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "<template>", line 2, in top-level template code
+TypeError: can only concatenate str (not "float") to str
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/src/homeassistant/homeassistant/helpers/template.py", line 758, in async_render_to_info
+    render_info._result = self.async_render(  # noqa: SLF001
+                          ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+        variables, strict=strict, log_fn=log_fn, **kwargs
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/usr/src/homeassistant/homeassistant/helpers/template.py", line 643, in async_render
+    raise TemplateError(err) from err
+homeassistant.exceptions.TemplateError: TypeError: can only concatenate str (not "float") to str
+2025-09-15 15:10:47.822 ERROR (MainThread) [homeassistant.components.template.template_entity] TemplateError('TypeError: can only concatenate str (not "float") to str') while processing template 'Template<template=({% set v = states('sensor.daikinap86694_climatecontrol_outdoor_temperature') %} {{ v|float(10.0) }}
+{% set off = states('input_number.ute_offset_daikin') | float(0) %} {{ (v + off) if v == v else 'unknown' }}) renders=4>' for attribute '_attr_native_value' in entity 'sensor.ute_daikin_korr'
+2025-09-15 15:11:24.155 WARNING (MainThread) [homeassistant.components.mqtt.light.schema_json] Invalid color mode 'color_temp' received for entity light.kjokken_zb_lys
+2025-09-15 15:51:52.770 WARNING (MainThread) [homeassistant.components.websocket_api.http.connection] [140405499840128] Trond from 127.0.0.1 (Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36 Edg/141.0.0.0): Disconnected: Received error message during command phase: No PONG received after 27.5 seconds
+2025-09-16 01:31:30.771 ERROR (MainThread) [pydaikin.daikin_base] Exception in TaskGroup: Connection timeout to host http://192.168.10.54/aircon/get_sensor_info
+2025-09-16 01:31:30.773 ERROR (MainThread) [homeassistant.components.daikin.coordinator] Timeout fetching DaikinAP86694 data
+2025-09-16 06:27:01.992 ERROR (MainThread) [homeassistant.components.websocket_api.http.connection] [140405488006176] Error handling message: value must be at most 255 for dictionary value @ data['max']. Got '10000' (invalid_format) Trond from 127.0.0.1 (Mozilla/5.0 (Linux; Android 15; SM-S928B Build/AP3A.240905.015.A2; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/140.0.7339.51 Mobile Safari/537.36 Home Assistant/2025.8.7-17352 (Android 15; SM-S928B))
+2025-09-16 06:27:17.775 ERROR (MainThread) [homeassistant.components.websocket_api.http.connection] [140405488006176] Error handling message: value must be at most 255 for dictionary value @ data['max']. Got '9000' (invalid_format) Trond from 127.0.0.1 (Mozilla/5.0 (Linux; Android 15; SM-S928B Build/AP3A.240905.015.A2; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/140.0.7339.51 Mobile Safari/537.36 Home Assistant/2025.8.7-17352 (Android 15; SM-S928B))
+2025-09-16 08:16:37.849 ERROR (MainThread) [homeassistant.components.hassio.handler] Client error on /ingress/validate_session request 401, message='Attempt to decode JSON with unexpected mimetype: text/plain; charset=utf-8', url='http://172.30.32.2/ingress/validate_session'
+2025-09-16 08:16:37.849 ERROR (MainThread) [homeassistant.components.hassio] Failed to to call /ingress/validate_session - 
+2025-09-16 09:10:42.770 WARNING (MainThread) [homeassistant.components.websocket_api.http.connection] [140405499270528] Trond from 127.0.0.1 (Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36 Edg/141.0.0.0): Disconnected: Received error message during command phase: No PONG received after 27.5 seconds
+2025-09-16 10:05:56.770 WARNING (MainThread) [homeassistant.components.websocket_api.http.connection] [140405601096448] Trond from 127.0.0.1 (Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36 Edg/141.0.0.0): Disconnected: Received error message during command phase: No PONG received after 27.5 seconds

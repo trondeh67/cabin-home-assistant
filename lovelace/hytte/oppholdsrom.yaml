@@ -61,12 +61,12 @@ cards:
               {% elif c in ['snowy','snowy-rainy'] %}mdi:weather-snowy
               {% elif c in ['hail'] %}mdi:weather-hail
               {% elif c in ['fog'] %}mdi:weather-fog
-              {% elif c in ['windy'] %}mdi:weather-windy
+              {% elif c in ['windy','windy-variant'] %}mdi:weather-windy
               {% else %}mdi:weather-partly-cloudy
               {% endif %}
             content: >
-              {% set t = states('sensor.ute_temperatur_virtuell')|float(default=nan) %}
-              {{ 'Yr: ' ~ (t|round(0) ~ '°C') if t == t else 'Yr: NA°C' }}
+              {% set t = state_attr('weather.forecast_home', 'temperature') | float(none) %}
+              {{ 'Yr: ' ~ (t|round(0) ~ '°C') if t is not none else 'Yr: NA°C' }}
             tap_action:
               action: more-info
               entity: weather.forecast_home
@@ -82,12 +82,15 @@ cards:
             show_temperature_control: true
             collapsible_controls: true
             fill_container: true
+
           - type: custom:mini-graph-card
             name: Temp 24t
             entities:
-              - entity: sensor.tjukktommern_inne_temperatur
+              - entity: sensor.stue_temperatur_virtuell
             hours_to_show: 24
             points_per_hour: 4
+            decimals: 1
+
             show:
               name: true
               icon: false
@@ -113,8 +116,8 @@ cards:
             icon: mdi:weather-sunset
             tap_action:
               action: call-service
-              service: scene.turn_on
-              target: { entity_id: scene.oppholdsrom_kveld_dempet }
+              service: script.lys_oppholdsom_dempet
+
           - type: custom:mushroom-template-card
             primary: Nattlys
             icon: mdi:lightbulb-night
@@ -208,6 +211,98 @@ cards:
                 type: custom:mushroom-entity-card
                 name: ""
         show_empty: false
+
+      - type: vertical-stack
+        cards:
+          - type: custom:mushroom-title-card
+            title: VARME – STUE (Daikin)
+
+          - type: entities
+            entities:
+              - input_number.stue_onsket_temp
+              - entity: sensor.stue_temperatur_virtuell
+                name: Målt inne (virtuell)
+              - entity: sensor.ute_temperatur_virtuell
+                name: Ute (virtuell)
+              - entity: sensor.stue_target_pumpesettpunkt
+                name: Beregnet setpunkt
+              - entity: climate.daikinap86694
+                name: Daikin
+              - input_boolean.stue_klima_hold
+
+              # --- D-ledd: diagnostikk ---
+              - type: section
+                label: D-ledd
+              - entity: sensor.stue_temp_stigning
+                name: dT/dt (°C/min)
+              - entity: sensor.stue_d_bidrag
+                name: D-bidrag (°C)
+
+          - type: entities
+            title: Tuning
+            entities:
+              - input_number.stue_base_offset_a
+              - input_number.stue_kulde_slope_b
+              - input_number.stue_kulde_terskel
+              - input_number.stue_kp
+              - input_number.stue_min_setpunkt
+              - input_number.stue_max_setpunkt
+              - input_number.stue_setpunkt_endringsgrense
+              # --- D-ledd: parametre ---
+              - input_number.stue_kd
+              - input_number.stue_deriv_threshold
+              - input_number.stue_deriv_cap
+
+      - type: horizontal-stack
+        cards:
+          - type: custom:mini-graph-card
+            name: Temp vs setpunkt (24t)
+            hours_to_show: 24
+            points_per_hour: 6
+            line_width: 2
+            show:
+              state: false
+              legend: true
+              labels: false
+            entities:
+              - entity: sensor.stue_temperatur_virtuell
+                name: Inne
+              - entity: sensor.stue_target_pumpesettpunkt
+                name: Beregnet setpkt
+                show_points: false
+
+          - type: custom:mini-graph-card
+            name: dT/dt & D (12t)
+            hours_to_show: 12
+            points_per_hour: 6
+            line_width: 2
+            show:
+              state: false
+              legend: true
+              labels: false
+            entities:
+              - entity: sensor.stue_temp_stigning
+                name: dT/dt (°C/min)
+              - entity: sensor.stue_d_bidrag
+                name: D-bidrag (°C)
+
+          - type: custom:mushroom-template-card
+            primary: >
+              {% set d = states('sensor.stue_d-bidrag')|float(0) %}
+              D-ledd {{ d|round(2) }} °C
+            icon: >
+              {% set d = states('sensor.stue_d-bidrag')|float(0) %}
+              {% if d|abs > 0 %}
+                mdi:sigma
+              {% else %}
+                mdi:sigma-lower
+              {% endif %}
+            icon_color: >
+              {% set d = states('sensor.stue_d-bidrag')|float(0) %}
+              {% if d > 0 %}green
+              {% elif d < 0 %}red
+              {% else %}grey
+              {% endif %}
 
       # SISTE – systemstatus
       - type: custom:mushroom-title-card

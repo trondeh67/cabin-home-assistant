@@ -73,7 +73,7 @@
   icon: mdi:lightbulb-on-outline
   metadata: {}
 - id: '1756837094786'
-  name: stue_alt_av (Duplisere)
+  name: stue_alt_av
   entities:
     light.stue_5x_spott:
       min_color_temp_kelvin: 2202
@@ -129,6 +129,13 @@
       brightness:
       friendly_name: Vegglampe
       supported_features: 44
+      state: 'off'
+    light.lampe_ved_ovn:
+      supported_color_modes:
+      - onoff
+      color_mode:
+      friendly_name: Lampe ved ovn
+      supported_features: 0
       state: 'off'
   icon: mdi:lightbulb-off
   metadata: {}
@@ -600,4 +607,688 @@
       supported_features: 44
       state: 'on'
   icon: mdi:lightbulb
+  metadata: {}
+- id: '1757612779363'
+  name: stue_max
+  entities:
+    light.lampe_ved_ovn:
+      supported_color_modes:
+      - onoff
+      color_mode: onoff
+      friendly_name: Lampe ved ovn
+      supported_features: 0
+      state: 'on'
+    light.stue_leselampe_hoyre:
+      supported_color_modes:
+      - onoff
+      color_mode: onoff
+      friendly_name: Leselampe høyre
+      supported_features: 0
+      state: 'on'
+    light.stue_leselampe_venstre:
+      supported_color_modes:
+      - onoff
+      color_mode: onoff
+      friendly_name: Leselampe venstre
+      supported_features: 0
+      state: 'on'
+    light.stue_5x_spott:
+      min_color_temp_kelvin: 2202
+      max_color_temp_kelvin: 4000
+      min_mireds: 250
+      max_mireds: 454
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      supported_color_modes:
+      - color_temp
+      effect:
+      color_mode: color_temp
+      brightness: 255
+      color_temp_kelvin: 2801
+      color_temp: 357
+      hs_color:
+      - 28.185
+      - 62.588
+      rgb_color:
+      - 255
+      - 170
+      - 95
+      xy_color:
+      - 0.516
+      - 0.386
+      friendly_name: Takspott
+      supported_features: 44
+      state: 'on'
+    light.led_stue_butterfly:
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      supported_color_modes:
+      - brightness
+      effect:
+      color_mode: brightness
+      brightness: 255
+      friendly_name: Vegglampe
+      supported_features: 44
+      state: 'on'
+  icon: mdi:lightbulb
+  metadata: {}
+- id: '1757612989951'
+  name: stue_dempet
+  entities:
+    light.lampe_ved_ovn:
+      supported_color_modes:
+      - onoff
+      color_mode: onoff
+      friendly_name: Lampe ved ovn
+      supported_features: 0
+      state: 'on'
+    light.stue_leselampe_hoyre:
+      supported_color_modes:
+      - onoff
+      color_mode: onoff
+      friendly_name: Leselampe høyre
+      supported_features: 0
+      state: 'on'
+    light.stue_leselampe_venstre:
+      supported_color_modes:
+      - onoff
+      color_mode: onoff
+      friendly_name: Leselampe venstre
+      supported_features: 0
+      state: 'on'
+    light.led_stue_butterfly:
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      supported_color_modes:
+      - brightness
+      effect:
+      color_mode: brightness
+      brightness: 133
+      friendly_name: Vegglampe
+      supported_features: 44
+      state: 'on'
+    light.stue_5x_spott:
+      min_color_temp_kelvin: 2202
+      max_color_temp_kelvin: 4000
+      min_mireds: 250
+      max_mireds: 454
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      supported_color_modes:
+      - color_temp
+      effect:
+      color_mode: color_temp
+      brightness: 56
+      color_temp_kelvin: 2801
+      color_temp: 357
+      hs_color:
+      - 28.185
+      - 62.588
+      rgb_color:
+      - 255
+      - 170
+      - 95
+      xy_color:
+      - 0.516
+      - 0.386
+      friendly_name: Takspott
+      supported_features: 44
+      state: 'on'
+  icon: mdi:lightbulb-night
+  metadata: {}
+- id: '1757613219200'
+  name: stue_dag
+  entities:
+    light.led_stue_butterfly:
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      supported_color_modes:
+      - brightness
+      effect:
+      color_mode: brightness
+      brightness: 217
+      friendly_name: Vegglampe
+      supported_features: 44
+      state: 'on'
+    light.lampe_ved_ovn:
+      supported_color_modes:
+      - onoff
+      color_mode: onoff
+      friendly_name: Lampe ved ovn
+      supported_features: 0
+      state: 'on'
+    light.stue_leselampe_venstre:
+      supported_color_modes:
+      - onoff
+      color_mode:
+      friendly_name: Leselampe venstre
+      supported_features: 0
+      state: 'off'
+    light.stue_leselampe_hoyre:
+      supported_color_modes:
+      - onoff
+      color_mode:
+      friendly_name: Leselampe høyre
+      supported_features: 0
+      state: 'off'
+    light.stue_5x_spott:
+      min_color_temp_kelvin: 2202
+      max_color_temp_kelvin: 4000
+      min_mireds: 250
+      max_mireds: 454
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      supported_color_modes:
+      - color_temp
+      effect:
+      color_mode:
+      brightness:
+      color_temp_kelvin:
+      color_temp:
+      hs_color:
+      rgb_color:
+      xy_color:
+      friendly_name: Takspott
+      supported_features: 44
+      state: 'off'
+  icon: mdi:lightbulb-multiple
+  metadata: {}
+- id: '1757621342337'
+  name: spisestue_max
+  entities:
+    light.dimmer_spisestue_1_dimmeaktuator:
+      supported_color_modes:
+      - brightness
+      color_mode: brightness
+      brightness: 255
+      friendly_name: Taklys
+      supported_features: 0
+      state: 'on'
+    light.dimmer_spisestue_2_dimmeaktuator:
+      supported_color_modes:
+      - brightness
+      color_mode: brightness
+      brightness: 255
+      friendly_name: Spisebord
+      supported_features: 0
+      state: 'on'
+  metadata: {}
+- id: '1757621405293'
+  name: spisestue_dag
+  entities:
+    light.dimmer_spisestue_1_dimmeaktuator:
+      supported_color_modes:
+      - brightness
+      color_mode: brightness
+      brightness: 128
+      friendly_name: Taklys
+      supported_features: 0
+      state: 'on'
+    light.dimmer_spisestue_2_dimmeaktuator:
+      supported_color_modes:
+      - brightness
+      color_mode: brightness
+      brightness: 128
+      friendly_name: Spisebord
+      supported_features: 0
+      state: 'on'
+  metadata: {}
+- id: '1757621462688'
+  name: spisestue_dempet
+  entities:
+    light.dimmer_spisestue_1_dimmeaktuator:
+      supported_color_modes:
+      - brightness
+      color_mode: brightness
+      brightness: 38
+      friendly_name: Taklys
+      supported_features: 0
+      state: 'on'
+    light.dimmer_spisestue_2_dimmeaktuator:
+      supported_color_modes:
+      - brightness
+      color_mode: brightness
+      brightness: 5
+      friendly_name: Spisebord
+      supported_features: 0
+      state: 'on'
+  metadata: {}
+- id: '1757621493454'
+  name: spisestue_av
+  entities:
+    light.dimmer_spisestue_1_dimmeaktuator:
+      supported_color_modes:
+      - brightness
+      color_mode:
+      brightness:
+      friendly_name: Taklys
+      supported_features: 0
+      state: 'off'
+    light.dimmer_spisestue_2_dimmeaktuator:
+      supported_color_modes:
+      - brightness
+      color_mode:
+      brightness:
+      friendly_name: Spisebord
+      supported_features: 0
+      state: 'off'
+  metadata: {}
+- id: '1757622599547'
+  name: kjøkken_max
+  entities:
+    light.dimmer_kjokken_1_dimmeaktuator:
+      supported_color_modes:
+      - brightness
+      color_mode: brightness
+      brightness: 255
+      friendly_name: Taklys
+      supported_features: 0
+      state: 'on'
+    light.0xc4d8c8fffeacc63d:
+      min_color_temp_kelvin: 2202
+      max_color_temp_kelvin: 4000
+      min_mireds: 250
+      max_mireds: 454
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      supported_color_modes:
+      - color_temp
+      effect:
+      color_mode: color_temp
+      brightness: 255
+      color_temp_kelvin: 2801
+      color_temp: 357
+      hs_color:
+      - 28.185
+      - 62.588
+      rgb_color:
+      - 255
+      - 170
+      - 95
+      xy_color:
+      - 0.516
+      - 0.386
+      friendly_name: Oppvaskkum
+      supported_features: 44
+      state: 'on'
+    light.kjokken_zb_lys:
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      supported_color_modes:
+      - brightness
+      effect:
+      color_mode: brightness
+      brightness: 255
+      friendly_name: Lys overskap
+      supported_features: 44
+      state: 'on'
+  metadata: {}
+- id: '1757622709344'
+  name: kjøkken_dag
+  entities:
+    light.dimmer_kjokken_1_dimmeaktuator:
+      supported_color_modes:
+      - brightness
+      color_mode: brightness
+      brightness: 115
+      friendly_name: Taklys
+      supported_features: 0
+      state: 'on'
+    light.0xc4d8c8fffeacc63d:
+      min_color_temp_kelvin: 2202
+      max_color_temp_kelvin: 4000
+      min_mireds: 250
+      max_mireds: 454
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      supported_color_modes:
+      - color_temp
+      effect:
+      color_mode: color_temp
+      brightness: 153
+      color_temp_kelvin: 2801
+      color_temp: 357
+      hs_color:
+      - 28.185
+      - 62.588
+      rgb_color:
+      - 255
+      - 170
+      - 95
+      xy_color:
+      - 0.516
+      - 0.386
+      friendly_name: Oppvaskkum
+      supported_features: 44
+      state: 'on'
+    light.kjokken_zb_lys:
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      supported_color_modes:
+      - brightness
+      effect:
+      color_mode: brightness
+      brightness: 178
+      friendly_name: Lys overskap
+      supported_features: 44
+      state: 'on'
+  metadata: {}
+- id: '1757622765780'
+  name: kjøkken_dempet
+  entities:
+    light.dimmer_kjokken_1_dimmeaktuator:
+      supported_color_modes:
+      - brightness
+      color_mode: brightness
+      brightness: 51
+      friendly_name: Taklys
+      supported_features: 0
+      state: 'on'
+    light.0xc4d8c8fffeacc63d:
+      min_color_temp_kelvin: 2202
+      max_color_temp_kelvin: 4000
+      min_mireds: 250
+      max_mireds: 454
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      supported_color_modes:
+      - color_temp
+      effect:
+      color_mode: color_temp
+      brightness: 54
+      color_temp_kelvin: 2801
+      color_temp: 357
+      hs_color:
+      - 28.185
+      - 62.588
+      rgb_color:
+      - 255
+      - 170
+      - 95
+      xy_color:
+      - 0.516
+      - 0.386
+      friendly_name: Oppvaskkum
+      supported_features: 44
+      state: 'on'
+    light.kjokken_zb_lys:
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      supported_color_modes:
+      - brightness
+      effect:
+      color_mode: brightness
+      brightness: 97
+      friendly_name: Lys overskap
+      supported_features: 44
+      state: 'on'
+  metadata: {}
+- id: '1757622809961'
+  name: kjøkken_av
+  entities:
+    light.dimmer_kjokken_1_dimmeaktuator:
+      supported_color_modes:
+      - brightness
+      color_mode:
+      brightness:
+      friendly_name: Taklys
+      supported_features: 0
+      state: 'off'
+    light.kjokken_zb_lys:
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      supported_color_modes:
+      - brightness
+      effect:
+      color_mode:
+      brightness:
+      friendly_name: Lys overskap
+      supported_features: 44
+      state: 'off'
+    light.0xc4d8c8fffeacc63d:
+      min_color_temp_kelvin: 2202
+      max_color_temp_kelvin: 4000
+      min_mireds: 250
+      max_mireds: 454
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      supported_color_modes:
+      - color_temp
+      effect:
+      color_mode:
+      brightness:
+      color_temp_kelvin:
+      color_temp:
+      hs_color:
+      rgb_color:
+      xy_color:
+      friendly_name: Oppvaskkum
+      supported_features: 44
+      state: 'off'
+  metadata: {}
+- id: '1757623711403'
+  name: gang_max
+  entities:
+    light.dimmer_gang_1_dimmeaktuator:
+      supported_color_modes:
+      - brightness
+      color_mode: brightness
+      brightness: 255
+      friendly_name: Taklys oppe
+      supported_features: 0
+      state: 'on'
+    light.dimmer_gang_2_dimmeaktuator:
+      supported_color_modes:
+      - brightness
+      color_mode: brightness
+      brightness: 255
+      friendly_name: Taklys nede
+      supported_features: 0
+      state: 'on'
+    light.maleribelysning:
+      supported_color_modes:
+      - onoff
+      color_mode: onoff
+      friendly_name: Maleribelysning
+      supported_features: 0
+      state: 'on'
+  metadata: {}
+- id: '1757623780042'
+  name: gang_dag
+  entities:
+    light.dimmer_gang_1_dimmeaktuator:
+      supported_color_modes:
+      - brightness
+      color_mode: brightness
+      brightness: 178
+      friendly_name: Taklys oppe
+      supported_features: 0
+      state: 'on'
+    light.dimmer_gang_2_dimmeaktuator:
+      supported_color_modes:
+      - brightness
+      color_mode: brightness
+      brightness: 178
+      friendly_name: Taklys nede
+      supported_features: 0
+      state: 'on'
+    light.maleribelysning:
+      supported_color_modes:
+      - onoff
+      color_mode: onoff
+      friendly_name: Maleribelysning
+      supported_features: 0
+      state: 'on'
+  metadata: {}
+- id: '1757623814227'
+  name: gang_dempet
+  entities:
+    light.dimmer_gang_1_dimmeaktuator:
+      supported_color_modes:
+      - brightness
+      color_mode: brightness
+      brightness: 46
+      friendly_name: Taklys oppe
+      supported_features: 0
+      state: 'on'
+    light.dimmer_gang_2_dimmeaktuator:
+      supported_color_modes:
+      - brightness
+      color_mode: brightness
+      brightness: 74
+      friendly_name: Taklys nede
+      supported_features: 0
+      state: 'on'
+    light.maleribelysning:
+      supported_color_modes:
+      - onoff
+      color_mode: onoff
+      friendly_name: Maleribelysning
+      supported_features: 0
+      state: 'on'
+  metadata: {}
+- id: '1757623859074'
+  name: gang_av
+  entities:
+    light.dimmer_gang_1_dimmeaktuator:
+      supported_color_modes:
+      - brightness
+      color_mode:
+      brightness:
+      friendly_name: Taklys oppe
+      supported_features: 0
+      state: 'off'
+    light.dimmer_gang_2_dimmeaktuator:
+      supported_color_modes:
+      - brightness
+      color_mode:
+      brightness:
+      friendly_name: Taklys nede
+      supported_features: 0
+      state: 'off'
+    light.maleribelysning:
+      supported_color_modes:
+      - onoff
+      color_mode:
+      friendly_name: Maleribelysning
+      supported_features: 0
+      state: 'off'
+  metadata: {}
+- id: '1757624018531'
+  name: vindfang_max
+  entities:
+    light.dimmer_vindfang_dimmeaktuator:
+      supported_color_modes:
+      - brightness
+      color_mode: brightness
+      brightness: 255
+      friendly_name: Taklys
+      supported_features: 0
+      state: 'on'
+  metadata: {}
+- id: '1757624045584'
+  name: vindfang_dag
+  entities:
+    light.dimmer_vindfang_dimmeaktuator:
+      supported_color_modes:
+      - brightness
+      color_mode: brightness
+      brightness: 230
+      friendly_name: Taklys
+      supported_features: 0
+      state: 'on'
+  metadata: {}
+- id: '1757624075578'
+  name: vindfang_dempet
+  entities:
+    light.dimmer_vindfang_dimmeaktuator:
+      supported_color_modes:
+      - brightness
+      color_mode: brightness
+      brightness: 76
+      friendly_name: Taklys
+      supported_features: 0
+      state: 'on'
+  metadata: {}
+- id: '1757624095495'
+  name: vindfang_av
+  entities:
+    light.dimmer_vindfang_dimmeaktuator:
+      supported_color_modes:
+      - brightness
+      color_mode:
+      brightness:
+      friendly_name: Taklys
+      supported_features: 0
+      state: 'off'
   metadata: {}

@@ -1,0 +1,143 @@
+input_number:
+  zigbee_offline_threshold_hours:
+    name: Zigbee – terskel timer
+    min: 0
+    max: 72
+    step: 0.5
+    mode: box
+    unit_of_measurement: h
+    icon: mdi:timer-alert
+    initial: 6
+
+template:
+  - trigger:
+      - platform: time_pattern
+        minutes: "/15"
+    sensor:
+      - name: "Zigbee offline kandidater"
+        # -> sensor.zigbee_offline_kandidater
+        unique_id: zigbee_offline_candidates_labels_clean
+        icon: mdi:access-point-network-off
+        state: >
+          {% set threshold = states('input_number.zigbee_offline_threshold_hours')|float(6) %}
+          {% set tagged = expand(label_entities('zigbee_watchlist')) %}
+          {# Velg én representant per device: temp-sensor -> annen sensor -> første entitet #}
+          {% set pick = namespace(seen=[], reps=[]) %}
+          {% for e in tagged if e is not none and e.state not in ['unknown','unavailable'] %}
+            {% set did = device_id(e.entity_id) %}
+            {% if did and (did not in pick.seen)
+                  and e.entity_id.startswith('sensor.')
+                  and (state_attr(e.entity_id,'device_class') == 'temperature') %}
+              {% set _ = pick.seen.append(did) %}
+              {% set _ = pick.reps.append(e) %}
+            {% endif %}
+          {% endfor %}
+          {% for e in tagged if e is not none and e.state not in ['unknown','unavailable'] %}
+            {% set did = device_id(e.entity_id) %}
+            {% if did and (did not in pick.seen) and e.entity_id.startswith('sensor.') %}
+              {% set _ = pick.seen.append(did) %}
+              {% set _ = pick.reps.append(e) %}
+            {% endif %}
+          {% endfor %}
+          {% if pick.reps | length == 0 %}
+            0
+          {% else %}
+            {% set offenders = [] %}
+            {% for e in pick.reps %}
+              {% set ls = state_attr(e.entity_id, 'last_seen') %}
+              {% if ls %}
+                {% set age_h = ( now() - as_datetime(ls) ).total_seconds() / 3600 %}
+              {% else %}
+                {% set age_h = ( now() - e.last_updated ).total_seconds() / 3600 %}
+              {% endif %}
+              {% if age_h > threshold %}
+                {% set _ = offenders.append(e.entity_id) %}
+              {% endif %}
+            {% endfor %}
+            {{ offenders|length }}
+          {% endif %}
+        attributes:
+          label_used: "zigbee_watchlist"
+          found_entities: "{{ label_entities('zigbee_watchlist') | join(', ') }}"
+          representatives: >
+            {% set tagged = expand(label_entities('zigbee_watchlist')) %}
+            {% set pick = namespace(seen=[], reps=[]) %}
+            {% for e in tagged if e is not none and e.state not in ['unknown','unavailable'] %}
+              {% set did = device_id(e.entity_id) %}
+              {% if did and (did not in pick.seen)
+                    and e.entity_id.startswith('sensor.')
+                    and (state_attr(e.entity_id,'device_class') == 'temperature') %}
+                {% set _ = pick.seen.append(did) %}
+                {% set _ = pick.reps.append(e.entity_id) %}
+              {% endif %}
+            {% endfor %}
+            {% for e in tagged if e is not none and e.state not in ['unknown','unavailable'] %}
+              {% set did = device_id(e.entity_id) %}
+              {% if did and (did not in pick.seen) and e.entity_id.startswith('sensor.') %}
+                {% set _ = pick.seen.append(did) %}
+                {% set _ = pick.reps.append(e.entity_id) %}
+              {% endif %}
+            {% endfor %}
+            {{ pick.reps | join(', ') }}
+          offenders: >
+            {% set threshold = states('input_number.zigbee_offline_threshold_hours')|float(6) %}
+            {% set tagged = expand(label_entities('zigbee_watchlist')) %}
+            {% set pick = namespace(seen=[], reps=[]) %}
+            {% for e in tagged if e is not none and e.state not in ['unknown','unavailable'] %}
+              {% set did = device_id(e.entity_id) %}
+              {% if did and (did not in pick.seen)
+                    and e.entity_id.startswith('sensor.')
+                    and (state_attr(e.entity_id,'device_class') == 'temperature') %}
+                {% set _ = pick.seen.append(did) %}
+                {% set _ = pick.reps.append(e) %}
+              {% endif %}
+            {% endfor %}
+            {% for e in tagged if e is not none and e.state not in ['unknown','unavailable'] %}
+              {% set did = device_id(e.entity_id) %}
+              {% if did and (did not in pick.seen) and e.entity_id.startswith('sensor.') %}
+                {% set _ = pick.seen.append(did) %}
+                {% set _ = pick.reps.append(e) %}
+              {% endif %}
+            {% endfor %}
+            {% set lines = [] %}
+            {% for e in pick.reps %}
+              {% set ls = state_attr(e.entity_id, 'last_seen') %}
+              {% if ls %}
+                {% set age_h = ( now() - as_datetime(ls) ).total_seconds() / 3600 %}
+              {% else %}
+                {% set age_h = ( now() - e.last_updated ).total_seconds() / 3600 %}
+              {% endif %}
+              {% if age_h > threshold %}
+                {% set _ = lines.append( "- " ~ e.name ~ " (`" ~ e.entity_id ~ "`) • " ~ age_h|round(1) ~ "h") %}
+              {% endif %}
+            {% endfor %}
+            {{ lines|join('\n') }}
+
+automation:
+  - id: zigbee_offline_watchdog_labels_notify_clean
+    alias: Zigbee – varsle om enheter uten rapportering (labels)
+    mode: single
+    trigger:
+      - platform: state
+        entity_id: sensor.zigbee_offline_kandidater
+      - platform: time_pattern
+        minutes: "/30"
+    condition:
+      - condition: template
+        value_template: "{{ (states('sensor.zigbee_offline_kandidater')|int(0)) > 0 }}"
+    action:
+      - variables:
+          offenders_md: "{{ state_attr('sensor.zigbee_offline_kandidater','offenders') or '—' }}"
+          threshold: "{{ states('input_number.zigbee_offline_threshold_hours') }}"
+      - service: persistent_notification.create
+        data:
+          title: "Zigbee: enheter uten rapportering > {{ threshold }}h"
+          message: >
+            Label: zigbee_watchlist
+            {{ offenders_md }}
+      - service: notify.notify
+        data:
+          title: "Zigbee offline (>{{ threshold }}h)"
+          message: "{{ offenders_md }}"
+          data:
+            tag: zigbee_offline_watchdog

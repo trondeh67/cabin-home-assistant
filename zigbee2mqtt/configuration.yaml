@@ -10,6 +10,7 @@ serial:
   adapter: ember
   baudrate: 115200
 advanced:
+  last_seen: ISO_8601
   log_level: debug
   channel: 11
   network_key:
@@ -84,5 +85,6 @@ devices:
     friendly_name: gang_maleribelysning
   '0x00158d008afd6b45':
     friendly_name: bod_temperaturmåler
+    temperature_precision: ''
   '0xd44867fffefc2ce3':
     friendly_name: bod_dørkontakt

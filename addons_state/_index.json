@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-09-10T09:46:44+02:00",
+  "timestamp": "2025-09-16T14:27:23+02:00",
   "addons": {
     "addons": [
       {
@@ -28,8 +28,8 @@
         "description": "Allow logging in remotely to Home Assistant using SSH",
         "advanced": true,
         "stage": "stable",
-        "version": "9.19.0",
-        "version_latest": "9.19.0",
+        "version": "9.20.1",
+        "version_latest": "9.20.1",
         "update_available": false,
         "available": true,
         "detached": false,
@@ -168,8 +168,8 @@
         "description": "Zero config VPN for building secure networks",
         "advanced": false,
         "stage": "stable",
-        "version": "0.26.0",
-        "version_latest": "0.26.0",
+        "version": "0.26.1",
+        "version_latest": "0.26.1",
         "update_available": false,
         "available": true,
         "detached": false,

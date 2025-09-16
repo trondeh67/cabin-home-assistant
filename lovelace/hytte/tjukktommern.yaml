@@ -1,4 +1,4 @@
-title: TJUKKTØMMERN
+Ftitle: TJUKKTØMMERN
 views:
   - !include oppholdsrom.yaml
 
@@ -11,19 +11,45 @@ views:
       - type: vertical-stack
         cards:
           - type: custom:mushroom-title-card
-            title: LYSSCENER
+            title: LYSSCENER & LYS
           - type: grid
             columns: 3
             square: false
             cards:
               - type: custom:mushroom-template-card
-                primary: Alt på
+                primary: Max
                 icon: mdi:lightbulb-group
                 tap_action:
                   action: call-service
                   service: scene.turn_on
                   target:
-                    entity_id: scene.stue_alt_pa
+                    entity_id: scene.stue_max
+              - type: custom:mushroom-template-card
+                primary: Dag
+                icon: mdi:lightbulb-group
+                tap_action:
+                  action: call-service
+                  service: scene.turn_on
+                  target:
+                    entity_id: scene.stue_dag
+              - type: custom:mushroom-template-card
+                primary: Kveld
+                icon: mdi:lightbulb-group
+                tap_action:
+                  action: call-service
+                  service: scene.turn_on
+                  target:
+                    entity_id: scene.stue_dempet
+              - type: custom:mushroom-template-card
+                primary: Av
+                icon: mdi:lightbulb-off
+                icon_color: red
+
+                tap_action:
+                  action: call-service
+                  service: scene.turn_on
+                  target:
+                    entity_id: scene.stue_alt_av_duplisere
 
           - type: grid
             columns: 2
@@ -59,7 +85,46 @@ views:
       - type: vertical-stack
         cards:
           - type: custom:mushroom-title-card
-            title: LYS
+            title: LYSSCENER & LYS
+          - type: grid
+            columns: 3
+            square: false
+            cards:
+              - type: custom:mushroom-template-card
+                primary: Max
+                icon: mdi:lightbulb-group
+                tap_action:
+                  action: call-service
+                  service: scene.turn_on
+                  target:
+                    entity_id: scene.spisestue_max
+              - type: custom:mushroom-template-card
+                primary: Dag
+                icon: mdi:lightbulb-group
+                tap_action:
+                  action: call-service
+                  service: scene.turn_on
+                  target:
+                    entity_id: scene.spisestue_dag
+              - type: custom:mushroom-template-card
+                primary: Kveld
+                icon: mdi:lightbulb-group
+                tap_action:
+                  action: call-service
+                  service: scene.turn_on
+                  target:
+                    entity_id: scene.spisestue_dempet
+              - type: custom:mushroom-template-card
+                primary: Av
+                icon: mdi:lightbulb-off
+                icon_color: red
+
+                tap_action:
+                  action: call-service
+                  service: scene.turn_on
+                  target:
+                    entity_id: scene.spisestue_av
+
           - type: grid
             columns: 1
             square: false
@@ -85,6 +150,48 @@ views:
     cards:
       - type: custom:mushroom-title-card
         title: KJØKKEN
+      - type: vertical-stack
+        cards:
+          - type: custom:mushroom-title-card
+            title: LYSSCENER & LYS
+          - type: grid
+            columns: 3
+            square: false
+            cards:
+              - type: custom:mushroom-template-card
+                primary: Max
+                icon: mdi:lightbulb-group
+                tap_action:
+                  action: call-service
+                  service: scene.turn_on
+                  target:
+                    entity_id: scene.kjokken_max
+              - type: custom:mushroom-template-card
+                primary: Dag
+                icon: mdi:lightbulb-group
+                tap_action:
+                  action: call-service
+                  service: scene.turn_on
+                  target:
+                    entity_id: scene.kjokken_dag
+              - type: custom:mushroom-template-card
+                primary: Kveld
+                icon: mdi:lightbulb-group
+                tap_action:
+                  action: call-service
+                  service: scene.turn_on
+                  target:
+                    entity_id: scene.kjokken_dempet
+              - type: custom:mushroom-template-card
+                primary: Av
+                icon: mdi:lightbulb-off
+                icon_color: red
+                tap_action:
+                  action: call-service
+                  service: scene.turn_on
+                  target:
+                    entity_id: scene.kjokken_av
+
       - type: custom:auto-entities
         card:
           type: grid
@@ -212,6 +319,48 @@ views:
     cards:
       - type: custom:mushroom-title-card
         title: Gang
+      - type: vertical-stack
+        cards:
+          - type: custom:mushroom-title-card
+            title: LYSSCENER & LYS
+          - type: grid
+            columns: 3
+            square: false
+            cards:
+              - type: custom:mushroom-template-card
+                primary: Max
+                icon: mdi:lightbulb-group
+                tap_action:
+                  action: call-service
+                  service: scene.turn_on
+                  target:
+                    entity_id: scene.gang_max
+              - type: custom:mushroom-template-card
+                primary: Dag
+                icon: mdi:lightbulb-group
+                tap_action:
+                  action: call-service
+                  service: scene.turn_on
+                  target:
+                    entity_id: scene.gang_dag
+              - type: custom:mushroom-template-card
+                primary: Kveld
+                icon: mdi:lightbulb-group
+                tap_action:
+                  action: call-service
+                  service: scene.turn_on
+                  target:
+                    entity_id: scene.gang_dempet
+              - type: custom:mushroom-template-card
+                primary: Av
+                icon: mdi:lightbulb-off
+                icon_color: red
+                tap_action:
+                  action: call-service
+                  service: scene.turn_on
+                  target:
+                    entity_id: scene.gang_av
+
       - type: grid
         columns: 2
         square: false
@@ -238,6 +387,48 @@ views:
     cards:
       - type: custom:mushroom-title-card
         title: Vindfang
+      - type: vertical-stack
+        cards:
+          - type: custom:mushroom-title-card
+            title: LYSSCENER & LYS
+          - type: grid
+            columns: 3
+            square: false
+            cards:
+              - type: custom:mushroom-template-card
+                primary: Max
+                icon: mdi:lightbulb-group
+                tap_action:
+                  action: call-service
+                  service: scene.turn_on
+                  target:
+                    entity_id: scene.vindfang_max
+              - type: custom:mushroom-template-card
+                primary: Dag
+                icon: mdi:lightbulb-group
+                tap_action:
+                  action: call-service
+                  service: scene.turn_on
+                  target:
+                    entity_id: scene.vindfang_dag
+              - type: custom:mushroom-template-card
+                primary: Kveld
+                icon: mdi:lightbulb-group
+                tap_action:
+                  action: call-service
+                  service: scene.turn_on
+                  target:
+                    entity_id: scene.vindfang_dempet
+              - type: custom:mushroom-template-card
+                primary: Av
+                icon: mdi:lightbulb-off
+                icon_color: red
+                tap_action:
+                  action: call-service
+                  service: scene.turn_on
+                  target:
+                    entity_id: scene.vindfang_av
+
       - type: custom:auto-entities
         card:
           type: grid
@@ -251,6 +442,7 @@ views:
               options:
                 type: custom:mushroom-light-card
                 show_brightness_control: true
+
   - title: Bod
     path: bod
     icon: mdi:door-closed

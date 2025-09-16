@@ -40,3 +40,8 @@ uploads/
 .DS_Store
 .vscode/
 .idea/
+home-assistant.log*
+www/community/
+zigbee2mqtt/database.db
+zigbee2mqtt/log/
+addons_state/*.json

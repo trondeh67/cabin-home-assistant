@@ -29,8 +29,10 @@ http:
   trusted_proxies:
     - 127.0.0.1
 
-# ... alt over her beholdes som hos deg ...
+homeassistant:
+  packages: !include_dir_named packages
 
+# --------------------------- TEMPLATE-SENSORER ---------------------------
 template:
   # --- Systemversjoner ---
   - sensor:
@@ -59,65 +61,150 @@ template:
           {% set t = states('sensor.ha_uptime') | float(0) %}
           {{ (t / 24) | round(1) }} d
 
-  # --- Korrigerte kilder ---
+  # --- Korrigerte ute-kilder + virtuelle sensorer (uten heartbeat) ---
   - sensor:
       - name: "Ute Netatmo (korr)"
         unique_id: ute_netatmo_corr
         unit_of_measurement: "°C"
         device_class: temperature
+        state_class: measurement
         state: >
-          {% set v = states('sensor.tjukktommern_inne_tjukktommern_ute_temperatur')|float(default=nan) %}
-          {% set off = states('input_number.ute_offset_netatmo')|float(0) %}
+          {% set s = states('sensor.tjukktommern_inne_tjukktommern_ute_temperatur') %}
+          {% set v = s | float if s | is_number else none %}
+
+          {% set off = states('input_number.ute_offset_netatmo') | float(0) %}
           {{ (v + off) if v == v else 'unknown' }}
 
       - name: "Ute Daikin (korr)"
         unique_id: ute_daikin_corr
         unit_of_measurement: "°C"
         device_class: temperature
+        state_class: measurement
         state: >
-          {% set v = states('sensor.daikinap86694_climatecontrol_outdoor_temperature')|float(default=nan) %}
-          {% set off = states('input_number.ute_offset_daikin')|float(0) %}
+          {% set v = states('sensor.daikinap86694_climatecontrol_outdoor_temperature') %}
+          {{ v|float(10.0) }}
+
+          {% set off = states('input_number.ute_offset_daikin') | float(0) %}
           {{ (v + off) if v == v else 'unknown' }}
 
-  # --- Virtuell ute med heartbeat (trigger-basert template) ---
-  - trigger:
-      - platform: time_pattern
-        minutes: "/10"
-      - platform: state
-        entity_id:
-          - sensor.ute_netatmo_korr
-          - sensor.ute_daikin_korr
-    sensor:
       - name: "Ute temperatur (virtuell)"
         unique_id: ute_temp_virtual
         unit_of_measurement: "°C"
         device_class: temperature
+        state_class: measurement
         availability: >
-          {{ has_value('sensor.ute_netatmo_korr') or has_value('sensor.ute_daikin_korr') }}
+          {{ has_value('sensor.ute_netatmo_korr') }}
         state: >
-          {% set n = states('sensor.ute_netatmo_korr')|float(default=nan) %}
-          {% set d = states('sensor.ute_daikin_korr')|float(default=nan) %}
+          {% set s = states('sensor.ute_netatmo_korr') %}
+          {{ s|float if s|is_number else none }}
 
-          {% set n_age = (now() - states.sensor.ute_netatmo_korr.last_changed).total_seconds()
-                          if states.sensor.ute_netatmo_korr is not none else 999999 %}
-          {% set d_age = (now() - states.sensor.ute_daikin_korr.last_changed).total_seconds()
-                          if states.sensor.ute_daikin_korr is not none else 999999 %}
-          {% set fresh_n = (n == n) and (n_age < 1800) %}
-          {% set fresh_d = (d == d) and (d_age < 1800) %}
+      - name: "Stue temperatur (virtuell)"
+        unique_id: stue_temp_virtual
+        unit_of_measurement: "°C"
+        device_class: temperature
+        state_class: measurement
+        availability: >
+          {{ has_value('sensor.tjukktommern_inne_temperatur')
+              and has_value('sensor.tjukktommern_motion_sensor_temperatur') }}
+        state: >
+          {# Råverdier #}
+          {% set net_s = states('sensor.tjukktommern_inne_temperatur') %}
+          {% set sens_s = states('sensor.tjukktommern_motion_sensor_temperatur') %}
 
-          {% if fresh_n and fresh_d %}
-            {% set diff = (n - d) | abs %}
-            {% set t1 = 1.2 %}
-            {% set t2 = 1.8 %}
-            {% set avg = (n + d) / 2 %}
-            {% set mn  = [n, d] | min %}
-            {% set w = ((diff - t1) / (t2 - t1)) %}
-            {% set w = 0 if w < 0 else (1 if w > 1 else w) %}
-            {{ ((1 - w) * avg + w * mn) | round(1) }}
-          {% elif fresh_n %}
-            {{ n | round(1) }}
-          {% elif fresh_d %}
-            {{ d | round(1) }}
-          {% else %}
-            unknown
+          {% set netatmo_raw = net_s|float if net_s|is_number else none %}
+          {% set sensibo_raw = sens_s|float if sens_s|is_number else none %}
+
+          {# Glattet STATE fra statistics; fall tilbake til rå #}
+          {% set netatmo = states('sensor.stue_netatmo_30_min_snitt') | float(default=netatmo_raw) %}
+          {% set sensibo = states('sensor.stue_sensibo_30_min_snitt') | float(default=sensibo_raw) %}
+
+          {# Outlier-vern #}
+          {% set diff = (netatmo - sensibo) | abs %}
+
+          {# Kontekst (sol og fyring) #}
+          {% set sun_elev = state_attr('sun.sun','elevation') | float(-90) %}
+          {% set hour = now().hour %}
+          {% set morning_sun = (7 <= hour <= 11) and (sun_elev > 5) %}
+          {% set slope = states('sensor.stue_sensibo_stigningshastighet') | float(0) %}
+          {% set early_fire = slope >= 1.0 %}
+
+          {# Basis-vekter #}
+          {% set w_netatmo = 0.35 %}
+          {% set w_sensibo = 0.65 %}
+
+          {# Justeringer #}
+          {% if morning_sun %}
+            {% set w_netatmo = 0.20 %}
+            {% set w_sensibo = 0.80 %}
           {% endif %}
+          {% if early_fire %}
+            {% set w_netatmo = w_netatmo * 0.7 %}
+            {% set w_sensibo = w_sensibo * 1.1 %}
+          {% endif %}
+
+          {# Normaliser #}
+          {% set wsum = w_netatmo + w_sensibo %}
+          {% set w_netatmo = w_netatmo / wsum %}
+          {% set w_sensibo = w_sensibo / wsum %}
+
+          {# Resultat (ingen avrunding -> jevnere graf) #}
+          {% if diff > 3 %}
+            {{ ((netatmo + sensibo) / 2) }}
+          {% else %}
+            {{ (w_netatmo * netatmo + w_sensibo * sensibo) }}
+          {% endif %}
+        attributes:
+          netatmo_in: "{{ states('sensor.tjukktommern_inne_temperatur') }}"
+          sensibo_in: "{{ states('sensor.tjukktommern_motion_sensor_temperatur') }}"
+          netatmo_used: "{{ states('sensor.stue_netatmo_30_min_snitt') or states('sensor.tjukktommern_inne_temperatur') }}"
+          sensibo_used: "{{ states('sensor.stue_sensibo_30_min_snitt') or states('sensor.tjukktommern_motion_sensor_temperatur') }}"
+          diff_abs: >
+            {{ ((states('sensor.tjukktommern_inne_temperatur')|float(0)) -
+                (states('sensor.tjukktommern_motion_sensor_temperatur')|float(0))) | abs | round(2) }}
+          sensibo_slope_c_per_h: "{{ states('sensor.stue_sensibo_stigningshastighet') }}"
+          morning_sun: "{{ (7 <= now().hour <= 11) and (state_attr('sun.sun','elevation')|float(-90) > 5) }}"
+          weights: >
+            {%- set sun_elev = state_attr('sun.sun','elevation') | float(-90) -%}
+            {%- set hour = now().hour -%}
+            {%- set morning_sun = (7 <= hour <= 11) and (sun_elev > 5) -%}
+            {%- set slope = states('sensor.stue_sensibo_stigningshastighet') | float(0) -%}
+            {%- set early_fire = slope >= 1.0 -%}
+            {%- set wn = 0.35 -%}
+            {%- set ws = 0.65 -%}
+            {%- if morning_sun -%}
+              {%- set wn = 0.20 -%}
+              {%- set ws = 0.80 -%}
+            {%- endif -%}
+            {%- if early_fire -%}
+              {%- set wn = wn * 0.7 -%}
+              {%- set ws = ws * 1.1 -%}
+            {%- endif -%}
+            {%- set wsum = wn + ws -%}
+            {{ {'netatmo': (wn/wsum)|round(2), 'sensibo': (ws/wsum)|round(2)} }}
+
+# --------------------------- PLATFORM-SENSORER ---------------------------
+sensor:
+  # --- Glatting (30 min) -> STATE = mean ---
+  - platform: statistics
+    name: "Stue Netatmo (30 min snitt)"
+    entity_id: sensor.tjukktommern_inne_temperatur
+    max_age:
+      minutes: 30
+    precision: 3
+    state_characteristic: mean
+
+  - platform: statistics
+    name: "Stue Sensibo (30 min snitt)"
+    entity_id: sensor.tjukktommern_motion_sensor_temperatur
+    max_age:
+      minutes: 30
+    precision: 3
+    state_characteristic: mean
+
+  # --- Rask stigning (°C/h) for å detektere tidlig ovnsfyring ---
+  - platform: derivative
+    name: "Stue Sensibo stigningshastighet"
+    source: sensor.tjukktommern_motion_sensor_temperatur
+    unit_time: h
+    time_window: "00:15:00"
+    round: 2

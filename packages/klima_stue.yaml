@@ -62,18 +62,48 @@ input_number:
     step: 0.5
     unit_of_measurement: "°C"
 
+  # --- D-LEDD: Tuning ---
+  stue_kd:
+    name: "Stue D-forsterkning (Kd)"
+    min: 0
+    max: 5
+    step: 0.1
+    icon: mdi:alpha-d-box
+  stue_deriv_threshold:
+    name: "Stue D terskel (°C/min)"
+    min: 0
+    max: 0.2
+    step: 0.005
+    icon: mdi:sigma-lower
+  stue_deriv_cap:
+    name: "Stue D maks bidrag (°C)"
+    min: 0
+    max: 3
+    step: 0.1
+    icon: mdi:speedometer
+
 input_boolean:
   stue_klima_hold:
     name: "Stue klima HOLD (pause regulering)"
     icon: mdi:pause-octagon
 
 # ====== Beregninger ======
+# --- D-LEDD: stigningshastighet for romtemperatur ---
+sensor:
+  - platform: derivative
+    source: sensor.stue_temperatur_virtuell
+    name: "Stue temp stigning"
+    unit_time: min # resultat i °C/min
+    time_window: "00:10:00" # 10-minutters vindu
+    round: 3
+
 template:
   - sensor:
       - name: "Stue target pumpesettpunkt"
         unique_id: stue_target_pumpesettpunkt
         unit_of_measurement: "°C"
         state: >
+          {# Inndata #}
           {% set desired = states('input_number.stue_onsket_temp')|float(21.5) %}
           {% set Tin = states('sensor.stue_temperatur_virtuell')|float(default=desired) %}
           {% set Tout = states('sensor.ute_temperatur_virtuell')|float(10.0) %}
@@ -85,14 +115,22 @@ template:
           {% set cold = max(0, Tt - Tout) %}
           {% set offset_ff = a + b * cold %}
 
-          {# Svakt P-ledd #}
+          {# P-ledd #}
           {% set Kp = states('input_number.stue_kp')|float(0.30) %}
           {% set error = desired - Tin %}
-          {% set corr = Kp * error %}
+          {% set corr_p = Kp * error %}
 
-          {% set raw_target = desired + offset_ff + corr %}
+          {# --- D-LEDD: prediktivt ledd mot stigning/fall --- #}
+          {% set dTdt = states('sensor.stue_temp_stigning')|float(0.0) %}       {# °C/min #}
+          {% set Kd = states('input_number.stue_kd')|float(0.0) %}
+          {% set d_thr = states('input_number.stue_deriv_threshold')|float(0.03) %}
+          {% set d_cap = states('input_number.stue_deriv_cap')|float(1.5) %}
+          {# Bare reager når |stigning| > terskel; negativ dTdt (fall) gir positivt D-bidrag #}
+          {% set d_raw = ( -Kd * dTdt ) if (dTdt|abs > d_thr) else 0 %}
+          {% set corr_d = [d_cap, [-d_cap, d_raw]|max]|min %}
 
-          {# Begrensning #}
+          {# Sum og begrensning #}
+          {% set raw_target = desired + offset_ff + corr_p + corr_d %}
           {% set tmin = states('input_number.stue_min_setpunkt')|float(18.0) %}
           {% set tmax = states('input_number.stue_max_setpunkt')|float(28.0) %}
           {% set clamped = [tmax, [tmin, raw_target]|max]|min %}
@@ -105,6 +143,18 @@ template:
         state: >
           {{ (states('input_number.stue_onsket_temp')|float(21.5)
               - states('sensor.stue_temperatur_virtuell')|float(21.5)) | round(2) }}
+
+      # --- D-LEDD: eksponér D-bidraget for diagnose (valgfritt i UI) ---
+      - name: "Stue D-bidrag"
+        unique_id: stue_d_contrib
+        unit_of_measurement: "°C"
+        state: >
+          {% set dTdt = states('sensor.stue_temp_stigning')|float(0.0) %}
+          {% set Kd = states('input_number.stue_kd')|float(0.0) %}
+          {% set d_thr = states('input_number.stue_deriv_threshold')|float(0.03) %}
+          {% set d_cap = states('input_number.stue_deriv_cap')|float(1.5) %}
+          {% set d_raw = ( -Kd * dTdt ) if (dTdt|abs > d_thr) else 0 %}
+          {{ ([d_cap, [ -d_cap, d_raw ]|max]|min) | round(2) }}
 
 # ====== Antisjattering (rate limit) ======
 timer:
@@ -126,8 +176,12 @@ automation:
         entity_id:
           - sensor.stue_target_pumpesettpunkt
           - sensor.stue_temperatur_virtuell
-          - sensor.ute_temperatur_virtuell # NB: riktig navn
+          - sensor.ute_temperatur_virtuell
+          - sensor.stue_temp_stigning # --- D-LEDD: legg til derivative
           - input_number.stue_onsket_temp
+          - input_number.stue_kd # --- D-LEDD: retuning skal trigge
+          - input_number.stue_deriv_threshold
+          - input_number.stue_deriv_cap
 
       # Kryssing UNDER ønsket temp (med hysterese)
       - platform: template
@@ -160,6 +214,7 @@ automation:
             {{ (t if t is number else states('sensor.stue_target_pumpesettpunkt')|float(22.0))|float }}
           max_step: "{{ states('input_number.stue_setpunkt_endringsgrense')|float(1.0) }}"
           min_effective_delta: 0.2
+          dterm: "{{ states('sensor.stue_d_bidrag')|default(states('sensor.stue_d-bidrag')) }}"
       - variables:
           delta: "{{ target - current_set }}"
           next_set: >
@@ -192,8 +247,10 @@ automation:
                 data:
                   name: "Stue klima (Daikin)"
                   message: >
-                    "Endrer setpunkt fra {{ current_set|round(1) }} → {{ next_set|round(1) }}
-                    (target: {{ target|round(1) }}, delta: {{ (target-current_set)|round(2) }})"
+                    Endrer setpunkt {{ current_set|round(1) }} → {{ next_set|round(1) }}
+                    (target: {{ target|round(1) }}, Δ: {{ (target-current_set)|round(2) }},
+                    dT/dt: {{ states('sensor.stue_temp_stigning') }} °C/min,
+                    D: {{ states('sensor.stue_d-bidrag') | default(states('sensor.stue_d_bidrag')) }} °C)
                   entity_id: climate.daikinap86694
 
           - conditions:
@@ -204,10 +261,11 @@ automation:
                 data:
                   name: "Stue klima (Daikin)"
                   message: >
-                    "Ingen endring: current {{ current_set|round(1) }}≈target {{ target|round(1) }}
-                    (terskel: {{ min_effective_delta }})"
+                    Ingen endring: current {{ current_set|round(1) }}≈target {{ target|round(1) }}
+                    (terskel: {{ min_effective_delta }},
+                    dT/dt: {{ states('sensor.stue_temp_stigning') }} °C/min,
+                    D: {{ states('sensor.stue_d-bidrag') | default(states('sensor.stue_d_bidrag')) }} °C)
                   entity_id: climate.daikinap86694
 
-      # Hvis condition blokkerer, logg *hvorfor*
     trace:
       stored_traces: 10

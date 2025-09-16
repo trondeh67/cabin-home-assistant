@@ -65,7 +65,22 @@ lys_dagtid_avskrudd_alarm:
   sequence:
   - target:
       entity_id:
-      - scene.velkommen_hjem
-      - scene.oppholdsrom_matlaging
-      - scene.stue_normal
+      - scene.gang_dag
+      - scene.kjokken_dag
+      - scene.stue_dag
+      - scene.gang_dag
+      - scene.spisestue_dag
     action: scene.turn_on
+lys_oppholdsom_dempet:
+  alias: Lys – oppholdsom dempet
+  mode: single
+  sequence:
+  - target:
+      entity_id:
+      - scene.gang_dempet
+      - scene.kjokken_dempet
+      - scene.stue_dempet
+      - scene.gang_dempet
+      - scene.spisestue_dempet
+    action: scene.turn_on
+  description: ''
