@@ -155,7 +155,8 @@ if git remote get-url "${GIT_REMOTE}" >/dev/null 2>&1; then
   git fetch --all -q || log "advarsel: fetch feilet"
   # Rebase for å unngå unødige merge-commits
   if git rev-parse --verify "${GIT_BRANCH}" >/dev/null 2>&1; then
-    git pull --rebase -q "${GIT_REMOTE}" "${GIT_BRANCH}" || log "advarsel: pull --rebase feilet (fortsetter lokalt)"
+    git -c pull.rebase=true -c rebase.autoStash=true pull -q "${GIT_REMOTE}" "${GIT_BRANCH}" || \
+      log "advarsel: pull --rebase feilet (fortsetter lokalt)"
   fi
 else
   log "ingen git remote konfigurert – hopper over fetch/pull (tips: git remote add ${GIT_REMOTE} git@github.com:<user>/<repo>.git)"
