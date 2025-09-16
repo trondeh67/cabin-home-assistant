@@ -122,7 +122,7 @@ zigbee2mqtt/coordinator_backup.json
 # Add-on cache/state
 addons/
 !addons/local/        # behold lokale add-ons
-addons_state/*.json
+# addons_state/*.json
 
 # IDE / OS
 .vscode/
