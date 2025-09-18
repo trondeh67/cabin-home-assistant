@@ -98,6 +98,68 @@ cards:
               labels: false
             line_width: 2
 
+      - type: vertical-stack
+        cards:
+          - type: custom:mushroom-title-card
+            title: VARME – STUE (bruker)
+
+          # A) Ønsket temperatur (sittehøyde) – kun input_number
+          - type: entities
+            entities:
+              - input_number.stue_onsket_temp
+
+          # B) AV / PÅ – kaller skript (sikkert) i stedet for å gi full climate-kontroll
+          - type: grid
+            columns: 2
+            square: false
+            cards:
+              - type: custom:mushroom-template-card
+                primary: "Skru AV varmepumpe"
+                secondary: >
+                  {% if is_state('input_boolean.stue_klima_hold','on') %}
+                    Hold er aktiv
+                  {% else %}
+                    Slår av og aktiverer hold
+                  {% endif %}
+                icon: mdi:power
+                icon_color: red
+                tap_action:
+                  action: call-service
+                  service: script.turn_on
+                  target: { entity_id: script.stue_klima_av }
+                double_tap_action:
+                  action: none
+                hold_action:
+                  action: none
+
+              - type: custom:mushroom-template-card
+                primary: "Skru PÅ varmepumpe"
+                secondary: "Slipper hold og synker setpunkt"
+                icon: mdi:power
+                icon_color: green
+                tap_action:
+                  action: call-service
+                  service: script.turn_on
+                  target: { entity_id: script.stue_klima_pa }
+
+          # C) Statusflis – viser beregnet setpkt og faktisk setpkt på Daikin
+          - type: custom:mushroom-template-card
+            primary: >
+              {% set calc = states('sensor.stue_target_pumpesettpunkt')|float(nan) %}
+              {% set sp   = state_attr('climate.daikinap86694','temperature')|float(nan) %}
+              Beregnet {{ calc|round(1) if calc==calc else '–' }} °C  •  Daikin {{ sp|round(1) if sp==sp else '–' }} °C
+            secondary: >
+              Modus: {{ states('climate.daikinap86694')|upper }}
+              {% if is_state('input_boolean.stue_klima_hold','on') %} • HOLD aktiv{% endif %}
+            icon: mdi:thermostat
+            icon_color: >
+              {% set mode = states('climate.daikinap86694') %}
+              {% if mode in ['heat','heat_cool'] %}amber
+              {% elif mode in ['cool'] %}blue
+              {% else %}grey
+              {% endif %}
+            multiline_secondary: true
+
       # LYS – sceneknapper og “kun lys som er PÅ”
       - type: custom:mushroom-title-card
         title: Lys & scener
@@ -211,112 +273,6 @@ cards:
                 type: custom:mushroom-entity-card
                 name: ""
         show_empty: false
-
-      - type: vertical-stack
-        cards:
-          - type: custom:mushroom-title-card
-            title: VARME – STUE (Daikin)
-
-          - type: entities
-            entities:
-              - input_number.stue_onsket_temp
-              - entity: sensor.stue_temperatur_virtuell
-                name: Målt inne (virtuell)
-              - entity: sensor.ute_temperatur_virtuell
-                name: Ute (virtuell)
-              - entity: sensor.stue_target_pumpesettpunkt
-                name: Beregnet setpunkt
-              - entity: climate.daikinap86694
-                name: Daikin
-              - input_boolean.stue_klima_hold
-
-              # --- D-ledd: diagnostikk ---
-              - type: section
-                label: D-ledd
-              - entity: sensor.stue_temp_stigning
-                name: dT/dt (°C/min)
-              - entity: sensor.stue_d_bidrag
-                name: D-bidrag (°C)
-
-          - type: entities
-            title: Tuning
-            entities:
-              - input_number.stue_base_offset_a
-              - input_number.stue_kulde_slope_b
-              - input_number.stue_kulde_terskel
-              - input_number.stue_kp
-              - input_number.stue_min_setpunkt
-              - input_number.stue_max_setpunkt
-              - input_number.stue_setpunkt_endringsgrense
-              # --- D-ledd: parametre ---
-              - input_number.stue_kd
-              - input_number.stue_deriv_threshold
-              - input_number.stue_deriv_cap
-
-      - type: horizontal-stack
-        cards:
-          - type: custom:mini-graph-card
-            name: Temp vs setpunkt (24t)
-            hours_to_show: 24
-            points_per_hour: 6
-            line_width: 2
-            show:
-              state: false
-              legend: true
-              labels: false
-            entities:
-              - entity: sensor.stue_temperatur_virtuell
-                name: Inne
-              - entity: sensor.stue_target_pumpesettpunkt
-                name: Beregnet setpkt
-                show_points: false
-
-          - type: custom:mini-graph-card
-            name: dT/dt & D (12t)
-            hours_to_show: 12
-            points_per_hour: 6
-            line_width: 2
-            show:
-              state: false
-              legend: true
-              labels: false
-            entities:
-              - entity: sensor.stue_temp_stigning
-                name: dT/dt (°C/min)
-              - entity: sensor.stue_d_bidrag
-                name: D-bidrag (°C)
-
-          - type: custom:mushroom-template-card
-            primary: >
-              {% set d = states('sensor.stue_d-bidrag')|float(0) %}
-              D-ledd {{ d|round(2) }} °C
-            icon: >
-              {% set d = states('sensor.stue_d-bidrag')|float(0) %}
-              {% if d|abs > 0 %}
-                mdi:sigma
-              {% else %}
-                mdi:sigma-lower
-              {% endif %}
-            icon_color: >
-              {% set d = states('sensor.stue_d-bidrag')|float(0) %}
-              {% if d > 0 %}green
-              {% elif d < 0 %}red
-              {% else %}grey
-              {% endif %}
-
-      # SISTE – systemstatus
-      - type: custom:mushroom-title-card
-        title: System
-      - type: grid
-        columns: 2
-        square: false
-        cards:
-          - type: custom:mushroom-entity-card
-            entity: sensor.ha_core_versjon
-            name: HA versjon
-          - type: custom:mushroom-entity-card
-            entity: sensor.ha_uptime_dager
-            name: Uptime
 
     card_mod:
       style: |

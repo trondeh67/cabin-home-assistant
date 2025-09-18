@@ -1,9 +1,16 @@
+# ============================================================
+#  STUE – VARMESTYRING (Daikin)
+#  P + I + D + feed-forward, rate-limit og cooldown
+# ============================================================
+
 homeassistant:
   customize:
     sensor.stue_target_pumpesettpunkt:
       friendly_name: "Stue: beregnet setpunkt til varmepumpe (Daikin)"
 
-# ====== Tuning / grenser ======
+# ------------------------------------------------------------
+#  TUNING / GRENSER
+# ------------------------------------------------------------
 input_number:
   stue_onsket_temp:
     name: "Stue: ønsket temp (sittehøyde)"
@@ -13,6 +20,7 @@ input_number:
     unit_of_measurement: "°C"
     icon: mdi:thermometer
 
+  # --- Feed-forward (uteavhengig baseløft)
   stue_base_offset_a:
     name: "Stue offset base a"
     min: -2
@@ -25,7 +33,7 @@ input_number:
     min: 0
     max: 0.5
     step: 0.01
-    icon: mdi:chart-spline
+    icon: mdi:chart-bell-curve-cumulative
 
   stue_kulde_terskel:
     name: "Stue offset kulde-terskel (°C)"
@@ -34,6 +42,7 @@ input_number:
     step: 1
     icon: mdi:snowflake-thermometer
 
+  # --- P-ledd
   stue_kp:
     name: "Stue P-forsterkning (Kp)"
     min: 0
@@ -41,9 +50,40 @@ input_number:
     step: 0.05
     icon: mdi:alpha-p-box
 
+  # --- I-ledd
+  stue_ki:
+    name: "Stue I-forsterkning (Ki) [°C/(°C·min)]"
+    min: 0
+    max: 0.05
+    step: 0.001
+    icon: mdi:alpha-i-box
+
+  stue_i_cap:
+    name: "Stue I maks bidrag (°C)"
+    min: 0.2
+    max: 5
+    step: 0.1
+    icon: mdi:speedometer
+
+  stue_i_leak:
+    name: "Stue I lekkasje per steg (0–0.2)"
+    min: 0
+    max: 0.2
+    step: 0.005
+    icon: mdi:water-percent
+
+  stue_i_term:
+    name: "Stue I-term (°C)"
+    min: -5
+    max: 5
+    step: 0.1
+    unit_of_measurement: "°C"
+    icon: mdi:sigma
+
+  # --- Begrensninger på Daikin-setpunkt
   stue_min_setpunkt:
     name: "Stue min setpunkt (Daikin)"
-    min: 15
+    min: 13
     max: 22
     step: 0.5
     unit_of_measurement: "°C"
@@ -62,19 +102,21 @@ input_number:
     step: 0.5
     unit_of_measurement: "°C"
 
-  # --- D-LEDD: Tuning ---
+  # --- D-ledd
   stue_kd:
     name: "Stue D-forsterkning (Kd)"
     min: 0
-    max: 5
-    step: 0.1
+    max: 30
+    step: 0.05
     icon: mdi:alpha-d-box
+
   stue_deriv_threshold:
     name: "Stue D terskel (°C/min)"
     min: 0
     max: 0.2
-    step: 0.005
+    step: 0.0001
     icon: mdi:sigma-lower
+
   stue_deriv_cap:
     name: "Stue D maks bidrag (°C)"
     min: 0
@@ -87,185 +129,289 @@ input_boolean:
     name: "Stue klima HOLD (pause regulering)"
     icon: mdi:pause-octagon
 
-# ====== Beregninger ======
-# --- D-LEDD: stigningshastighet for romtemperatur ---
+# ------------------------------------------------------------
+#  MÅLEBEHANDLING – DERIVERT ROMTEMP (D-LEDD INPUT)
+# ------------------------------------------------------------
 sensor:
   - platform: derivative
     source: sensor.stue_temperatur_virtuell
     name: "Stue temp stigning"
-    unit_time: min # resultat i °C/min
-    time_window: "00:10:00" # 10-minutters vindu
+    unit_time: min # °C/min
+    time_window: "00:05:00" # glatt 10 minutter
     round: 3
 
+# ------------------------------------------------------------
+#  BEREGNINGER – TARGET + DIAGNOSE
+# ------------------------------------------------------------
 template:
   - sensor:
+      # --- HOVEDUTGANG: beregnet setpunkt til varmepumpen ---
       - name: "Stue target pumpesettpunkt"
         unique_id: stue_target_pumpesettpunkt
         unit_of_measurement: "°C"
         state: >
-          {# Inndata #}
+          {# === INNDATA === #}
           {% set desired = states('input_number.stue_onsket_temp')|float(21.5) %}
-          {% set Tin = states('sensor.stue_temperatur_virtuell')|float(default=desired) %}
-          {% set Tout = states('sensor.ute_temperatur_virtuell')|float(10.0) %}
+          {% set Tin     = states('sensor.stue_temperatur_virtuell')|float(desired) %}
+          {% set Tout    = states('sensor.ute_temperatur_virtuell')|float(10.0) %}
 
-          {# Feed-forward #}
-          {% set a  = states('input_number.stue_base_offset_a')|float(1.0) %}
-          {% set b  = states('input_number.stue_kulde_slope_b')|float(0.10) %}
-          {% set Tt = states('input_number.stue_kulde_terskel')|float(15.0) %}
-          {% set cold = max(0, Tt - Tout) %}
+          {# === FEED-FORWARD (UTE-KOMPENSASJON) === #}
+          {% set a  = states('input_number.stue_base_offset_a')|float(1.5) %}
+          {% set b  = states('input_number.stue_kulde_slope_b')|float(0.05) %}
+          {% set Tt = states('input_number.stue_kulde_terskel')|float(13.0) %}
+          {% set cold = (Tt - Tout) if ((Tt - Tout) > 0) else 0 %}
           {% set offset_ff = a + b * cold %}
 
-          {# P-ledd #}
-          {% set Kp = states('input_number.stue_kp')|float(0.30) %}
+          {# === P-LEDD === #}
+          {% set Kp    = states('input_number.stue_kp')|float(0.30) %}
           {% set error = desired - Tin %}
           {% set corr_p = Kp * error %}
 
-          {# --- D-LEDD: prediktivt ledd mot stigning/fall --- #}
-          {% set dTdt = states('sensor.stue_temp_stigning')|float(0.0) %}       {# °C/min #}
-          {% set Kd = states('input_number.stue_kd')|float(0.0) %}
+          {# === I-LEDD (lagret som input_number i °C) === #}
+          {% set corr_i = states('input_number.stue_i_term')|float(0.0) %}
+
+          {# === D-LEDD (på målt dT/dt) === #}
+          {% set dTdt = states('sensor.stue_temp_stigning')|float(0.0) %}  {# °C/min #}
+          {% set Kd   = states('input_number.stue_kd')|float(0.0) %}
           {% set d_thr = states('input_number.stue_deriv_threshold')|float(0.03) %}
           {% set d_cap = states('input_number.stue_deriv_cap')|float(1.5) %}
-          {# Bare reager når |stigning| > terskel; negativ dTdt (fall) gir positivt D-bidrag #}
-          {% set d_raw = ( -Kd * dTdt ) if (dTdt|abs > d_thr) else 0 %}
-          {% set corr_d = [d_cap, [-d_cap, d_raw]|max]|min %}
+          {% set d_raw = (-Kd * dTdt) if ((dTdt|abs) > d_thr) else 0 %}
+          {% set corr_d = d_cap if d_raw > d_cap else (-d_cap if d_raw < -d_cap else d_raw) %}
 
-          {# Sum og begrensning #}
-          {% set raw_target = desired + offset_ff + corr_p + corr_d %}
-          {% set tmin = states('input_number.stue_min_setpunkt')|float(18.0) %}
+          {# === SUM + KLEMMING (MIN/MAX) === #}
+          {% set raw_target = desired + offset_ff + corr_p + corr_i + corr_d %}
+          {% set tmin = states('input_number.stue_min_setpunkt')|float(13.0) %}
           {% set tmax = states('input_number.stue_max_setpunkt')|float(28.0) %}
-          {% set clamped = [tmax, [tmin, raw_target]|max]|min %}
+          {% set clamped = tmax if raw_target > tmax else (tmin if raw_target < tmin else raw_target) %}
 
           {{ clamped | round(1) }}
 
+      # --- DIAGNOSE: temperaturfeil (for P/I-visualisering) ---
       - name: "Stue temperaturfeil"
         unique_id: stue_temp_error
         unit_of_measurement: "°C"
         state: >
-          {{ (states('input_number.stue_onsket_temp')|float(21.5)
-              - states('sensor.stue_temperatur_virtuell')|float(21.5)) | round(2) }}
+          {% set sp = states('input_number.stue_onsket_temp')|float(21.5) %}
+          {% set ti = states('sensor.stue_temperatur_virtuell')|float(sp) %}
+          {{ (sp - ti) | round(2) }}
 
-      # --- D-LEDD: eksponér D-bidraget for diagnose (valgfritt i UI) ---
+      # --- DIAGNOSE: D-bidrag (klippet) ---
       - name: "Stue D-bidrag"
         unique_id: stue_d_contrib
         unit_of_measurement: "°C"
+        icon: mdi:sigma-lower
         state: >
           {% set dTdt = states('sensor.stue_temp_stigning')|float(0.0) %}
-          {% set Kd = states('input_number.stue_kd')|float(0.0) %}
+          {% set Kd   = states('input_number.stue_kd')|float(0.0) %}
           {% set d_thr = states('input_number.stue_deriv_threshold')|float(0.03) %}
           {% set d_cap = states('input_number.stue_deriv_cap')|float(1.5) %}
-          {% set d_raw = ( -Kd * dTdt ) if (dTdt|abs > d_thr) else 0 %}
-          {{ ([d_cap, [ -d_cap, d_raw ]|max]|min) | round(2) }}
+          {% set d_raw = (-Kd * dTdt) if ((dTdt|abs) > d_thr) else 0 %}
+          {% set d_lim = d_cap if d_raw > d_cap else (-d_cap if d_raw < -d_cap else d_raw) %}
+          {{ d_lim | round(2) }}
 
-# ====== Antisjattering (rate limit) ======
+# ------------------------------------------------------------
+#  ANTISJATTERING (COOLDOWN)
+# ------------------------------------------------------------
 timer:
   stue_klima_cooldown:
     duration: "00:10:00"
 
-# ====== Regulering mot Daikin ======
+  # ------------------------------------------------------------
+  #  I-LEDD OPPDATERING: integrasjon av temperaturfeil
+  # ------------------------------------------------------------
+
 automation:
+  # ----------------------------------------------------------
+  # I-LEDD OPPDATERING: integrasjon av temperaturfeil (hver 5. min)
+  # ----------------------------------------------------------
+  - id: stue_klima_i_update
+    alias: "Stue klima – oppdater I-ledd"
+    mode: queued
+    max: 3
+    trigger:
+      - platform: time_pattern
+        minutes: "/2" # dt = 5 min
+      - platform: state
+        entity_id:
+          - input_number.stue_onsket_temp
+          - sensor.stue_temperatur_virtuell
+          - sensor.ute_temperatur_virtuell
+    condition:
+      - condition: state
+        entity_id: input_boolean.stue_klima_hold
+        state: "off"
+    action:
+      - variables:
+          dt_min: 2
+          desired: "{{ states('input_number.stue_onsket_temp')|float(21.5) }}"
+          Tin: "{{ states('sensor.stue_temperatur_virtuell')|float(desired) }}"
+          error: "{{ (desired|float) - (Tin|float) }}"
+          Ki: "{{ states('input_number.stue_ki')|float(0.008) }}"
+          leak: "{{ states('input_number.stue_i_leak')|float(0.02) }}"
+          cap: "{{ states('input_number.stue_i_cap')|float(1.5) }}"
+          I_prev: "{{ states('input_number.stue_i_term')|float(0) }}"
+          db: 0.1
+          tmin: "{{ states('input_number.stue_min_setpunkt')|float(18.0) }}"
+          tmax: "{{ states('input_number.stue_max_setpunkt')|float(28.0) }}"
+          current_set: >
+            {% set t = state_attr('climate.daikinap86694','temperature') %}
+            {{ (t if t is number else states('sensor.stue_target_pumpesettpunkt')|float(22.0))|float }}
+          near_max: "{{ (current_set|float) >= (tmax|float - 0.1) }}"
+          near_min: "{{ (current_set|float) <= (tmin|float + 0.1) }}"
+          freeze_bool: >
+            {% set e = error|float %}
+            {% if (near_max|bool and e > 0) or (near_min|bool and e < 0) %}
+              true
+            {% else %}
+              false
+            {% endif %}
+      - variables:
+          incr: >
+            {% set e = error|float %}
+            {% if freeze_bool|bool or (e|abs < db) %}
+              0
+            {% else %}
+              {{ (Ki|float) * e * dt_min }}
+            {% endif %}
+          I_tmp: "{{ (I_prev|float) * (1 - (leak|float)) + (incr|float) }}"
+          I_next: >
+            {% set v = I_tmp|float %}
+            {% set c = cap|float %}
+            {{ c if v > c else (-c if v < -c else v) }}
+      - service: input_number.set_value
+        target:
+          entity_id: input_number.stue_i_term
+        data:
+          value: "{{ I_next  }}"
+      - service: logbook.log
+        data:
+          name: "Stue klima (I-ledd)"
+          message: >
+            I_prev={{ I_prev }} → I_next={{ I_next|float|round(2) }} (err={{ error|float|round(2) }} °C,
+            freeze={{ freeze_bool }}, leak={{ leak }}, Ki={{ Ki }}, dt={{ dt_min }}m)
+          entity_id: "input_number.stue_i_term"
+
+  # ----------------------------------------------------------
+  # REGULERING MOT DAIKIN: rate limit + cooldown + hysterese
+  # ----------------------------------------------------------
   - id: stue_klima_regulering_daikin
     alias: "Stue klima – reguler settpunkt på Daikin"
     mode: restart
     trigger:
-      # Heartbeat
+      # Reager når beregnet setpunkt faktisk har oppdatert seg
+      - platform: state
+        entity_id: sensor.stue_target_pumpesettpunkt
+      # Heartbeat for å rette opp ev. tapte hendelser
       - platform: time_pattern
         minutes: "/5"
-
-      # Endring i relevante sensorer
-      - platform: state
-        entity_id:
-          - sensor.stue_target_pumpesettpunkt
-          - sensor.stue_temperatur_virtuell
-          - sensor.ute_temperatur_virtuell
-          - sensor.stue_temp_stigning # --- D-LEDD: legg til derivative
-          - input_number.stue_onsket_temp
-          - input_number.stue_kd # --- D-LEDD: retuning skal trigge
-          - input_number.stue_deriv_threshold
-          - input_number.stue_deriv_cap
-
-      # Kryssing UNDER ønsket temp (med hysterese)
-      - platform: template
-        value_template: >
-          {{ states('sensor.stue_temperatur_virtuell')|float(9999)
-            < (states('input_number.stue_onsket_temp')|float - 0.05) }}
-
-      # Kryssing OVER ønsket temp (med hysterese)
-      - platform: template
-        value_template: >
-          {{ states('sensor.stue_temperatur_virtuell')|float(-9999)
-            > (states('input_number.stue_onsket_temp')|float + 0.05) }}
 
     condition:
       - condition: state
         entity_id: input_boolean.stue_klima_hold
         state: "off"
       - condition: template
-        value_template: "{{ states('sensor.stue_target_pumpesettpunkt')|float(none) is not none }}"
+        value_template: "{{ states('sensor.stue_target_pumpesettpunkt')|is_number }}"
       - condition: template
         value_template: "{{ states('climate.daikinap86694') not in ['unavailable','unknown'] }}"
       - condition: template
         value_template: "{{ is_state('timer.stue_klima_cooldown','idle') }}"
+
     action:
-      - variables:
-          daikin: "climate.daikinap86694"
-          target: "{{ states('sensor.stue_target_pumpesettpunkt')|float(22.0) }}"
-          current_set: >
-            {% set t = state_attr('climate.daikinap86694','temperature') %}
-            {{ (t if t is number else states('sensor.stue_target_pumpesettpunkt')|float(22.0))|float }}
-          max_step: "{{ states('input_number.stue_setpunkt_endringsgrense')|float(1.0) }}"
-          min_effective_delta: 0.2
-          dterm: "{{ states('sensor.stue_d_bidrag')|default(states('sensor.stue_d-bidrag')) }}"
-      - variables:
-          delta: "{{ target - current_set }}"
-          next_set: >
-            {% if (delta | abs) <= max_step %}
-              {{ target }}
-            {% else %}
-              {{ (current_set + max_step) if (delta > 0) else (current_set - max_step) }}
-            {% endif %}
+      # Ved heartbeat (ikke state-trigger) – gi templates 2s på å sette seg
       - choose:
           - conditions:
               - condition: template
-                value_template: "{{ (target - current_set) | abs >= min_effective_delta }}"
+                value_template: "{{ trigger.platform != 'state' }}"
             sequence:
+              - delay: "00:00:02"
+
+      - variables:
+          target_raw: "{{ states('sensor.stue_target_pumpesettpunkt')|float(22.0) }}"
+          current_set: >
+            {% set t = state_attr('climate.daikinap86694','temperature') %}
+            {{ (t if t is number else 22.0)|float }}
+          max_step: "{{ states('input_number.stue_setpunkt_endringsgrense')|float(1.0) }}"
+          min_effective_delta: 0.1
+          dev_min: "{{ state_attr('climate.daikinap86694','min_temp')|float(16) }}"
+          dev_max: "{{ state_attr('climate.daikinap86694','max_temp')|float(30) }}"
+
+      - variables:
+          # Klampe target til enhetens grenser FØR vi beregner delta
+          target_eff: >
+            {% set v = target_raw|float %}
+            {% set v1 = dev_max|float if v > dev_max|float else v %}
+            {% set v2 = dev_min|float if v1 < dev_min|float else v1 %}
+            {{ v2 }}
+          delta: "{{ (target_eff|float) - (current_set|float) }}"
+          next_set: >
+            {% set cs = current_set|float %}
+            {% set step = max_step|float %}
+            {% if (delta|abs) <= step %}
+              {{ target_eff }}
+            {% else %}
+              {{ (cs + step) if (delta > 0) else (cs - step) }}
+            {% endif %}
+          step: 0.5
+          next_set_quant: >
+            {% set s = step|float %}
+            {% set ns = next_set|float %}
+            {% if delta > 0 %}
+              {{ (((ns/s)|round(0, 'ceil')) * s) | round(1) }}
+            {% elif delta < 0 %}
+              {{ (((ns/s)|round(0, 'floor')) * s) | round(1) }}
+            {% else %}
+              {{ (((ns/s)|round(0)) * s) | round(1) }}
+            {% endif %}
+
+      - choose:
+          - conditions:
+              - condition: template
+                value_template: "{{ (target_eff - current_set)|abs >= min_effective_delta }}"
+            sequence:
+              # Sett riktig modus om nødvendig
               - if:
                   - condition: template
-                    value_template: "{{ states(daikin) != 'heat' }}"
+                    value_template: "{{ not is_state('climate.daikinap86694','heat') }}"
                 then:
                   - service: climate.set_hvac_mode
-                    target: { entity_id: "{{ daikin }}" }
-                    data: { hvac_mode: heat }
-              - service: climate.set_temperature
-                target: { entity_id: "{{ daikin }}" }
-                data:
-                  temperature: "{{ next_set | round(1) }}"
-              - event: stue_klima_sett_ok
-                event_data:
-                  from: "{{ current_set | round(1) }}"
-                  to: "{{ next_set | round(1) }}"
+                    target:
+                      entity_id: climate.daikinap86694
+                    data:
+                      hvac_mode: heat
+
               - service: logbook.log
                 data:
                   name: "Stue klima (Daikin)"
                   message: >
-                    Endrer setpunkt {{ current_set|round(1) }} → {{ next_set|round(1) }}
-                    (target: {{ target|round(1) }}, Δ: {{ (target-current_set)|round(2) }},
-                    dT/dt: {{ states('sensor.stue_temp_stigning') }} °C/min,
-                    D: {{ states('sensor.stue_d-bidrag') | default(states('sensor.stue_d_bidrag')) }} °C)
+                    Sendt setpunkt {{ (current_set|float)|round(1) }} → {{ (next_set_quant|float)|round(1) }}
+                    (mål rå={{ (target_raw|float)|round(1) }}, mål eff={{ (target_eff|float)|round(1) }},
+                    dev[min,max]=[{{ (dev_min|float)|round(1) }},{{ (dev_max|float)|round(1) }}],
+                    Δeff={{ ((target_eff|float)-(current_set|float))|round(2) }})
+                  entity_id: "climate.daikinap86694"
+              # Send step-begrenset og klampet temperatur
+              - service: climate.set_temperature
+                target:
                   entity_id: climate.daikinap86694
+                data:
+                  temperature: >
+                    {% set v = next_set_quant|float %}
+                    {% set v1 = dev_max|float if v > dev_max|float else v %}
+                    {% set v2 = dev_min|float if v1 < dev_min|float else v1 %}
+                    {{ v2|round(1) }}
+              - service: timer.start
+                target:
+                  entity_id: timer.stue_klima_cooldown
+                data:
+                  duration: "00:10:00"
 
           - conditions:
               - condition: template
-                value_template: "{{ (target - current_set) | abs < min_effective_delta }}"
+                value_template: "{{ (target_eff - current_set)|abs < min_effective_delta }}"
             sequence:
               - service: logbook.log
                 data:
                   name: "Stue klima (Daikin)"
                   message: >
-                    Ingen endring: current {{ current_set|round(1) }}≈target {{ target|round(1) }}
-                    (terskel: {{ min_effective_delta }},
-                    dT/dt: {{ states('sensor.stue_temp_stigning') }} °C/min,
-                    D: {{ states('sensor.stue_d-bidrag') | default(states('sensor.stue_d_bidrag')) }} °C)
-                  entity_id: climate.daikinap86694
-
-    trace:
-      stored_traces: 10
+                    Ingen endring: current {{ current_set|float|round(1) }}≈target_eff {{ target_eff|float|round(1) }}
+                    (terskel: {{ min_effective_delta }}, dev[min,max]=[{{ dev_min|float|round(0) }},{{ dev_max|float|round(0) }}])
+                  entity_id: "climate.daikinap86694"

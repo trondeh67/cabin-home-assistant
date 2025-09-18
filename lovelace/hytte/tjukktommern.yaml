@@ -504,3 +504,160 @@ views:
                 #tap_action:
                 #  action: toggle
         show_empty: false
+
+  # Varmepumpestyriong
+  - title: Varmepumpestyring
+    path: varmepumpestyring
+    icon: mdi:heat-pump-outline
+    visible:
+      - user: f0d7a7b897f448c0acf93cabb356c822
+    cards:
+      - type: custom:mushroom-title-card
+        title: Varmepumpestyring
+      - type: vertical-stack
+        cards:
+          # --- Graf: inne vs beregnet setpunkt ---
+          - type: custom:mini-graph-card
+            name: Temp vs setpunkt (24t)
+            hours_to_show: 24
+            points_per_hour: 6
+            line_width: 2
+            show:
+              state: false
+              legend: true
+              labels: false
+            entities:
+              - entity: sensor.stue_temperatur_virtuell
+                name: Inne
+              - entity: sensor.stue_target_pumpesettpunkt
+                name: Beregnet setpkt
+                show_points: false
+
+          # --- Hovedstatus og styring ---
+          - type: entities
+            entities:
+              - input_number.stue_onsket_temp
+              - entity: sensor.stue_temperatur_virtuell
+                name: Målt inne (virtuell)
+              - entity: sensor.ute_temperatur_virtuell
+                name: Ute (virtuell)
+              - entity: sensor.stue_target_pumpesettpunkt
+                name: Beregnet setpunkt
+              - entity: climate.daikinap86694
+                name: Daikin
+              - input_boolean.stue_klima_hold
+
+              # --- D-ledd: diagnostikk ---
+              - type: section
+                label: D-ledd
+              - entity: sensor.stue_temp_stigning
+                name: dT/dt (°C/min)
+              - entity: sensor.stue_d_bidrag
+                name: D-bidrag (°C)
+
+              # --- I-ledd: diagnostikk (NY) ---
+              - type: section
+                label: I-ledd
+              - entity: input_number.stue_i_term
+                name: I-term (°C)
+              - entity: sensor.stue_temperaturfeil
+                name: Feil (SP - T) (°C)
+
+          # --- Tuningparametre ---
+          - type: entities
+            title: Tuning – P & feed-forward
+            entities:
+              - input_number.stue_base_offset_a
+              - input_number.stue_kulde_slope_b
+              - input_number.stue_kulde_terskel
+              - input_number.stue_kp
+              - input_number.stue_min_setpunkt
+              - input_number.stue_max_setpunkt
+              - input_number.stue_setpunkt_endringsgrense
+
+          # --- Tuning – D-ledd ---
+          - type: entities
+            title: Tuning – D-ledd
+            entities:
+              - input_number.stue_kd
+              - input_number.stue_deriv_threshold
+              - input_number.stue_deriv_cap
+
+          # --- Tuning – I-ledd (NY) ---
+          - type: entities
+            title: Tuning – I-ledd
+            entities:
+              - entity: input_number.stue_ki
+                name: Ki (°C/(°C·min))
+              - entity: input_number.stue_i_leak
+                name: I-lekkasje pr. steg
+              - entity: input_number.stue_i_cap
+                name: Maks |I-bidrag| (°C)
+              - entity: input_number.stue_i_term
+                name: I-term (nå) (°C)
+
+          - type: vertical-stack
+            cards:
+              # --- Graf: inne vs beregnet setpunkt ---
+              - type: custom:mini-graph-card
+                name: Temp vs setpunkt (24t)
+                hours_to_show: 24
+                points_per_hour: 6
+                line_width: 2
+                show:
+                  state: false
+                  legend: true
+                  labels: false
+                entities:
+                  - entity: sensor.stue_temperatur_virtuell
+                    name: Inne
+                  - entity: sensor.stue_target_pumpesettpunkt
+                    name: Beregnet setpkt
+                    show_points: false
+
+              # --- Graf: dT/dt og D-bidrag ---
+              - type: custom:mini-graph-card
+                name: dT/dt & D (12t)
+                hours_to_show: 12
+                points_per_hour: 6
+                line_width: 2
+                show:
+                  state: false
+                  legend: true
+                  labels: false
+                entities:
+                  - entity: sensor.stue_temp_stigning
+                    name: dT/dt (°C/min)
+                  - entity: sensor.stue_d_bidrag
+                    name: D-bidrag (°C)
+
+              # --- Flis: live D-ledd ---
+              - type: custom:mushroom-template-card
+                primary: >
+                  {% set d = states('sensor.stue_d_bidrag')|float(0) %}
+                  D-ledd {{ d|round(2) }} °C
+                secondary: >
+                  dT/dt: {{ states('sensor.stue_temp_stigning') }} °C/min
+                icon: >
+                  {% set d = states('sensor.stue_d_bidrag')|float(0) %}
+                  {% if d|abs > 0 %}mdi:sigma{% else %}mdi:sigma-lower{% endif %}
+                icon_color: >
+                  {% set d = states('sensor.stue_d_bidrag')|float(0) %}
+                  {% if d > 0 %}green{% elif d < 0 %}red{% else %}grey{% endif %}
+                fill_container: false
+
+              # --- Ekstra rad: I-term & feil (NY) ---
+              - type: custom:mini-graph-card
+                name: I-term & Feil (24t)
+                hours_to_show: 24
+                points_per_hour: 6
+                line_width: 2
+                show:
+                  state: false
+                  legend: true
+                  labels: false
+                entities:
+                  - entity: input_number.stue_i_term
+                    name: I-term (°C)
+                  - entity: sensor.stue_temperaturfeil
+                    name: Feil (°C)

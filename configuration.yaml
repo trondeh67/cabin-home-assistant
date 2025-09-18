@@ -81,11 +81,15 @@ template:
         device_class: temperature
         state_class: measurement
         state: >
-          {% set v = states('sensor.daikinap86694_climatecontrol_outdoor_temperature') %}
-          {{ v|float(10.0) }}
-
+          {% set raw = states('sensor.daikinap86694_climatecontrol_outdoor_temperature') %}
           {% set off = states('input_number.ute_offset_daikin') | float(0) %}
-          {{ (v + off) if v == v else 'unknown' }}
+          {% if raw | is_number %}
+            {{ (raw | float + off) | round(1) }}
+          {% else %}
+            unknown
+          {% endif %}
+        availability: >
+          {{ states('sensor.daikinap86694_climatecontrol_outdoor_temperature') | is_number }}
 
       - name: "Ute temperatur (virtuell)"
         unique_id: ute_temp_virtual

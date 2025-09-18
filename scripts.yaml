@@ -84,3 +84,32 @@ lys_oppholdsom_dempet:
       - scene.spisestue_dempet
     action: scene.turn_on
   description: ''
+stue_klima_av:
+  alias: stue_klima_av
+  sequence:
+  - target:
+      entity_id: input_boolean.stue_klima_hold
+    action: input_boolean.turn_on
+  - target:
+      entity_id: climate.daikinap86694
+    data:
+      hvac_mode: 'off'
+    action: climate.set_hvac_mode
+  description: ''
+stue_klima_pa:
+  alias: stue_klima_pa
+  sequence:
+  - target:
+      entity_id: climate.daikinap86694
+    data:
+      hvac_mode: heat
+    action: climate.set_hvac_mode
+  - target:
+      entity_id: input_boolean.stue_klima_hold
+    action: input_boolean.turn_off
+  - target:
+      entity_id: climate.daikinap86694
+    data:
+      temperature: '{{ states(''sensor.stue_target_pumpesettpunkt'') | float(20) }}'
+    action: climate.set_temperature
+  description: ''
