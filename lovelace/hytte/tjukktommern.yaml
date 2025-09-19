@@ -550,8 +550,10 @@ views:
               # --- D-ledd: diagnostikk ---
               - type: section
                 label: D-ledd
-              - entity: sensor.stue_temp_stigning
-                name: dT/dt (°C/min)
+              - entity: sensor.stue_temp_stigning_slow
+                name: dT/dt (°C/min) slow
+              - entity: sensor.stue_temp_stigning_fast
+                name: dT/dt (°C/min) fast
               - entity: sensor.stue_d_bidrag
                 name: D-bidrag (°C)
 
@@ -560,6 +562,7 @@ views:
                 label: I-ledd
               - entity: input_number.stue_i_term
                 name: I-term (°C)
+
               - entity: sensor.stue_temperaturfeil
                 name: Feil (SP - T) (°C)
 

@@ -79,6 +79,7 @@ input_number:
     step: 0.1
     unit_of_measurement: "°C"
     icon: mdi:sigma
+    mode: box
 
   # --- Begrensninger på Daikin-setpunkt
   stue_min_setpunkt:
@@ -124,6 +125,14 @@ input_number:
     step: 0.1
     icon: mdi:speedometer
 
+  stue_auto_boost_minutes:
+    name: "Stue: auto-boost varighet (min)"
+    min: 10
+    max: 120
+    step: 5
+    unit_of_measurement: "min"
+    icon: mdi:timer
+
 input_boolean:
   stue_klima_hold:
     name: "Stue klima HOLD (pause regulering)"
@@ -140,10 +149,41 @@ sensor:
     time_window: "00:05:00" # glatt 10 minutter
     round: 3
 
+  # RASK: responsiv nok til å oppdage “nå stiger det”
+  - platform: derivative
+    name: stue_temp_stigning_fast
+    source: sensor.stue_temperatur_virtuell
+    unit_time: min # °C/min
+    time_window: "00:05:00"
+    round: 3
+
+  # TREG: robust til platå-deteksjon uten å trigge på støy
+  - platform: derivative
+    name: stue_temp_stigning_slow
+    source: sensor.stue_temperatur_virtuell
+    unit_time: min
+    time_window: "00:15:00"
+    round: 3
+
+  # 30-minutters glidende middel (til tidlig release/diagnostikk)
+  - platform: statistics
+    name: stue_temp_mean_30m
+    entity_id: sensor.stue_temperatur_virtuell
+    max_age: "00:30:00"
+    state_characteristic: mean
+
 # ------------------------------------------------------------
 #  BEREGNINGER – TARGET + DIAGNOSE
 # ------------------------------------------------------------
 template:
+  - sensor:
+      - name: stue_temp_delta_vs_mean30
+        unit_of_measurement: "°C"
+        state: >
+          {% set nowT = states('sensor.stue_temperatur_virtuell')|float(0) %}
+          {% set m30  = states('sensor.stue_temp_mean_30m')|float(nowT) %}
+          {{ (nowT - m30)|round(2) }}
+
   - sensor:
       # --- HOVEDUTGANG: beregnet setpunkt til varmepumpen ---
       - name: "Stue target pumpesettpunkt"
@@ -216,9 +256,8 @@ timer:
   stue_klima_cooldown:
     duration: "00:10:00"
 
-  # ------------------------------------------------------------
-  #  I-LEDD OPPDATERING: integrasjon av temperaturfeil
-  # ------------------------------------------------------------
+  stue_auto_boost:
+    duration: "00:30:00" # standard; kan overskrives i automasjon
 
 automation:
   # ----------------------------------------------------------
@@ -415,3 +454,201 @@ automation:
                     Ingen endring: current {{ current_set|float|round(1) }}≈target_eff {{ target_eff|float|round(1) }}
                     (terskel: {{ min_effective_delta }}, dev[min,max]=[{{ dev_min|float|round(0) }},{{ dev_max|float|round(0) }}])
                   entity_id: "climate.daikinap86694"
+
+  - id: stue_auto_boost_on_manual_jump
+    alias: "Stue – Auto-boost ved manuell økning (med 3D/vifte/guard)"
+    mode: single
+    trigger:
+      - platform: state
+        entity_id: input_number.stue_onsket_temp
+    condition:
+      - condition: template
+        value_template: >
+          {% set prev = trigger.from_state.state|float(0) %}
+          {% set curr = trigger.to_state.state|float(0) %}
+          {{ (curr - prev) >= 2.0 }}
+      - condition: state
+        entity_id: input_boolean.stue_klima_hold
+        state: "off"
+    action:
+      - variables:
+          desired: "{{ states('input_number.stue_onsket_temp')|float }}"
+          Tin: "{{ states('sensor.stue_temperatur_virtuell')|float }}"
+          mins: "{{ states('timer.stue_auto_boost')|default('') and 0 or 30 }}" # uvesentlig; vi setter under
+          raw_target: "{{ states('sensor.stue_target_pumpesettpunkt')|float(desired + 2.0) }}"
+          clamped: "{{ [ [ raw_target, 15.0 ]|max , 26.0 ]|min }}"
+          quant: "{{ ((clamped*2)|round(0)/2) | float }}"
+          delta: "{{ desired - Tin }}"
+          t_daikin: "{{ state_attr('climate.daikinap86694','current_temperature')|float(0) }}"
+          discrepancy: "{{ (t_daikin - Tin)|round(2) }}"
+          hvact: "{{ state_attr('climate.daikinap86694','hvac_action')|default('',true) }}"
+      # Anti-windup: nullstill I-ledd hvis finnes
+      - choose:
+          - conditions: "{{ states('input_number.stue_i_ledd') not in ['unknown','unavailable'] }}"
+            sequence:
+              - service: input_number.set_value
+                data: { entity_id: input_number.stue_i_ledd, value: 0 }
+
+      # Parkér PID mens vi booter varme
+      - service: input_boolean.turn_on
+        target: { entity_id: input_boolean.stue_klima_hold }
+
+      # Hard push: HEAT + 3D + vifte
+      - service: climate.set_hvac_mode
+        data: { entity_id: climate.daikinap86694, hvac_mode: heat }
+      - service: climate.set_swing_mode
+        data: { entity_id: climate.daikinap86694, swing_mode: "3D" }
+      - choose:
+          - conditions: "{{ delta > 3.0 }}"
+            sequence:
+              - service: climate.set_fan_mode
+                data: { entity_id: climate.daikinap86694, fan_mode: "4" }
+        default:
+          - service: climate.set_fan_mode
+            data: { entity_id: climate.daikinap86694, fan_mode: "3" }
+
+      # Discrepancy-guard: hvis Daikin tror det er varmt ved innsuget → legg på +2.0 (kvantisert)
+      - choose:
+          - conditions: "{{ discrepancy >= 3.0 and hvact != 'heating' and delta >= 1.0 }}"
+            sequence:
+              - variables:
+                  bump: "{{ (( (desired + 2.0)*2 )|round(0)/2) | float }}"
+              - service: climate.set_temperature
+                data:
+                  {
+                    entity_id: climate.daikinap86694,
+                    temperature: "{{ bump }}",
+                  }
+        default:
+          # Ellers: bruk beregnet setpunkt direkte (overstyr rate-limit)
+          - service: climate.set_temperature
+            data:
+              { entity_id: climate.daikinap86694, temperature: "{{ quant }}" }
+
+      # Start/forleng boost-vindu (bruk helper varighet hvis du har; ellers 30 min)
+      - service: timer.start
+        data:
+          entity_id: timer.stue_auto_boost
+          duration: "{{ (states('input_number.stue_auto_boost_minutes')|int(30)) * 60 }}"
+
+  - id: stue_auto_boost_early_release
+    alias: "Stue – Auto-boost: tidlig release (komfortrapport)"
+    mode: single
+    trigger:
+      - platform: time_pattern
+        minutes: "/5"
+    condition:
+      - condition: state
+        entity_id: input_boolean.stue_klima_hold
+        state: "on"
+      - condition: template
+        value_template: >
+          {% set dtdt = states('sensor.stue_temp_stigning')|float(0) %}
+          {% set desired = states('input_number.stue_onsket_temp')|float %}
+          {% set Tin = states('sensor.stue_temperatur_virtuell')|float %}
+          {{ dtdt >= 0.010 or (desired - Tin) < 0.7 }}
+    action:
+      - service: input_boolean.turn_off
+        target: { entity_id: input_boolean.stue_klima_hold }
+      # Komfort: ned med vifte, tilbake til Vertical
+      - service: climate.set_fan_mode
+        data: { entity_id: climate.daikinap86694, fan_mode: "2" }
+      - service: climate.set_swing_mode
+        data: { entity_id: climate.daikinap86694, swing_mode: "Vertical" }
+      - service: timer.cancel
+        data: { entity_id: timer.stue_auto_boost }
+
+  - id: stue_auto_boost_timeout_release
+    alias: "Stue – Auto-boost: timeout release"
+    mode: single
+    trigger:
+      - platform: event
+        event_type: timer.finished
+        event_data:
+          entity_id: timer.stue_auto_boost
+    action:
+      - service: input_boolean.turn_off
+        target: { entity_id: input_boolean.stue_klima_hold }
+      - service: climate.set_fan_mode
+        data: { entity_id: climate.daikinap86694, fan_mode: "Auto" }
+      - service: climate.set_swing_mode
+        data: { entity_id: climate.daikinap86694, swing_mode: "Vertical" }
+
+  - id: stue_auto_boost_on_plateau
+    alias: "Stue – Auto-boost ved platå (dT/dt lav, med 3D/vifte/guard)"
+    mode: single
+    trigger:
+      - platform: numeric_state
+        entity_id: sensor.stue_temp_stigning_slow
+        below: 0.003 # °C/min
+        for: "00:20:00"
+    condition:
+      - condition: state
+        entity_id: input_boolean.stue_klima_hold
+        state: "off"
+      - condition: template
+        value_template: >-
+          {% set d_fast  = states('sensor.stue_temp_stigning_fast')|float(0) %}
+          {% set d30     = states('sensor.stue_temp_delta_vs_mean30')|float(0) %}
+          {% set desired = states('input_number.stue_onsket_temp')|float(0) %}
+          {% set Tin     = states('sensor.stue_temperatur_virtuell')|float(0) %}
+          {# Release hvis: 1) dT/dt ≥ 0.01 °C/min, 2) nåtemp ≥ 0.3 °C over 30m-mean, eller 3) vi er nær mål #}
+          {{ (d_fast >= 0.010) or (d30 >= 0.30) or ((desired - Tin) < 0.7) }}
+
+    action:
+      - variables:
+          desired: "{{ states('input_number.stue_onsket_temp')|float }}"
+          Tin: "{{ states('sensor.stue_temperatur_virtuell')|float }}"
+          raw_target: "{{ states('sensor.stue_target_pumpesettpunkt')|float(desired + 1.5) }}"
+          clamped: "{{ [ [ raw_target, 15.0 ]|max , 26.0 ]|min }}"
+          quant: "{{ ((clamped*2)|round(0)/2) | float }}"
+          delta: "{{ desired - Tin }}"
+          t_daikin: "{{ state_attr('climate.daikinap86694','current_temperature')|float(0) }}"
+          discrepancy: "{{ (t_daikin - Tin)|round(2) }}"
+          hvact: "{{ state_attr('climate.daikinap86694','hvac_action')|default('',true) }}"
+      - service: input_boolean.turn_on
+        target: { entity_id: input_boolean.stue_klima_hold }
+      - service: climate.set_hvac_mode
+        data: { entity_id: climate.daikinap86694, hvac_mode: heat }
+      - service: climate.set_swing_mode
+        data: { entity_id: climate.daikinap86694, swing_mode: "3D" }
+      - choose:
+          - conditions: "{{ delta > 2.0 }}"
+            sequence:
+              - service: climate.set_fan_mode
+                data: { entity_id: climate.daikinap86694, fan_mode: "4" }
+        default:
+          - service: climate.set_fan_mode
+            data: { entity_id: climate.daikinap86694, fan_mode: "3" }
+      - choose:
+          - conditions: "{{ discrepancy >= 3.0 and hvact != 'heating' and delta >= 1.0 }}"
+            sequence:
+              - variables:
+                  bump: "{{ (( (desired + 2.0)*2 )|round(0)/2) | float }}"
+              - service: climate.set_temperature
+                data:
+                  {
+                    entity_id: climate.daikinap86694,
+                    temperature: "{{ bump }}",
+                  }
+              - service: logbook.log
+                data:
+                  name: "Autoboost ved ingen eller svak temperaturøkning"
+                  message: >
+                    Temperaturen er big-bumpet til {{bump}}
+                  entity_id: "input_number.stue_i_term"
+
+        default:
+          - service: climate.set_temperature
+            data:
+              { entity_id: climate.daikinap86694, temperature: "{{ quant }}" }
+          - service: logbook.log
+            data:
+              name: "Autoboost ved ingen eller svak temperaturøkning"
+              message: >
+                Temperaturen er small-bumpet til {{quant}}
+              entity_id: "input_number.stue_i_term"
+      - service: timer.start
+        data:
+          entity_id: timer.stue_auto_boost
+          duration: "{{ (states('input_number.stue_auto_boost_minutes')|int(30)) * 60 }}"
