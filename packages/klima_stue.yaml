@@ -24,7 +24,7 @@ input_number:
   stue_base_offset_a:
     name: "Stue offset base a"
     min: -2
-    max: 4
+    max: 5
     step: 0.1
     icon: mdi:tune-variant
 
@@ -107,7 +107,7 @@ input_number:
   stue_kd:
     name: "Stue D-forsterkning (Kd)"
     min: 0
-    max: 30
+    max: 100
     step: 0.05
     icon: mdi:alpha-d-box
 
@@ -142,13 +142,6 @@ input_boolean:
 #  MÅLEBEHANDLING – DERIVERT ROMTEMP (D-LEDD INPUT)
 # ------------------------------------------------------------
 sensor:
-  - platform: derivative
-    source: sensor.stue_temperatur_virtuell
-    name: "Stue temp stigning"
-    unit_time: min # °C/min
-    time_window: "00:05:00" # glatt 10 minutter
-    round: 3
-
   # RASK: responsiv nok til å oppdage “nå stiger det”
   - platform: derivative
     name: stue_temp_stigning_fast
@@ -184,7 +177,6 @@ template:
           {% set m30  = states('sensor.stue_temp_mean_30m')|float(nowT) %}
           {{ (nowT - m30)|round(2) }}
 
-  - sensor:
       # --- HOVEDUTGANG: beregnet setpunkt til varmepumpen ---
       - name: "Stue target pumpesettpunkt"
         unique_id: stue_target_pumpesettpunkt
@@ -207,11 +199,9 @@ template:
           {% set error = desired - Tin %}
           {% set corr_p = Kp * error %}
 
-          {# === I-LEDD (lagret som input_number i °C) === #}
-          {% set corr_i = states('input_number.stue_i_term')|float(0.0) %}
 
           {# === D-LEDD (på målt dT/dt) === #}
-          {% set dTdt = states('sensor.stue_temp_stigning')|float(0.0) %}  {# °C/min #}
+          {% set dTdt = states('sensor.stue_temp_stigning_fast')|float(0.0) %}  {# °C/min #}
           {% set Kd   = states('input_number.stue_kd')|float(0.0) %}
           {% set d_thr = states('input_number.stue_deriv_threshold')|float(0.03) %}
           {% set d_cap = states('input_number.stue_deriv_cap')|float(1.5) %}
@@ -219,7 +209,7 @@ template:
           {% set corr_d = d_cap if d_raw > d_cap else (-d_cap if d_raw < -d_cap else d_raw) %}
 
           {# === SUM + KLEMMING (MIN/MAX) === #}
-          {% set raw_target = desired + offset_ff + corr_p + corr_i + corr_d %}
+          {% set raw_target = desired + offset_ff + corr_p + corr_d %}
           {% set tmin = states('input_number.stue_min_setpunkt')|float(13.0) %}
           {% set tmax = states('input_number.stue_max_setpunkt')|float(28.0) %}
           {% set clamped = tmax if raw_target > tmax else (tmin if raw_target < tmin else raw_target) %}
@@ -241,7 +231,7 @@ template:
         unit_of_measurement: "°C"
         icon: mdi:sigma-lower
         state: >
-          {% set dTdt = states('sensor.stue_temp_stigning')|float(0.0) %}
+          {% set dTdt = states('sensor.stue_temp_stigning_fast')|float(0.0) %}
           {% set Kd   = states('input_number.stue_kd')|float(0.0) %}
           {% set d_thr = states('input_number.stue_deriv_threshold')|float(0.03) %}
           {% set d_cap = states('input_number.stue_deriv_cap')|float(1.5) %}
@@ -254,7 +244,7 @@ template:
 # ------------------------------------------------------------
 timer:
   stue_klima_cooldown:
-    duration: "00:10:00"
+    duration: "00:02:00"
 
   stue_auto_boost:
     duration: "00:30:00" # standard; kan overskrives i automasjon
@@ -275,6 +265,7 @@ automation:
           - input_number.stue_onsket_temp
           - sensor.stue_temperatur_virtuell
           - sensor.ute_temperatur_virtuell
+
     condition:
       - condition: state
         entity_id: input_boolean.stue_klima_hold
@@ -343,6 +334,10 @@ automation:
       # Heartbeat for å rette opp ev. tapte hendelser
       - platform: time_pattern
         minutes: "/5"
+      - platform: event
+        event_type: timer.finished
+        event_data:
+          entity_id: timer.stue_klima_cooldown
 
     condition:
       - condition: state
@@ -370,90 +365,273 @@ automation:
             {% set t = state_attr('climate.daikinap86694','temperature') %}
             {{ (t if t is number else 22.0)|float }}
           max_step: "{{ states('input_number.stue_setpunkt_endringsgrense')|float(1.0) }}"
-          min_effective_delta: 0.1
           dev_min: "{{ state_attr('climate.daikinap86694','min_temp')|float(16) }}"
           dev_max: "{{ state_attr('climate.daikinap86694','max_temp')|float(30) }}"
 
-      - variables:
-          # Klampe target til enhetens grenser FØR vi beregner delta
+          # Klamp target til enhetens grenser FØR vi beregner delta
           target_eff: >
             {% set v = target_raw|float %}
             {% set v1 = dev_max|float if v > dev_max|float else v %}
             {% set v2 = dev_min|float if v1 < dev_min|float else v1 %}
             {{ v2 }}
-          delta: "{{ (target_eff|float) - (current_set|float) }}"
-          next_set: >
-            {% set cs = current_set|float %}
-            {% set step = max_step|float %}
-            {% if (delta|abs) <= step %}
-              {{ target_eff }}
-            {% else %}
-              {{ (cs + step) if (delta > 0) else (cs - step) }}
-            {% endif %}
-          step: 0.5
-          next_set_quant: >
-            {% set s = step|float %}
-            {% set ns = next_set|float %}
-            {% if delta > 0 %}
-              {{ (((ns/s)|round(0, 'ceil')) * s) | round(1) }}
-            {% elif delta < 0 %}
-              {{ (((ns/s)|round(0, 'floor')) * s) | round(1) }}
-            {% else %}
-              {{ (((ns/s)|round(0)) * s) | round(1) }}
+
+          # 0.5 °C steg (Daikin API bug på target_temp_step)
+          device_step: 0.5
+
+          # "Sann" etterslep
+          Tin: "{{ states('sensor.stue_temperatur_virtuell')|float(0) }}"
+          desired: "{{ states('input_number.stue_onsket_temp')|float(21.5) }}"
+          deficit: "{{ (desired - Tin)|float }}"
+
+          # --- Varmebias / offset ---
+          heat_bias_min: "{{ states('input_number.stue_heat_bias_min')|float(3.0) }}" # base a = 3 °C
+          heat_bias_gain: "{{ states('input_number.stue_heat_bias_gain')|float(0.5) }}" # ekstra bias pr °C underskudd
+
+          # Hysterese på deficit slik at vi ikke flapper rundt 0
+          deficit_eff: >
+            {% set d = deficit|float %}
+            {% if d >= 0.15 %} {{ d }}
+            {% elif d <= 0 %} 0
+            {% else %} 0
             {% endif %}
 
+          # Dynamisk deadband (float!)
+          min_effective_delta: >
+            {% if deficit|float >= 0.5 %} 0.10
+            {% else %} {{ (device_step|float)/2 }}    {# 0.25 #}
+            {% endif %}
+
+          # Rate-limit skaleres med etterslep
+          eff_max_step: >
+            {% if deficit|float >= 2.0 %} 2.0
+            {% elif deficit|float >= 1.0 %} 1.0
+            {% else %} {{ max_step|float }}
+            {% endif %}
+
+          # --- FØR: target_eff, current_set, device_step, deficit, eff_max_step er allerede definert ---
+
+          # 1) Hva P/I-regulatoren vil (kan være liten)
+          delta_raw: "{{ (target_eff|float) - (current_set|float) }}"
+
+          # 2) Boost basert på faktisk kaldt rom (deficit)
+          #    0.5 °C når deficit >= 1.0; 1.0 °C når deficit >= 2.0; 1.5 °C når deficit >= 3.0
+          boost_step: >
+            {% if deficit|float >= 3.0 %} 1.5
+            {% elif deficit|float >= 2.0 %} 1.0
+            {% elif deficit|float >= 1.0 %} 0.5
+            {% elif deficit|float >= 0.5 %} 0.25
+            {% else %} 0.0
+            {% endif %}
+
+          # 3) Boost-target = nåværende settpunkt + boost_step (klampet til enhetens grenser)
+          boost_target: >
+            {% set bt = (current_set|float) + (boost_step|float) %}
+            {% set v1 = dev_max|float if bt > dev_max|float else bt %}
+            {% set v2 = dev_min|float if v1 < dev_min|float else v1 %}
+            {{ v2 }}
+
+          # 4) Kommandomål: ved oppvarming sikter vi mot høyeste av target_eff og boost_target
+          # Minimum settpunkt (floor) for å faktisk kunne holde ønsket temp
+          set_floor: >
+            {% set b = (heat_bias_min|float) + (heat_bias_gain|float) * (deficit_eff|float) %}
+            {{ (desired|float) + b }}
+
+          # Tak (ceiling) strammes når underskudd er lite, men aldri under floor
+          set_ceiling_raw: >
+            {% set des = desired|float %}
+            {% set d = deficit_eff|float %}
+            {% set extra = 6 if d>=2.0 else 4 if d>=1.0 else 2 if d>=0.5 else 1 %}
+            {{ des + (heat_bias_min|float) + extra }}
+
+          set_ceiling: >
+            {% set ceil = set_ceiling_raw|float %}
+            {% set floor = set_floor|float %}
+            {{ [ceil, floor]|max }}
+
+          # Kommandomål: boost opp om kaldt, men klamp mellom floor/ceiling
+          target_up: >
+            {% if deficit|float > 0 %} {{ [target_eff|float, boost_target|float]|max }}
+            {% else %} {{ target_eff|float }}
+            {% endif %}
+
+          target_cmd: >
+            {% set up = target_up|float %}
+            {{ [ set_ceiling|float, [up, set_floor|float]|max ]|min }}
+
+          # 5) Delta mot kommandomål
+          delta: "{{ (target_cmd|float) - (current_set|float) }}"
+
+          # 6) Rate-limitert bevegelse mot target_cmd
+          move: >
+            {% set d = delta|float %}
+            {% set s = eff_max_step|float %}
+            {% if d > 0 %} {{ min(d, s) }}
+            {% elif d < 0 %} {{ max(d, -s) }}
+            {% else %} 0
+            {% endif %}
+
+          # 7) Nytt rått settpunkt før kvantisering
+          next_set_raw: "{{ (current_set|float) + (move|float) }}"
+
+          # Kvantiser til 0.5 °C (nærmeste)
+          next_set_q_try: >
+            {% set x = next_set_raw|float %}
+            {{ ((x*2)|round(0) / 2) | float }}
+
+          # Monotoni: kvantisering må ikke snu retning
+          next_set_quant: >
+            {% set cs = current_set|float %}
+            {% set ds = device_step|float %}
+            {% set d  = delta|float %}
+            {% set q  = next_set_q_try|float %}
+            {# Gå opp: bare korriger hvis kvantisering havnet UNDER gjeldende #}
+            {% if d > 0 and q < cs %} {{ (cs + ds) }}
+            {# Gå ned: bare korriger hvis kvantisering havnet OVER gjeldende #}
+            {% elif d < 0 and q > cs %} {{ (cs - ds) }}
+            {% else %} {{ q }}
+            {% endif %}
+
+          # --- Robust sluttverdi som faktisk skal sendes til Daikin ---
+          # Beskytt mot '' / None på next_set_quant og (sjeldent) dev_min/dev_max
+          vmax: "{{ dev_max|float(30) }}"
+          vmin: "{{ dev_min|float(16) }}"
+
+          send_set: >
+            {# Bruk next_set_quant hvis gyldig, ellers fall-back til current_set #}
+            {% set base = next_set_quant|float(current_set|float(22.0)) %}
+            {% set hi = vmax|float(30) %}
+            {% set lo = vmin|float(16) %}
+            {{ [hi, [base, lo]|max]|min | round(1) }}
+
       - choose:
+          # -------- ENDRING --------
+
           - conditions:
               - condition: template
-                value_template: "{{ (target_eff - current_set)|abs >= min_effective_delta }}"
+                value_template: >
+                  {% set cs  = current_set|float(0) %}
+                  {% set ss  = send_set|float(0) %}
+                  {% set tol = (device_step|float(0.5))/4 %}
+                  {% set gap_cmd = (target_cmd|float - current_set|float)|abs %}
+                  {% set dead    = (min_effective_delta|float) %}
+                  {% set cold    = (deficit|float) >= 0.7 %}
+                  {% set force_track = ((target_eff|float - current_set|float) >= 0.5 and (deficit|float) >= 0.3) %}
+                  {{ (ss - cs)|abs > tol and (gap_cmd >= dead or cold or force_track) }}
             sequence:
-              # Sett riktig modus om nødvendig
+              # Sett HEAT hvis nødvendig
               - if:
                   - condition: template
                     value_template: "{{ not is_state('climate.daikinap86694','heat') }}"
                 then:
                   - service: climate.set_hvac_mode
-                    target:
-                      entity_id: climate.daikinap86694
-                    data:
-                      hvac_mode: heat
+                    target: { entity_id: climate.daikinap86694 }
+                    data: { hvac_mode: heat }
+
+              # Debug-variabler til logging
+              - variables:
+                  _cur: "{{ current_set|float(0) }}"
+                  _nq: "{{ next_set_quant|float(0) }}"
+                  _send: "{{ send_set|float(0) }}"
+                  _raw: "{{ target_raw|float(0) }}"
+                  _eff: "{{ target_eff|float(0) }}"
+                  _cmd: "{{ target_cmd|float(0) }}"
+                  _floor: "{{ set_floor|float(0) }}"
+                  _cap: "{{ set_ceiling|float(0) }}"
+                  _Tin: "{{ Tin|float(0) }}"
+                  _des: "{{ desired|float(0) }}"
+                  _def: "{{ (desired|float(0) - Tin|float(0)) }}"
+                  _deltaraw: "{{ (target_eff|float(0) - current_set|float(0)) }}"
+                  _delta: "{{ (target_cmd|float(0) - current_set|float(0)) }}"
+                  _move: "{{ move|float(0) }}"
+                  _rl: "{{ eff_max_step }}"
+                  _tol: "{{ (device_step|float(0.5)) / 4 }}"
+                  _dead: "{{ (min_effective_delta|float(0)) }}"
+                  _trig: "{{ trigger.platform if trigger is defined else 'manual' }}"
 
               - service: logbook.log
                 data:
                   name: "Stue klima (Daikin)"
                   message: >
-                    Sendt setpunkt {{ (current_set|float)|round(1) }} → {{ (next_set_quant|float)|round(1) }}
-                    (mål rå={{ (target_raw|float)|round(1) }}, mål eff={{ (target_eff|float)|round(1) }},
-                    dev[min,max]=[{{ (dev_min|float)|round(1) }},{{ (dev_max|float)|round(1) }}],
-                    Δeff={{ ((target_eff|float)-(current_set|float))|round(2) }})
-                  entity_id: "climate.daikinap86694"
-              # Send step-begrenset og klampet temperatur
-              - service: climate.set_temperature
-                target:
-                  entity_id: climate.daikinap86694
-                data:
-                  temperature: >
-                    {% set v = next_set_quant|float %}
-                    {% set v1 = dev_max|float if v > dev_max|float else v %}
-                    {% set v2 = dev_min|float if v1 < dev_min|float else v1 %}
-                    {{ v2|round(1) }}
-              - service: timer.start
-                target:
-                  entity_id: timer.stue_klima_cooldown
-                data:
-                  duration: "00:10:00"
+                    {{ _trig }} | cur={{ _cur|round(1) }} → send={{ _send|round(1) }} (nq={{ _nq|round(1) }})
+                    raw={{ _raw|round(1) }} eff={{ _eff|round(1) }} cmd={{ _cmd|round(1) }}
+                    floor={{ _floor|round(1) }} cap={{ _cap|round(1) }}
+                    Δraw={{ _deltaraw|round(2) }} Δ={{ _delta|round(2) }} move={{ _move|round(2) }} RL={{ _rl }}
+                    Tin={{ _Tin|round(1) }} des={{ _des|round(1) }} def={{ _def|round(2) }}
+                    tol={{ _tol|round(3) }} dead={{ _dead|round(2) }}
+                entity_id: climate.daikinap86694
 
+              - service: climate.set_temperature
+                target: { entity_id: climate.daikinap86694 }
+                data: { temperature: "{{ send_set }}" }
+
+              # (valgfritt) Kort kvitterings-vent + retry én gang
+              - wait_template: >
+                  {{ (state_attr('climate.daikinap86694','temperature')|float(0)) | round(1)
+                      == (send_set|float) | round(1) }}
+                timeout: "00:00:08"
+                continue_on_timeout: true
+              - choose:
+                  - conditions: >
+                      {{ (state_attr('climate.daikinap86694','temperature')|float(0)) < (send_set|float) - 0.1 }}
+                    sequence:
+                      - service: climate.set_temperature
+                        target: { entity_id: climate.daikinap86694 }
+                        data: { temperature: "{{ send_set }}" }
+
+              # start cooldown
+              - service: timer.start
+                target: { entity_id: timer.stue_klima_cooldown }
+                data:
+                  duration: >
+                    {% if deficit|float >= 2.0 %} 00:00:30
+                    {% elif deficit|float >= 1.0 %} 00:01:00
+                    {% else %} 00:02:00
+                    {% endif %}
+
+          # -------- INGEN ENDRING --------
+          # -------- INGEN ENDRING --------
           - conditions:
               - condition: template
-                value_template: "{{ (target_eff - current_set)|abs < min_effective_delta }}"
+                value_template: >
+                  {% set cs  = current_set|float(0) %}
+                  {% set ss  = send_set|float(0) %}
+                  {% set tol = (device_step|float(0.5))/4 %}
+                  {% set gap_cmd = (target_cmd|float - current_set|float)|abs %}
+                  {% set dead    = (min_effective_delta|float) %}
+                  {% set cold    = (deficit|float) >= 0.7 %}
+                  {{ not ( (ss - cs)|abs > tol and (gap_cmd >= dead or cold) ) and (ss - cs)|abs <= tol }}
             sequence:
+              - variables:
+                  _cur: "{{ current_set|float(0) }}"
+                  _send: "{{ send_set|float(0) }}"
+                  _nq: "{{ next_set_quant|float(0) }}"
+                  _eff: "{{ target_eff|float(0) }}"
+                  _cmd: "{{ target_cmd|float(0) }}"
+                  _Tin: "{{ Tin|float(0) }}"
+                  _des: "{{ desired|float(0) }}"
+                  _def: "{{ (desired|float(0) - Tin|float(0)) }}"
+                  _dead: "{{ (min_effective_delta|float(0)) }}"
+                  _tol: "{{ (device_step|float(0.5)) / 4 }}"
+                  _gap_cmd: "{{ (target_cmd|float(0) - current_set|float(0)) }}"
               - service: logbook.log
                 data:
                   name: "Stue klima (Daikin)"
                   message: >
-                    Ingen endring: current {{ current_set|float|round(1) }}≈target_eff {{ target_eff|float|round(1) }}
-                    (terskel: {{ min_effective_delta }}, dev[min,max]=[{{ dev_min|float|round(0) }},{{ dev_max|float|round(0) }}])
-                  entity_id: "climate.daikinap86694"
+                    Ingen endring: cur={{ _cur|round(1) }} (send={{ _send|round(1) }}, nq={{ _nq|round(1) }})
+                    Årsaker: |cmd-gap|={{ _gap_cmd|round(2) }} < dead={{ _dead|round(2) }}
+                    og/eller |send-cur|={{ (_send - _cur)|abs|round(3) }} ≤ tol={{ _tol|round(3) }}
+                    Kontekst: eff={{ _eff|round(1) }} cmd={{ _cmd|round(1) }} Tin={{ _Tin|round(1) }} des={{ _des|round(1) }} def={{ _def|round(2) }}
+                  entity_id: climate.daikinap86694
+
+        default:
+          # Fallback: vi landet i ingen av greinene – logg eksplisitt (skal i praksis ikke skje)
+          - service: logbook.log
+            data:
+              name: "Stue klima (Daikin)"
+              message: >
+                Ingen match i choose() – sjekk gating. cur={{ current_set }} send={{ send_set }}
+                eff={{ target_eff }} cmd={{ target_cmd }} dead={{ min_effective_delta }} tol={{ (device_step|float(0.5))/4 }}
+              entity_id: climate.daikinap86694
 
   - id: stue_auto_boost_on_manual_jump
     alias: "Stue – Auto-boost ved manuell økning (med 3D/vifte/guard)"
@@ -484,10 +662,13 @@ automation:
           hvact: "{{ state_attr('climate.daikinap86694','hvac_action')|default('',true) }}"
       # Anti-windup: nullstill I-ledd hvis finnes
       - choose:
-          - conditions: "{{ states('input_number.stue_i_ledd') not in ['unknown','unavailable'] }}"
+          - conditions:
+              - condition: template
+                value_template: "{{ states('input_number.stue_i_ledd') not in ['unknown','unavailable'] }}"
             sequence:
               - service: input_number.set_value
-                data: { entity_id: input_number.stue_i_ledd, value: 0 }
+                target: { entity_id: input_number.stue_i_ledd }
+                data: { value: 0 }
 
       # Parkér PID mens vi booter varme
       - service: input_boolean.turn_on
@@ -543,7 +724,7 @@ automation:
         state: "on"
       - condition: template
         value_template: >
-          {% set dtdt = states('sensor.stue_temp_stigning')|float(0) %}
+          {% set dtdt = states('sensor.stue_temp_stigning_fast')|float(0) %}
           {% set desired = states('input_number.stue_onsket_temp')|float %}
           {% set Tin = states('sensor.stue_temperatur_virtuell')|float %}
           {{ dtdt >= 0.010 or (desired - Tin) < 0.7 }}

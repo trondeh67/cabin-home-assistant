@@ -10,7 +10,7 @@
         "brightness": 254
     },
     "3": {
-        "state": "ON",
+        "state": "OFF",
         "brightness": 254,
         "color_mode": "color_temp",
         "color_temp": 357
@@ -60,7 +60,7 @@
         "last_seen": "2025-09-15T13:24:07.701Z"
     },
     "0x50325ffffe3b93ff": {
-        "state": "ON",
+        "state": "OFF",
         "update": {
             "state": "idle",
             "installed_version": 65554,
@@ -76,7 +76,7 @@
         "last_seen": "2025-09-15T13:36:28.477Z"
     },
     "0xb4e3f9fffed8958f": {
-        "state": "ON",
+        "state": "OFF",
         "update": {
             "state": "idle",
             "installed_version": 65554,
@@ -92,7 +92,7 @@
         "last_seen": "2025-09-15T12:56:38.576Z"
     },
     "0x50325ffffe35ddbd": {
-        "state": "ON",
+        "state": "OFF",
         "update": {
             "state": "idle",
             "installed_version": 65554,
@@ -108,7 +108,7 @@
         "last_seen": "2025-09-15T13:45:02.537Z"
     },
     "0x0c4314fffebf6ff2": {
-        "state": "ON",
+        "state": "OFF",
         "update": {
             "state": "idle",
             "installed_version": 65554,
@@ -124,7 +124,7 @@
         "last_seen": "2025-09-15T13:35:53.790Z"
     },
     "0x0c4314fffed0ed23": {
-        "state": "ON",
+        "state": "OFF",
         "update": {
             "state": "idle",
             "installed_version": 65554,

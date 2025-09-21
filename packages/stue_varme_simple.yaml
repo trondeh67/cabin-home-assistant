@@ -1,0 +1,279 @@
+# ============================================================
+#  STUE – VARMESTYRING (forenklet, robust)
+# ============================================================
+
+homeassistant:
+  customize:
+    sensor.stue_hp_target_eff:
+      friendly_name: "Stue: mål-settpunkt (effektiv, kvantisert)"
+    sensor.stue_hp_deficit:
+      friendly_name: "Stue: underskudd (ønsket - målt)"
+    input_number.stue_last_cmd_set:
+      icon: mdi:target
+    input_boolean.stue_klima_hold:
+      friendly_name: "Stue klima HOLD (pause regulering)"
+      icon: mdi:pause-octagon
+
+# -----------------------------
+#  INPUTS / GRENSEVERDIER
+# -----------------------------
+input_number:
+  stue_onsket_temp:
+    name: "Stue: ønsket temp (sittehøyde)"
+    min: 15
+    max: 24
+    step: 0.5
+    unit_of_measurement: "°C"
+    icon: mdi:thermometer
+
+  # Min/max på varmepumpens seteområde
+  stue_min_setpunkt:
+    name: "Stue: min setpunkt (Daikin)"
+    min: 13
+    max: 22
+    step: 0.5
+    unit_of_measurement: "°C"
+
+  stue_max_setpunkt:
+    name: "Stue: max setpunkt (Daikin)"
+    min: 22
+    max: 30
+    step: 0.5
+    unit_of_measurement: "°C"
+
+  # VARMEBIAS = litt over ønsket for å holde komfort (kun ved positivt underskudd)
+  stue_heat_bias_base:
+    name: "Stue: varme-bias base (°C)"
+    min: 0
+    max: 6
+    step: 0.5
+    unit_of_measurement: "°C"
+    mode: box
+
+  stue_heat_bias_gain:
+    name: "Stue: varme-bias gain (°C per °C underskudd)"
+    min: 0
+    max: 1
+    step: 0.1
+    mode: box
+
+  # UTE-FEED-FORWARD = løft når ute < terskel
+  stue_ff_base_a:
+    name: "Stue: FF base a (°C)"
+    min: -2
+    max: 5
+    step: 0.1
+    mode: box
+
+  stue_ff_slope_b:
+    name: "Stue: FF slope b (°C per °C under terskel)"
+    min: 0
+    max: 0.5
+    step: 0.01
+    mode: box
+
+  stue_ff_threshold:
+    name: "Stue: FF terskel ute (°C)"
+    min: -10
+    max: 25
+    step: 1
+
+  # Autoritativt spor for sist kommanderte settpunkt (unngå treghet i Daikin-attr)
+  stue_last_cmd_set:
+    name: "Stue: sist sendt settpunkt"
+    min: 13
+    max: 30
+    step: 0.5
+    unit_of_measurement: "°C"
+    mode: box
+
+# Pause-bryter (navn/ikon satt via customize for å unngå YAML "duplicate key 'name'")
+input_boolean:
+  stue_klima_hold:
+    initial: off
+
+# Cooldown (antiflapping)
+timer:
+  stue_cooldown:
+    duration: "00:01:30"
+
+# -----------------------------
+#  SENSORS / BEREGNING
+# -----------------------------
+template:
+  - sensor:
+      - name: "stue_hp_deficit"
+        unique_id: stue_hp_deficit
+        unit_of_measurement: "°C"
+        state: >
+          {% set des = states('input_number.stue_onsket_temp')|float(21.5) %}
+          {% set tin = states('sensor.stue_temperatur_virtuell')|float(des) %}
+          {{ (des - tin)|round(2) }}
+
+      - name: "stue_hp_target_raw"
+        unique_id: stue_hp_target_raw
+        unit_of_measurement: "°C"
+        state: >
+          {% set des  = states('input_number.stue_onsket_temp')|float(21.5) %}
+          {% set tin  = states('sensor.stue_temperatur_virtuell')|float(des) %}
+          {% set tout = states('sensor.ute_temperatur_virtuell')|float(10.0) %}
+          {% set deficit = (des - tin) %}
+
+          {# --- VARMEBIAS --- #}
+          {# Base-bias (strukturell offset pga. høyt innsuget) skal ALLTID gjelde #}
+          {% set hb0 = states('input_number.stue_heat_bias_base')|float(0.0) %}
+          {# Ekstra bias kun når rommet faktisk er kaldt #}
+          {% set hbg = states('input_number.stue_heat_bias_gain')|float(0.0) %}
+          {% set dyn = (deficit if deficit > 0 else 0) %}
+          {% set bias = hb0 + hbg * dyn %}
+
+          {# --- UTE FEED-FORWARD --- #}
+          {% set a  = states('input_number.stue_ff_base_a')|float(1.0) %}
+          {% set b  = states('input_number.stue_ff_slope_b')|float(0.05) %}
+          {% set Tt = states('input_number.stue_ff_threshold')|float(13.0) %}
+          {% set cold = (Tt - tout) if (Tt - tout) > 0 else 0 %}
+          {% set ff = a + b * cold %}
+
+          {{ (des + bias + ff)|round(2) }}
+
+      - name: "stue_hp_target_eff"
+        unique_id: stue_hp_target_eff
+        unit_of_measurement: "°C"
+        state: >
+          {% set raw = states('sensor.stue_hp_target_raw')|float(22.0) %}
+          {% set tmin = states('input_number.stue_min_setpunkt')|float(16.0) %}
+          {% set tmax = states('input_number.stue_max_setpunkt')|float(28.0) %}
+          {% set devmin = state_attr('climate.daikinap86694','min_temp')|float(tmin) %}
+          {% set devmax = state_attr('climate.daikinap86694','max_temp')|float(tmax) %}
+          {% set step   = state_attr('climate.daikinap86694','target_temp_step')|float(0.5) %}
+          {% set clamped = [devmax, [raw, devmin]|max]|min %}
+          {% set q = ((clamped / step)|round(0) * step) %}
+          {{ q|round(1) }}
+
+# -----------------------------
+#  SCRIPT – SETT SETTPUNKT
+# -----------------------------
+script:
+  stue_hp_apply_setpoint:
+    alias: "Stue: sett varmepumpe-settpunkt"
+    description: "Setter HEAT (om nødvendig), setter settpunkt, venter kort og oppdaterer sist sendt."
+    mode: restart
+    fields:
+      temp:
+        description: "Settpunkttemperatur °C"
+        example: 22.5
+    sequence:
+      - variables:
+          _target: "{{ temp|float }}"
+          _step: "{{ state_attr('climate.daikinap86694','target_temp_step')|float(0.5) }}"
+      - if:
+          - condition: template
+            value_template: "{{ not is_state('climate.daikinap86694','heat') }}"
+        then:
+          - service: climate.set_hvac_mode
+            target: { entity_id: climate.daikinap86694 }
+            data: { hvac_mode: heat }
+
+      - service: climate.set_temperature
+        target: { entity_id: climate.daikinap86694 }
+        data: { temperature: "{{ _target }}" }
+
+      - wait_template: >
+          {{ (state_attr('climate.daikinap86694','temperature')|float(0)) | round(1)
+              == (_target|float) | round(1) }}
+        timeout: "00:00:06"
+        continue_on_timeout: true
+
+      - choose:
+          - conditions: >
+              {{ (state_attr('climate.daikinap86694','temperature')|float(0)) < (_target|float) - (_step/2) }}
+            sequence:
+              - service: climate.set_temperature
+                target: { entity_id: climate.daikinap86694 }
+                data: { temperature: "{{ _target }}" }
+              - delay: "00:00:02"
+
+      - service: input_number.set_value
+        target: { entity_id: input_number.stue_last_cmd_set }
+        data: { value: "{{ _target }}" }
+
+      - service: timer.start
+        target: { entity_id: timer.stue_cooldown }
+        data: { duration: "00:01:30" }
+
+      - service: logbook.log
+        data:
+          name: "Stue klima (Daikin)"
+          message: "Sendte settpunkt → {{ _target }} °C"
+          entity_id: climate.daikinap86694
+
+# -----------------------------
+#  AUTOMASJONER
+# -----------------------------
+automation:
+  - id: stue_hp_tracking
+    alias: "Stue klima – tracking av settpunkt"
+    mode: restart
+    trigger:
+      - platform: state
+        entity_id: sensor.stue_hp_target_eff
+      - platform: time_pattern
+        minutes: "/5"
+    condition:
+      - condition: state
+        entity_id: input_boolean.stue_klima_hold
+        state: "off"
+      - condition: template
+        value_template: "{{ is_state('timer.stue_cooldown','idle') }}"
+    action:
+      - variables:
+          target: "{{ states('sensor.stue_hp_target_eff')|float(22.0) }}"
+          step: "{{ state_attr('climate.daikinap86694','target_temp_step')|float(0.5) }}"
+          last: "{{ states('input_number.stue_last_cmd_set') }}"
+          dev: "{{ state_attr('climate.daikinap86694','temperature') }}"
+          current_set: >
+            {% if last is number %} {{ last }}
+            {% elif dev is number %} {{ dev }}
+            {% else %} 22.0
+            {% endif %}
+          gap: "{{ (target - (current_set|float))|abs }}"
+      - choose:
+          - conditions:
+              - condition: template
+                value_template: >
+                  {{ (target|float - current_set|float) | abs
+                       >= (step|float * 0.99) }}
+            sequence:
+              - service: script.stue_hp_apply_setpoint
+                data:
+                  temp: "{{ target }}"
+        default:
+          - service: logbook.log
+            data:
+              name: "Stue klima (Daikin)"
+              message: >
+                Ingen endring: cur={{ (current_set|float)|round(1) }},
+                target={{ target|round(1) }}, gap={{ ((target|float - current_set|float)|abs)|round(2) }}
+              entity_id: climate.daikinap86694
+
+  - id: stue_hp_watchdog
+    alias: "Stue klima – watchdog resync"
+    mode: single
+    trigger:
+      - platform: time_pattern
+        minutes: "/10"
+    condition:
+      - condition: state
+        entity_id: input_boolean.stue_klima_hold
+        state: "off"
+      - condition: template
+        value_template: "{{ is_state('timer.stue_cooldown','idle') }}"
+    action:
+      - variables:
+          target: "{{ states('sensor.stue_hp_target_eff')|float(22.0) }}"
+          cur: "{{ state_attr('climate.daikinap86694','temperature')|float(0) }}"
+          step: "{{ state_attr('climate.daikinap86694','target_temp_step')|float(0.5) }}"
+      - condition: template
+        value_template: "{{ (target - cur)|abs >= step*0.99 }}"
+      - service: script.stue_hp_apply_setpoint
+        data: { temp: "{{ target }}" }
