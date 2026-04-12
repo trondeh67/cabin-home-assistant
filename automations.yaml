@@ -30,11 +30,9 @@
   alias: Alarm påskrudd - skru av alt lys
   description: ''
   triggers:
-  - device_id: 2cc859fc07f9ebc270774f733eb0ac5e
-    domain: alarm_control_panel
-    entity_id: 67d4879e58839cbc3062e2d548e9b112
-    type: armed_away
-    trigger: device
+  - entity_id: alarm_control_panel.verisure_alarm
+    to: armed_away
+    trigger: state
   conditions: []
   actions:
   - sequence:

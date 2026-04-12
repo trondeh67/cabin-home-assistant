@@ -49,7 +49,7 @@ views:
                   action: call-service
                   service: scene.turn_on
                   target:
-                    entity_id: scene.stue_alt_av_duplisere
+                    entity_id: scene.stue_alt_av
 
           - type: grid
             columns: 2
