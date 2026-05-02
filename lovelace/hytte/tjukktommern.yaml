@@ -235,24 +235,16 @@ views:
         show_empty: false
       - type: custom:mushroom-title-card
         title: Ventilasjon
-      - type: custom:auto-entities
-        card:
-          type: grid
-          columns: 1
-          square: false
-        card_param: cards
-        filter:
-          include:
-            - area: Bad
-              domain: switch
-              options:
-                type: custom:mushroom-entity-card
-                layout: horizontal
-                secondary_info: last-changed
-                icon: mdi:fan
-                icon_color: >-
-                  {{ 'blue' if is_state(config.entity, 'on') else 'grey' }}
-        show_empty: false
+      - type: custom:mushroom-template-card
+        entity: switch.rele_vifte_aktuator
+        primary: Avtrekksvifte
+        secondary: >-
+          {{ 'På' if is_state('switch.rele_vifte_aktuator', 'on') else 'Av' }}
+        icon: mdi:fan
+        icon_color: >-
+          {{ 'blue' if is_state('switch.rele_vifte_aktuator', 'on') else 'grey' }}
+        tap_action:
+          action: toggle
   - title: Soverom 1
     path: soverom_1
     icon: mdi:bed-king
