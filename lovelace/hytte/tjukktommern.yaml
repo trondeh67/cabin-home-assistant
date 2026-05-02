@@ -470,22 +470,31 @@ views:
         # KLIMA
       - type: custom:mushroom-title-card
         title: Klima
-      - type: sensor
-        entity: sensor.bod_temperaturmaler_temperature
+      - type: custom:mushroom-title-card
+        title: Alternativ A
+      - type: custom:mini-graph-card
         name: Bod temperatur
-        graph: line
-        detail: 1
         hours_to_show: 24
-        unit: "°C"
-        show_empty: false
-      - type: sensor
-        entity: sensor.bod_temperatur
-        name: Bod temperatur (Verisure)
-        graph: line
-        detail: 1
-        hours_to_show: 24
-        unit: "°C"
-        show_empty: false
+        points_per_hour: 1
+        entities:
+          - entity: sensor.bod_temperaturmaler_temperature
+            name: Måler
+          - entity: sensor.bod_temperatur
+            name: Verisure
+      - type: custom:mushroom-title-card
+        title: Alternativ B
+      - type: grid
+        columns: 2
+        square: false
+        cards:
+          - type: custom:mushroom-template-card
+            primary: "{{ states('sensor.bod_temperaturmaler_temperature') }}°C"
+            secondary: Temperaturmåler
+            icon: mdi:thermometer
+          - type: custom:mushroom-template-card
+            primary: "{{ states('sensor.bod_temperatur') }}°C"
+            secondary: Verisure
+            icon: mdi:thermometer
   - title: Utendørs
     path: utendørs
     icon: mdi:sun-snowflake-variant
