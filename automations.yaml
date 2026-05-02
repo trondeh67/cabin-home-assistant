@@ -102,3 +102,37 @@
       entity_id: script.lys_dagtid_avskrudd_alarm
     action: script.turn_on
   mode: single
+- id: '1757200000001'
+  alias: Bryter Gang 2 Trykk Ned - Nattlys
+  description: ''
+  triggers:
+  - domain: mqtt
+    device_id: 265c826191a13ebbd54e6731bd3a331e
+    type: button_short_release
+    subtype: button_2
+    trigger: device
+  conditions: []
+  actions:
+  - action: scene.turn_on
+    metadata: {}
+    data: {}
+    target:
+      entity_id: scene.oppholdsrom_nattlys
+  mode: single
+- id: '1757200000002'
+  alias: Bryter Gang 2 Trykk Opp - Normal
+  description: ''
+  triggers:
+  - domain: mqtt
+    device_id: 265c826191a13ebbd54e6731bd3a331e
+    type: button_short_release
+    subtype: button_1
+    trigger: device
+  conditions: []
+  actions:
+  - action: script.turn_on
+    metadata: {}
+    data: {}
+    target:
+      entity_id: script.lys_dagtid_avskrudd_alarm
+  mode: single
