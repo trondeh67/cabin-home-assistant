@@ -470,19 +470,6 @@ views:
         # KLIMA
       - type: custom:mushroom-title-card
         title: Klima
-      - type: custom:mushroom-title-card
-        title: Alternativ A
-      - type: custom:mini-graph-card
-        name: Bod temperatur
-        hours_to_show: 24
-        points_per_hour: 1
-        entities:
-          - entity: sensor.bod_temperaturmaler_temperature
-            name: Måler
-          - entity: sensor.bod_temperatur
-            name: Verisure
-      - type: custom:mushroom-title-card
-        title: Alternativ B
       - type: grid
         columns: 2
         square: false
