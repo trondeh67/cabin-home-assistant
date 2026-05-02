@@ -75,6 +75,10 @@ views:
                 entity: light.lampe_ved_ovn
                 show_brightness_control: false
                 collapsible_controls: false
+              - type: custom:mushroom-light-card
+                entity: light.lys_rundt_tv
+                show_brightness_control: true
+                collapsible_controls: false
 
   - title: Spisestue
     path: spisestue
