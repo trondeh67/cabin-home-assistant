@@ -214,37 +214,39 @@ views:
     path: bad
     icon: mdi:shower
     cards:
-      - type: custom:mushroom-title-card
-        title: BAD
-      - type: custom:mushroom-title-card
-        title: Lys
-      - type: custom:auto-entities
-        card:
-          type: grid
-          columns: 2
-          square: false
-        card_param: cards
-        filter:
-          include:
-            - area: Bad
-              domain: light
-              options:
-                type: custom:mushroom-light-card
-                show_brightness_control: true
-                use_light_color: true
-        show_empty: false
-      - type: custom:mushroom-title-card
-        title: Ventilasjon
-      - type: custom:mushroom-template-card
-        entity: switch.rele_vifte_aktuator
-        primary: Avtrekksvifte
-        secondary: >-
-          {{ 'På' if is_state('switch.rele_vifte_aktuator', 'on') else 'Av' }}
-        icon: mdi:fan
-        icon_color: >-
-          {{ 'blue' if is_state('switch.rele_vifte_aktuator', 'on') else 'grey' }}
-        tap_action:
-          action: toggle
+      - type: vertical-stack
+        cards:
+          - type: custom:mushroom-title-card
+            title: BAD
+          - type: custom:mushroom-title-card
+            title: Lys
+          - type: custom:auto-entities
+            card:
+              type: grid
+              columns: 2
+              square: false
+            card_param: cards
+            filter:
+              include:
+                - area: Bad
+                  domain: light
+                  options:
+                    type: custom:mushroom-light-card
+                    show_brightness_control: true
+                    use_light_color: true
+            show_empty: false
+          - type: custom:mushroom-title-card
+            title: Ventilasjon
+          - type: custom:mushroom-template-card
+            entity: switch.rele_vifte_aktuator
+            primary: Avtrekksvifte
+            secondary: >-
+              {{ 'På' if is_state('switch.rele_vifte_aktuator', 'on') else 'Av' }}
+            icon: mdi:fan
+            icon_color: >-
+              {{ 'blue' if is_state('switch.rele_vifte_aktuator', 'on') else 'grey' }}
+            tap_action:
+              action: toggle
   - title: Soverom 1
     path: soverom_1
     icon: mdi:bed-king
