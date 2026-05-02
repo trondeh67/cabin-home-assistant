@@ -35,9 +35,12 @@
     trigger: state
   conditions: []
   actions:
-  - sequence:
-    - action: script.lys_alt_av
-      data: {}
+  - action: script.lys_alt_av
+    data: {}
+  - delay: '00:02:00'
+  - action: light.turn_off
+    target:
+      entity_id: light.stue_5x_spott
   mode: single
 - id: '1755152263990'
   alias: Low battery level detection & notification for all battery sensors
