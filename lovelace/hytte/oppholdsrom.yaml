@@ -71,11 +71,13 @@ cards:
         entity: switch.ute_varmekabel_varmepumpe
         icon: mdi:heat-wave
         icon_color: >-
-          {% if is_state('switch.ute_varmekabel_varmepumpe', 'on') %} orange
+          {% if states('sensor.ute_netatmo_korr') in ['unavailable','unknown'] %} red
+          {% elif is_state('switch.ute_varmekabel_varmepumpe', 'on') %} orange
           {% else %} grey
           {% endif %}
         content: >-
-          {% if is_state('switch.ute_varmekabel_varmepumpe', 'on') %} VK: På
+          {% if states('sensor.ute_netatmo_korr') in ['unavailable','unknown'] %} VK: Sikker
+          {% elif is_state('switch.ute_varmekabel_varmepumpe', 'on') %} VK: På
           {% else %} VK: Av
           {% endif %}
         tap_action:

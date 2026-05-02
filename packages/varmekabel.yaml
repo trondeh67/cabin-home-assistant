@@ -56,8 +56,67 @@ automation:
       - condition: state
         entity_id: switch.ute_varmekabel_varmepumpe
         state: "on"
+      - condition: not
+        conditions:
+          - condition: state
+            entity_id: sensor.ute_netatmo_korr
+            state:
+              - unavailable
+              - unknown
     actions:
       - action: switch.turn_off
         target:
           entity_id: switch.ute_varmekabel_varmepumpe
+    mode: single
+
+  - id: varmekabel_netatmo_utilgjengelig
+    alias: Varmekabel – Netatmo utilgjengelig (sikkerhetslås på)
+    description: Låser varmekabelen PÅ når Netatmo-sensor ikke er tilgjengelig
+    triggers:
+      - trigger: state
+        entity_id: sensor.ute_netatmo_korr
+        to:
+          - unavailable
+          - unknown
+      - trigger: homeassistant
+        event: start
+    conditions:
+      - condition: state
+        entity_id: sensor.ute_netatmo_korr
+        state:
+          - unavailable
+          - unknown
+    actions:
+      - action: switch.turn_on
+        target:
+          entity_id: switch.ute_varmekabel_varmepumpe
+    mode: single
+
+  - id: varmekabel_netatmo_tilbake
+    alias: Varmekabel – Netatmo tilbake (gjenoppta normal styring)
+    description: Når Netatmo blir tilgjengelig igjen, re-evalueres temperatur
+    triggers:
+      - trigger: state
+        entity_id: sensor.ute_netatmo_korr
+        from:
+          - unavailable
+          - unknown
+    actions:
+      - choose:
+          - conditions:
+              - condition: numeric_state
+                entity_id: sensor.ute_netatmo_korr
+                above: input_number.varmekabel_temp_av
+            sequence:
+              - action: switch.turn_off
+                target:
+                  entity_id: switch.ute_varmekabel_varmepumpe
+          - conditions:
+              - condition: numeric_state
+                entity_id: sensor.ute_netatmo_korr
+                below: input_number.varmekabel_temp_pa
+            sequence:
+              - action: switch.turn_on
+                target:
+                  entity_id: switch.ute_varmekabel_varmepumpe
     mode: single
