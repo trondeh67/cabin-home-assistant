@@ -491,10 +491,16 @@ views:
             primary: "{{ states('sensor.bod_temperaturmaler_temperature') }}°C"
             secondary: Temperaturmåler
             icon: mdi:thermometer
+            tap_action:
+              action: more-info
+              entity: sensor.bod_temperaturmaler_temperature
           - type: custom:mushroom-template-card
             primary: "{{ states('sensor.bod_temperatur') }}°C"
             secondary: Verisure
             icon: mdi:thermometer
+            tap_action:
+              action: more-info
+              entity: sensor.bod_temperatur
   - title: Utendørs
     path: utendørs
     icon: mdi:sun-snowflake-variant
