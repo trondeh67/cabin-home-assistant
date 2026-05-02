@@ -1,0 +1,63 @@
+input_number:
+  varmekabel_temp_pa:
+    name: Varmekabel på-temperatur
+    min: -10
+    max: 10
+    step: 0.5
+    initial: 2
+    unit_of_measurement: "°C"
+    icon: mdi:thermometer-chevron-up
+
+  varmekabel_temp_av:
+    name: Varmekabel av-temperatur
+    min: -10
+    max: 10
+    step: 0.5
+    initial: 4
+    unit_of_measurement: "°C"
+    icon: mdi:thermometer-chevron-down
+
+automation:
+  - id: varmekabel_sla_pa
+    alias: Varmekabel – slå på
+    description: Slår på varmekabelen når utetemperatur synker under terskelen
+    triggers:
+      - trigger: numeric_state
+        entity_id: sensor.ute_netatmo_korr
+        below: input_number.varmekabel_temp_pa
+      - trigger: homeassistant
+        event: start
+    conditions:
+      - condition: numeric_state
+        entity_id: sensor.ute_netatmo_korr
+        below: input_number.varmekabel_temp_pa
+      - condition: state
+        entity_id: switch.ute_varmekabel_varmepumpe
+        state: "off"
+    actions:
+      - action: switch.turn_on
+        target:
+          entity_id: switch.ute_varmekabel_varmepumpe
+    mode: single
+
+  - id: varmekabel_sla_av
+    alias: Varmekabel – slå av
+    description: Slår av varmekabelen når utetemperatur stiger over terskelen
+    triggers:
+      - trigger: numeric_state
+        entity_id: sensor.ute_netatmo_korr
+        above: input_number.varmekabel_temp_av
+      - trigger: homeassistant
+        event: start
+    conditions:
+      - condition: numeric_state
+        entity_id: sensor.ute_netatmo_korr
+        above: input_number.varmekabel_temp_av
+      - condition: state
+        entity_id: switch.ute_varmekabel_varmepumpe
+        state: "on"
+    actions:
+      - action: switch.turn_off
+        target:
+          entity_id: switch.ute_varmekabel_varmepumpe
+    mode: single
