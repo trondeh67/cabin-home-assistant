@@ -42,7 +42,7 @@ cards:
         icon: mdi:weather-partly-cloudy
         content: >
           {% set t = states('sensor.ute_temperatur_virtuell')|float(default=nan) %}
-          {{ (t|round(0) ~ '°C') if t == t else '—°C' }}
+          {{ (t|round(1) ~ '°C') if t == t else '—°C' }}
         tap_action:
           action: more-info
           entity: sensor.ute_temperatur_virtuell
