@@ -473,11 +473,18 @@ views:
       - type: sensor
         entity: sensor.bod_temperaturmaler_temperature
         name: Bod temperatur
-        graph: line # viser liten graf
-        detail: 1 # grovere oppløsning (sparsom)
-        hours_to_show: 24 # justér (f.eks. 48/72)
-        unit: "°C" # valgfritt, hvis ikke allerede satt
-
+        graph: line
+        detail: 1
+        hours_to_show: 24
+        unit: "°C"
+        show_empty: false
+      - type: sensor
+        entity: sensor.bod_temperatur
+        name: Bod temperatur (Verisure)
+        graph: line
+        detail: 1
+        hours_to_show: 24
+        unit: "°C"
         show_empty: false
   - title: Utendørs
     path: utendørs
