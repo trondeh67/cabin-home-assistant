@@ -58,8 +58,8 @@ lys_alt_av:
     then:
     - action: persistent_notification.create
       data:
-        title: "Lys – xComfort-lyser fortsatt på!"
-        message: "{{ fortsatt_pa | join(', ') }}"
+        title: Lys – xComfort-lyser fortsatt på!
+        message: '{{ fortsatt_pa | join('', '') }}'
 lys_dagtid_avskrudd_alarm:
   alias: Lys – dagtid/avskrudd alarm
   mode: single
@@ -70,7 +70,9 @@ lys_dagtid_avskrudd_alarm:
       - scene.kjokken_dag
       - scene.stue_dag
       - scene.spisestue_dag
+      - scene.vindfang_dag
     action: scene.turn_on
+    data: {}
 lys_oppholdsom_dempet:
   alias: Lys – oppholdsom dempet
   mode: single
@@ -81,5 +83,7 @@ lys_oppholdsom_dempet:
       - scene.kjokken_dempet
       - scene.stue_dempet
       - scene.spisestue_dempet
+      - scene.vindfang_dempet
     action: scene.turn_on
+    data: {}
   description: ''

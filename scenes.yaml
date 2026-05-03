@@ -311,34 +311,34 @@
     light.dimmer_vindfang_dimmeaktuator:
       supported_color_modes:
       - brightness
-      friendly_name: Dimmer vindfang Dimmeaktuator
-      supported_features: 0
       color_mode:
       brightness:
+      friendly_name: Taklys
+      supported_features: 0
       state: 'off'
     light.dimmer_gang_1_dimmeaktuator:
       supported_color_modes:
       - brightness
-      friendly_name: Dimmer gang 1 Dimmeaktuator
-      supported_features: 0
       color_mode: brightness
       brightness: 15
+      friendly_name: Taklys oppe
+      supported_features: 0
       state: 'on'
     light.dimmer_gang_2_dimmeaktuator:
       supported_color_modes:
       - brightness
-      friendly_name: Dimmer gang 2 Dimmeaktuator
-      supported_features: 0
       color_mode: brightness
       brightness: 10
+      friendly_name: Taklys nede
+      supported_features: 0
       state: 'on'
     light.dimmer_spisestue_2_dimmeaktuator:
       supported_color_modes:
       - brightness
-      friendly_name: Dimmer spisestue 2 Dimmeaktuator
-      supported_features: 0
       color_mode:
       brightness:
+      friendly_name: Spisebord
+      supported_features: 0
       state: 'off'
     light.lampe_ved_ovn:
       supported_color_modes:
@@ -350,8 +350,6 @@
     light.stue_5x_spott:
       min_color_temp_kelvin: 2202
       max_color_temp_kelvin: 4000
-      min_mireds: 250
-      max_mireds: 454
       effect_list:
       - blink
       - breathe
@@ -361,11 +359,16 @@
       - stop_effect
       supported_color_modes:
       - color_temp
+      group_entities:
+      - light.0x0c4314fffebf6ff2
+      - light.0x0c4314fffed0ed23
+      - light.0x50325ffffe35ddbd
+      - light.0x50325ffffe3b93ff
+      - light.0xb4e3f9fffed8958f
       effect:
       color_mode:
       brightness:
       color_temp_kelvin:
-      color_temp:
       hs_color:
       rgb_color:
       xy_color:
@@ -405,16 +408,56 @@
     light.dimmer_kjokken_1_dimmeaktuator:
       supported_color_modes:
       - brightness
-      friendly_name: Dimmer kjøkken 1 Dimmeaktuator
-      supported_features: 0
       color_mode:
       brightness:
+      friendly_name: Taklys
+      supported_features: 0
       state: 'off'
     light.kjokken_zb_lys:
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      supported_color_modes:
+      - brightness
+      group_entities:
+      - light.kjokken_overskap_venstre
+      - light.kjokken_overskap_hoyre
+      effect:
+      color_mode: brightness
+      brightness: 26
+      friendly_name: Lys overskap
+      supported_features: 44
+      state: 'on'
+    light.maleribelysning:
+      supported_color_modes:
+      - onoff
+      color_mode:
+      friendly_name: Maleribelysning
+      supported_features: 0
+      state: 'off'
+    light.kjokken_over_hoyskap:
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      supported_color_modes:
+      - brightness
+      effect:
+      color_mode: brightness
+      brightness: 133
+      friendly_name: Lys over høyskap
+      supported_features: 44
+      state: 'on'
+    light.0xc4d8c8fffeacc63d:
       min_color_temp_kelvin: 2202
       max_color_temp_kelvin: 4000
-      min_mireds: 250
-      max_mireds: 454
       effect_list:
       - blink
       - breathe
@@ -425,23 +468,15 @@
       supported_color_modes:
       - color_temp
       effect:
-      color_mode: color_temp
-      brightness: 26
-      color_temp_kelvin: 2801
-      color_temp: 357
+      color_mode:
+      brightness:
+      color_temp_kelvin:
       hs_color:
-      - 28.185
-      - 62.588
       rgb_color:
-      - 255
-      - 170
-      - 95
       xy_color:
-      - 0.516
-      - 0.386
-      friendly_name: Kjøkken_ZB_Lys
+      friendly_name: Oppvaskkum
       supported_features: 44
-      state: 'on'
+      state: 'off'
   icon: mdi:lightbulb-night
   metadata: {}
 - id: '1757108258216'
@@ -466,8 +501,6 @@
     light.0xc4d8c8fffeacc63d:
       min_color_temp_kelvin: 2202
       max_color_temp_kelvin: 4000
-      min_mireds: 250
-      max_mireds: 454
       effect_list:
       - blink
       - breathe
@@ -481,7 +514,6 @@
       color_mode: color_temp
       brightness: 153
       color_temp_kelvin: 2801
-      color_temp: 357
       hs_color:
       - 28.185
       - 62.588
@@ -505,10 +537,29 @@
       - stop_effect
       supported_color_modes:
       - brightness
+      group_entities:
+      - light.kjokken_overskap_venstre
+      - light.kjokken_overskap_hoyre
       effect:
       color_mode: brightness
       brightness: 178
       friendly_name: Lys overskap
+      supported_features: 44
+      state: 'on'
+    light.kjokken_over_hoyskap:
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      supported_color_modes:
+      - brightness
+      effect:
+      color_mode: brightness
+      brightness: 222
+      friendly_name: Lys over høyskap
       supported_features: 44
       state: 'on'
   icon: mdi:chef-hat
@@ -917,8 +968,6 @@
     light.0xc4d8c8fffeacc63d:
       min_color_temp_kelvin: 2202
       max_color_temp_kelvin: 4000
-      min_mireds: 250
-      max_mireds: 454
       effect_list:
       - blink
       - breathe
@@ -932,7 +981,6 @@
       color_mode: color_temp
       brightness: 255
       color_temp_kelvin: 2801
-      color_temp: 357
       hs_color:
       - 28.185
       - 62.588
@@ -956,10 +1004,29 @@
       - stop_effect
       supported_color_modes:
       - brightness
+      group_entities:
+      - light.kjokken_overskap_venstre
+      - light.kjokken_overskap_hoyre
       effect:
       color_mode: brightness
       brightness: 255
       friendly_name: Lys overskap
+      supported_features: 44
+      state: 'on'
+    light.kjokken_over_hoyskap:
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      supported_color_modes:
+      - brightness
+      effect:
+      color_mode: brightness
+      brightness: 255
+      friendly_name: Lys over høyskap
       supported_features: 44
       state: 'on'
   metadata: {}
@@ -977,8 +1044,6 @@
     light.0xc4d8c8fffeacc63d:
       min_color_temp_kelvin: 2202
       max_color_temp_kelvin: 4000
-      min_mireds: 250
-      max_mireds: 454
       effect_list:
       - blink
       - breathe
@@ -992,7 +1057,6 @@
       color_mode: color_temp
       brightness: 153
       color_temp_kelvin: 2801
-      color_temp: 357
       hs_color:
       - 28.185
       - 62.588
@@ -1016,10 +1080,29 @@
       - stop_effect
       supported_color_modes:
       - brightness
+      group_entities:
+      - light.kjokken_overskap_venstre
+      - light.kjokken_overskap_hoyre
       effect:
       color_mode: brightness
       brightness: 178
       friendly_name: Lys overskap
+      supported_features: 44
+      state: 'on'
+    light.kjokken_over_hoyskap:
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      supported_color_modes:
+      - brightness
+      effect:
+      color_mode: brightness
+      brightness: 222
+      friendly_name: Lys over høyskap
       supported_features: 44
       state: 'on'
   metadata: {}
@@ -1037,8 +1120,6 @@
     light.0xc4d8c8fffeacc63d:
       min_color_temp_kelvin: 2202
       max_color_temp_kelvin: 4000
-      min_mireds: 250
-      max_mireds: 454
       effect_list:
       - blink
       - breathe
@@ -1052,7 +1133,6 @@
       color_mode: color_temp
       brightness: 54
       color_temp_kelvin: 2801
-      color_temp: 357
       hs_color:
       - 28.185
       - 62.588
@@ -1076,10 +1156,29 @@
       - stop_effect
       supported_color_modes:
       - brightness
+      group_entities:
+      - light.kjokken_overskap_venstre
+      - light.kjokken_overskap_hoyre
       effect:
       color_mode: brightness
       brightness: 97
       friendly_name: Lys overskap
+      supported_features: 44
+      state: 'on'
+    light.kjokken_over_hoyskap:
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      supported_color_modes:
+      - brightness
+      effect:
+      color_mode: brightness
+      brightness: 191
+      friendly_name: Lys over høyskap
       supported_features: 44
       state: 'on'
   metadata: {}
@@ -1104,6 +1203,9 @@
       - stop_effect
       supported_color_modes:
       - brightness
+      group_entities:
+      - light.kjokken_overskap_venstre
+      - light.kjokken_overskap_hoyre
       effect:
       color_mode:
       brightness:
@@ -1113,8 +1215,6 @@
     light.0xc4d8c8fffeacc63d:
       min_color_temp_kelvin: 2202
       max_color_temp_kelvin: 4000
-      min_mireds: 250
-      max_mireds: 454
       effect_list:
       - blink
       - breathe
@@ -1128,11 +1228,26 @@
       color_mode:
       brightness:
       color_temp_kelvin:
-      color_temp:
       hs_color:
       rgb_color:
       xy_color:
       friendly_name: Oppvaskkum
+      supported_features: 44
+      state: 'off'
+    light.kjokken_over_hoyskap:
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      supported_color_modes:
+      - brightness
+      effect:
+      color_mode:
+      brightness:
+      friendly_name: Lys over høyskap
       supported_features: 44
       state: 'off'
   metadata: {}
