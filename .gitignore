@@ -42,6 +42,8 @@ secrets.yaml
 # Diverse
 uploads/
 .DS_Store
+.cache/
+.ha_run.lock
 .vscode/
 .idea/
 home-assistant.log*
