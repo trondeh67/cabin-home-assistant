@@ -1,4 +1,5 @@
 # HA runtime og database
+.HA_VERSION
 .storage/
 home-assistant_v2.db*
 *.db-shm
@@ -18,8 +19,11 @@ zigbee2mqtt/database.db*
 zigbee2mqtt/state.json
 zigbee2mqtt/coordinator_backup.json
 
-# HACS nedlastinger (vanlig å ignorere)
+# HACS nedlastinger og komponenter administrert av HACS
 www/community/**
+custom_components/hacs/
+custom_components/daikin_onecta/
+custom_components/google_assistant_sdk_custom/
 
 # Python cache
 custom_components/**/__pycache__/
@@ -44,4 +48,7 @@ home-assistant.log*
 www/community/
 zigbee2mqtt/database.db
 zigbee2mqtt/log/
-addons_state/*.json
+
+# Binære arkiver og eksterne verktøy
+*.tar.gz
+Sonoff-Dongle-Flasher-For-IHost/

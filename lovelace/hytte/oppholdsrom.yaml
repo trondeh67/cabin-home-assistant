@@ -161,17 +161,6 @@ cards:
                 use_light_color: true
                 show_brightness_control: true
                 collapsible_controls: true
-        sort:
-          method: name
-        show_empty: false
-      - type: custom:auto-entities
-        card:
-          type: grid
-          columns: 2
-          square: false
-        card_param: cards
-        filter:
-          include:
             - area: gang
               domain: light
               state: "on"
@@ -180,17 +169,6 @@ cards:
                 use_light_color: true
                 show_brightness_control: true
                 collapsible_controls: true
-        sort:
-          method: name
-        show_empty: false
-      - type: custom:auto-entities
-        card:
-          type: grid
-          columns: 2
-          square: false
-        card_param: cards
-        filter:
-          include:
             - area: kjokken
               domain: light
               state: "on"
@@ -199,17 +177,6 @@ cards:
                 use_light_color: true
                 show_brightness_control: true
                 collapsible_controls: true
-        sort:
-          method: name
-        show_empty: false
-      - type: custom:auto-entities
-        card:
-          type: grid
-          columns: 2
-          square: false
-        card_param: cards
-        filter:
-          include:
             - area: spisestue
               domain: light
               state: "on"
@@ -219,7 +186,7 @@ cards:
                 show_brightness_control: true
                 collapsible_controls: true
         sort:
-          method: name
+          method: area
         show_empty: false
 
       # DØRER/VINDUER – vis KUN hvis åpne (støyfritt på mobil)
