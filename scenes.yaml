@@ -572,14 +572,31 @@
       - brightness
       color_mode:
       brightness:
-      friendly_name: Dimmer kjøkken 1 Dimmeaktuator
+      friendly_name: Taklys
       supported_features: 0
       state: 'off'
     light.kjokken_zb_lys:
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      supported_color_modes:
+      - brightness
+      group_entities:
+      - light.kjokken_overskap_venstre
+      - light.kjokken_overskap_hoyre
+      effect:
+      color_mode:
+      brightness:
+      friendly_name: Lys overskap
+      supported_features: 44
+      state: 'off'
+    light.0xc4d8c8fffeacc63d:
       min_color_temp_kelvin: 2202
       max_color_temp_kelvin: 4000
-      min_mireds: 250
-      max_mireds: 454
       effect_list:
       - blink
       - breathe
@@ -593,11 +610,26 @@
       color_mode:
       brightness:
       color_temp_kelvin:
-      color_temp:
       hs_color:
       rgb_color:
       xy_color:
-      friendly_name: Kjøkken_ZB_Lys
+      friendly_name: Oppvaskkum
+      supported_features: 44
+      state: 'off'
+    light.kjokken_over_hoyskap:
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      supported_color_modes:
+      - brightness
+      effect:
+      color_mode:
+      brightness:
+      friendly_name: Lys over høyskap
       supported_features: 44
       state: 'off'
   icon: mdi:lightbulb-multiple-off
