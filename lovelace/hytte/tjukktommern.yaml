@@ -251,54 +251,56 @@ views:
     path: soverom
     icon: mdi:bed-king
     cards:
-      - type: custom:mushroom-title-card
-        title: Soverom 1
-      - type: custom:auto-entities
-        card:
-          type: grid
-          columns: 2
-          square: false
-        card_param: cards
-        filter:
-          include:
-            - area: Soverom 1
-              domain: light
-              options:
-                type: custom:mushroom-light-card
-                show_brightness_control: true
-        show_empty: false
-      - type: custom:mushroom-title-card
-        title: Soverom 2
-      - type: custom:auto-entities
-        card:
-          type: grid
-          columns: 2
-          square: false
-        card_param: cards
-        filter:
-          include:
-            - area: Soverom 2
-              domain: light
-              options:
-                type: custom:mushroom-light-card
-                show_brightness_control: true
-        show_empty: false
-      - type: custom:mushroom-title-card
-        title: Soverom 3
-      - type: custom:auto-entities
-        card:
-          type: grid
-          columns: 2
-          square: false
-        card_param: cards
-        filter:
-          include:
-            - area: Soverom 3
-              domain: light
-              options:
-                type: custom:mushroom-light-card
-                show_brightness_control: true
-        show_empty: false
+      - type: vertical-stack
+        cards:
+          - type: custom:mushroom-title-card
+            title: Soverom 1
+          - type: custom:auto-entities
+            card:
+              type: grid
+              columns: 2
+              square: false
+            card_param: cards
+            filter:
+              include:
+                - area: Soverom 1
+                  domain: light
+                  options:
+                    type: custom:mushroom-light-card
+                    show_brightness_control: true
+            show_empty: false
+          - type: custom:mushroom-title-card
+            title: Soverom 2
+          - type: custom:auto-entities
+            card:
+              type: grid
+              columns: 2
+              square: false
+            card_param: cards
+            filter:
+              include:
+                - area: Soverom 2
+                  domain: light
+                  options:
+                    type: custom:mushroom-light-card
+                    show_brightness_control: true
+            show_empty: false
+          - type: custom:mushroom-title-card
+            title: Soverom 3
+          - type: custom:auto-entities
+            card:
+              type: grid
+              columns: 2
+              square: false
+            card_param: cards
+            filter:
+              include:
+                - area: Soverom 3
+                  domain: light
+                  options:
+                    type: custom:mushroom-light-card
+                    show_brightness_control: true
+            show_empty: false
   - title: Vaskerom
     path: vaskerom
     icon: mdi:washing-machine
