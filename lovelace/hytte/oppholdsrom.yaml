@@ -242,3 +242,13 @@ cards:
                 type: custom:mushroom-entity-card
                 name: ""
         show_empty: false
+
+      # TEMPERATURINNSTILLINGER – avreise/ankomst
+      - type: custom:mushroom-title-card
+        title: Temperaturinnstillinger
+      - type: entities
+        entities:
+          - entity: input_number.forlat_daikin_temp
+          - entity: input_number.ankomst_daikin_temp
+          - entity: input_number.forlat_mill_temp
+          - entity: input_number.ankomst_mill_temp

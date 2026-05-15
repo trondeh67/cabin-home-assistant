@@ -1,0 +1,29 @@
+input_number:
+  forlat_daikin_temp:
+    name: Daikin – avreise
+    min: 5
+    max: 20
+    step: 1
+    unit_of_measurement: "°C"
+    icon: mdi:thermometer-minus
+  ankomst_daikin_temp:
+    name: Daikin – ankomst
+    min: 16
+    max: 28
+    step: 1
+    unit_of_measurement: "°C"
+    icon: mdi:thermometer-plus
+  forlat_mill_temp:
+    name: Mill – avreise
+    min: 5
+    max: 18
+    step: 1
+    unit_of_measurement: "°C"
+    icon: mdi:radiator-off
+  ankomst_mill_temp:
+    name: Mill – ankomst
+    min: 12
+    max: 28
+    step: 1
+    unit_of_measurement: "°C"
+    icon: mdi:radiator

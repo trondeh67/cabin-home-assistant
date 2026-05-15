@@ -110,7 +110,7 @@ forlat_hytta:
       target:
         entity_id: climate.daikinap86694
       data:
-        temperature: 16
+        temperature: "{{ states('input_number.forlat_daikin_temp') | float(16) }}"
         hvac_mode: heat
     - action: climate.set_temperature
       target:
@@ -118,7 +118,7 @@ forlat_hytta:
           - climate.stue_hoyre
           - climate.stue_venstre
       data:
-        temperature: 12
+        temperature: "{{ states('input_number.forlat_mill_temp') | float(12) }}"
         hvac_mode: heat
 ankomst_hytta:
   alias: Ankomst hytta
@@ -143,7 +143,7 @@ ankomst_hytta:
       target:
         entity_id: climate.daikinap86694
       data:
-        temperature: 22
+        temperature: "{{ states('input_number.ankomst_daikin_temp') | float(22) }}"
         hvac_mode: heat
     - action: climate.set_temperature
       target:
@@ -151,5 +151,5 @@ ankomst_hytta:
           - climate.stue_hoyre
           - climate.stue_venstre
       data:
-        temperature: 18
+        temperature: "{{ states('input_number.ankomst_mill_temp') | float(18) }}"
         hvac_mode: heat
