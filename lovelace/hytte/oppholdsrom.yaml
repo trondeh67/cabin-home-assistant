@@ -168,7 +168,7 @@ cards:
               action: call-service
               service: script.lys_alt_av
 
-      - type: custom:conditional
+      - type: conditional
         conditions:
           - condition: template
             value_template: >-
@@ -196,7 +196,7 @@ cards:
                       collapsible_controls: true
               show_empty: false
 
-      - type: custom:conditional
+      - type: conditional
         conditions:
           - condition: template
             value_template: >-
@@ -224,7 +224,7 @@ cards:
                       collapsible_controls: true
               show_empty: false
 
-      - type: custom:conditional
+      - type: conditional
         conditions:
           - condition: template
             value_template: >-
@@ -252,7 +252,7 @@ cards:
                       collapsible_controls: true
               show_empty: false
 
-      - type: custom:conditional
+      - type: conditional
         conditions:
           - condition: template
             value_template: >-
