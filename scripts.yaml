@@ -261,6 +261,11 @@ planlegg_ankomst:
         - condition: template
           value_template: "{{ timer_til | float < ml_timer | float }}"
       then:
+        - action: input_datetime.set_datetime
+          target:
+            entity_id: input_datetime.ankomst_mill_start
+          data:
+            datetime: "{{ now().strftime('%Y-%m-%d %H:%M:%S') }}"
         - action: climate.set_temperature
           target:
             entity_id:
@@ -269,11 +274,6 @@ planlegg_ankomst:
           data:
             temperature: "{{ states('input_number.ankomst_mill_temp') | float(18) }}"
             hvac_mode: heat
-        - action: input_datetime.set_datetime
-          target:
-            entity_id: input_datetime.ankomst_mill_start
-          data:
-            datetime: "{{ now().strftime('%Y-%m-%d %H:%M:%S') }}"
       else:
         - action: input_datetime.set_datetime
           target:
