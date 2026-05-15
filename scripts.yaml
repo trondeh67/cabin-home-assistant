@@ -184,14 +184,18 @@ planlegg_ankomst:
     # Avvis planlegging dersom ankomsttidspunkt er i fortiden
     - if:
         - condition: template
-          value_template: "{{ timer_til <= 0 }}"
+          value_template: "{{ timer_til | float <= 0 }}"
       then:
+        - action: notify.mobile_app_sm_s928b
+          data:
+            title: Ugyldig ankomsttidspunkt
+            message: Ankomsttidspunkt er i fortiden. Velg et fremtidig tidspunkt og prøv igjen.
         - action: persistent_notification.create
           data:
             title: Ugyldig ankomsttidspunkt
             message: Ankomsttidspunkt er i fortiden. Velg et fremtidig tidspunkt og prøv igjen.
     - condition: template
-      value_template: "{{ timer_til > 0 }}"
+      value_template: "{{ timer_til | float > 0 }}"
 
     # Varmepumpe: start nå hvis kortere tid enn offset, ellers planlegg
     - if:
