@@ -176,7 +176,7 @@ planlegg_ankomst:
   sequence:
     - variables:
         timer_til: >
-          {{ ((as_local(as_datetime(states('input_datetime.ankomst_tidspunkt'))) - now()).total_seconds() / 3600) }}
+          {{ ((state_attr('input_datetime.ankomst_tidspunkt', 'timestamp') - now().timestamp()) / 3600) }}
         vp_timer: "{{ states('input_number.ankomst_varmepumpe_timer') | float }}"
         sk_timer: "{{ states('input_number.ankomst_sikom_timer') | float }}"
         ml_timer: "{{ states('input_number.ankomst_mill_timer') | float }}"
@@ -219,7 +219,7 @@ planlegg_ankomst:
             entity_id: input_datetime.ankomst_varmepumpe_start
           data:
             datetime: >
-              {{ (as_local(as_datetime(states('input_datetime.ankomst_tidspunkt')))
+              {{ (as_datetime(states('input_datetime.ankomst_tidspunkt'))
                   - timedelta(hours=vp_timer | float)).strftime('%Y-%m-%d %H:%M:%S') }}
 
     # Sikom: start nå hvis kortere tid enn offset, ellers planlegg
@@ -227,6 +227,11 @@ planlegg_ankomst:
         - condition: template
           value_template: "{{ timer_til | float < sk_timer | float }}"
       then:
+        - action: input_datetime.set_datetime
+          target:
+            entity_id: input_datetime.ankomst_sikom_start
+          data:
+            datetime: "{{ now().strftime('%Y-%m-%d %H:%M:%S') }}"
         - action: google_assistant_sdk.send_text_command
           data:
             command: "set gang to comfort mode"
@@ -242,18 +247,13 @@ planlegg_ankomst:
         - action: google_assistant_sdk.send_text_command
           data:
             command: "set bereder to on"
-        - action: input_datetime.set_datetime
-          target:
-            entity_id: input_datetime.ankomst_sikom_start
-          data:
-            datetime: "{{ now().strftime('%Y-%m-%d %H:%M:%S') }}"
       else:
         - action: input_datetime.set_datetime
           target:
             entity_id: input_datetime.ankomst_sikom_start
           data:
             datetime: >
-              {{ (as_local(as_datetime(states('input_datetime.ankomst_tidspunkt')))
+              {{ (as_datetime(states('input_datetime.ankomst_tidspunkt'))
                   - timedelta(hours=sk_timer | float)).strftime('%Y-%m-%d %H:%M:%S') }}
 
     # Mill: start nå hvis kortere tid enn offset, ellers planlegg
@@ -280,7 +280,7 @@ planlegg_ankomst:
             entity_id: input_datetime.ankomst_mill_start
           data:
             datetime: >
-              {{ (as_local(as_datetime(states('input_datetime.ankomst_tidspunkt')))
+              {{ (as_datetime(states('input_datetime.ankomst_tidspunkt'))
                   - timedelta(hours=ml_timer | float)).strftime('%Y-%m-%d %H:%M:%S') }}
 
     - action: input_select.select_option
