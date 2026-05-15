@@ -147,8 +147,8 @@
       at: input_datetime.ankomst_varmepumpe_start
   conditions:
     - condition: state
-      entity_id: input_boolean.ankomst_planlagt
-      state: 'on'
+      entity_id: input_select.hytte_status
+      state: planlagt
   actions:
     - action: climate.set_temperature
       target:
@@ -165,8 +165,8 @@
       at: input_datetime.ankomst_sikom_start
   conditions:
     - condition: state
-      entity_id: input_boolean.ankomst_planlagt
-      state: 'on'
+      entity_id: input_select.hytte_status
+      state: planlagt
   actions:
     - action: google_assistant_sdk.send_text_command
       data:
@@ -192,8 +192,8 @@
       at: input_datetime.ankomst_mill_start
   conditions:
     - condition: state
-      entity_id: input_boolean.ankomst_planlagt
-      state: 'on'
+      entity_id: input_select.hytte_status
+      state: planlagt
   actions:
     - action: climate.set_temperature
       target:
@@ -223,7 +223,26 @@
         datetime: >
           {% set days = ((4 - now().weekday()) % 7) or 7 %}
           {{ (now().date() + timedelta(days=days)).strftime('%Y-%m-%d') }} 19:00:00
-    - action: input_boolean.turn_off
+    - action: input_select.select_option
       target:
-        entity_id: input_boolean.ankomst_planlagt
+        entity_id: input_select.hytte_status
+      data:
+        option: ledig
+  mode: single
+- id: 'ankomst_tid_passert'
+  alias: Ankomst – sett status til ankommet ved ankomsttidspunkt
+  description: ''
+  triggers:
+    - platform: time
+      at: input_datetime.ankomst_tidspunkt
+  conditions:
+    - condition: state
+      entity_id: input_select.hytte_status
+      state: planlagt
+  actions:
+    - action: input_select.select_option
+      target:
+        entity_id: input_select.hytte_status
+      data:
+        option: ankommet
   mode: single

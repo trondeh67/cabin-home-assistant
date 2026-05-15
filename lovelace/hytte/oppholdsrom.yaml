@@ -113,44 +113,40 @@ cards:
       # AVREISE / ANKOMST
       - type: custom:mushroom-title-card
         title: Avreise / Ankomst
-      - type: custom:mushroom-template-card
-        primary: Ankomsttidspunkt
-        secondary: >-
-          {% set dt = states('input_datetime.ankomst_tidspunkt') %}
-          {% if dt not in ['unknown','unavailable'] %}
-            {{ as_datetime(dt).strftime('%d.%m.%Y kl %H:%M') }}
-          {% else %}Ikke satt{% endif %}
-        icon: mdi:calendar-clock
-        icon_color: blue
-        tap_action:
-          action: more-info
-          entity: input_datetime.ankomst_tidspunkt
-      - type: grid
-        columns: 2
-        square: false
-        cards:
-          - type: custom:mushroom-template-card
-            primary: Forlat hytta
-            icon: mdi:home-export-outline
-            icon_color: red
-            tap_action:
-              action: call-service
-              service: script.forlat_hytta
-              confirmation:
-                text: "Husk å sjekke Sikom-appen!\nSett hytta i bortemodus?"
-          - type: conditional
-            conditions:
-              - condition: state
-                entity: input_boolean.ankomst_planlagt
-                state: "off"
-            card:
-              type: custom:mushroom-template-card
+
+      # Dato/tid-velger – kun synlig i ledig-tilstand
+      - type: conditional
+        conditions:
+          - condition: state
+            entity: input_select.hytte_status
+            state: ledig
+        card:
+          type: custom:mushroom-template-card
+          primary: Ankomsttidspunkt
+          secondary: >-
+            {% set dt = states('input_datetime.ankomst_tidspunkt') %}
+            {% if dt not in ['unknown','unavailable'] %}
+              {{ as_datetime(dt).strftime('%d.%m.%Y kl %H:%M') }}
+            {% else %}Ikke satt{% endif %}
+          icon: mdi:calendar-clock
+          icon_color: blue
+          tap_action:
+            action: more-info
+            entity: input_datetime.ankomst_tidspunkt
+
+      # LEDIG: Planlegg ankomst + Varme på
+      - type: conditional
+        conditions:
+          - condition: state
+            entity: input_select.hytte_status
+            state: ledig
+        card:
+          type: grid
+          columns: 2
+          square: false
+          cards:
+            - type: custom:mushroom-template-card
               primary: Planlegg ankomst
-              secondary: >-
-                {% set dt = states('input_datetime.ankomst_tidspunkt') %}
-                {% if dt not in ['unknown','unavailable'] %}
-                  {{ as_datetime(dt).strftime('%d.%m kl %H:%M') }}
-                {% else %}Ikke satt{% endif %}
               icon: mdi:home-import-outline
               icon_color: green
               tap_action:
@@ -158,22 +154,65 @@ cards:
                 service: script.planlegg_ankomst
                 confirmation:
                   text: "Planlegg oppvarming?\nHusk å sjekke Sikom-appen!"
-          - type: conditional
-            conditions:
-              - condition: state
-                entity: input_boolean.ankomst_planlagt
-                state: "on"
-            card:
-              type: custom:mushroom-template-card
-              primary: Ankomst aktiv
-              secondary: Trykk for å avbryte
+            - type: custom:mushroom-template-card
+              primary: Varme på
+              icon: mdi:fire
+              icon_color: amber
+              tap_action:
+                action: call-service
+                service: script.varme_paa_override
+                confirmation:
+                  text: "Start all oppvarming nå?\nHusk å sjekke Sikom-appen!"
+
+      # PLANLAGT: Planlagt [dato] + Varme på override
+      - type: conditional
+        conditions:
+          - condition: state
+            entity: input_select.hytte_status
+            state: planlagt
+        card:
+          type: grid
+          columns: 2
+          square: false
+          cards:
+            - type: custom:mushroom-template-card
+              primary: >-
+                {%- set dt = states('input_datetime.ankomst_tidspunkt') -%}
+                Planlagt {{ as_datetime(dt).strftime('%d.%m kl %H:%M') if dt not in ['unknown','unavailable'] else '—' }}
               icon: mdi:home-clock
               icon_color: orange
               tap_action:
                 action: call-service
-                service: script.avbryt_ankomst
+                service: script.avbryt_planlegging
                 confirmation:
-                  text: "Avbryt planlagt ankomst?\nKjører Forlat hytta for sikker tilstand."
+                  text: "Avbryt gjeldende planlegging og re-planlegg?"
+            - type: custom:mushroom-template-card
+              primary: Varme på
+              secondary: Overstyr planlegging
+              icon: mdi:fire
+              icon_color: amber
+              tap_action:
+                action: call-service
+                service: script.varme_paa_override
+                confirmation:
+                  text: "Overstyr planlegging og start varme nå?\nHusk å sjekke Sikom-appen!"
+
+      # ANKOMMET: Forlat hytta (full bredde)
+      - type: conditional
+        conditions:
+          - condition: state
+            entity: input_select.hytte_status
+            state: ankommet
+        card:
+          type: custom:mushroom-template-card
+          primary: Forlat hytta
+          icon: mdi:home-export-outline
+          icon_color: red
+          tap_action:
+            action: call-service
+            service: script.forlat_hytta
+            confirmation:
+              text: "Husk å sjekke Sikom-appen!\nSett hytta i bortemodus?"
 
       # LYS – sceneknapper og "kun lys som er PÅ"
       - type: custom:mushroom-title-card

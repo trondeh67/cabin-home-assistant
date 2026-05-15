@@ -1,7 +1,12 @@
-input_boolean:
-  ankomst_planlagt:
-    name: Ankomst planlagt
-    icon: mdi:home-clock
+input_select:
+  hytte_status:
+    name: Hytte status
+    options:
+      - ledig
+      - planlagt
+      - ankommet
+    initial: ledig
+    icon: mdi:home
 
 input_datetime:
   ankomst_tidspunkt:

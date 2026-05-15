@@ -120,9 +120,11 @@ forlat_hytta:
       data:
         temperature: "{{ states('input_number.forlat_mill_temp') | float(12) }}"
         hvac_mode: heat
-    - action: input_boolean.turn_off
+    - action: input_select.select_option
       target:
-        entity_id: input_boolean.ankomst_planlagt
+        entity_id: input_select.hytte_status
+      data:
+        option: ledig
     - action: input_datetime.set_datetime
       target:
         entity_id: input_datetime.ankomst_tidspunkt
@@ -163,6 +165,11 @@ ankomst_hytta:
       data:
         temperature: "{{ states('input_number.ankomst_mill_temp') | float(18) }}"
         hvac_mode: heat
+    - action: input_select.select_option
+      target:
+        entity_id: input_select.hytte_status
+      data:
+        option: ankommet
 planlegg_ankomst:
   alias: Planlegg ankomst
   mode: single
@@ -260,9 +267,11 @@ planlegg_ankomst:
               {{ (as_datetime(states('input_datetime.ankomst_tidspunkt'))
                   - timedelta(hours=ml_timer | float)).isoformat() }}
 
-    - action: input_boolean.turn_on
+    - action: input_select.select_option
       target:
-        entity_id: input_boolean.ankomst_planlagt
+        entity_id: input_select.hytte_status
+      data:
+        option: planlagt
     - action: persistent_notification.create
       data:
         title: Ankomst planlagt
@@ -272,15 +281,24 @@ planlegg_ankomst:
           Varmepumpe: {{ 'startet nå' if timer_til | float < vp_timer | float else (a - timedelta(hours=vp_timer | float)).strftime('%d.%m kl %H:%M') }}
           Sikom: {{ 'startet nå' if timer_til | float < sk_timer | float else (a - timedelta(hours=sk_timer | float)).strftime('%d.%m kl %H:%M') }}
           Mill: {{ 'startet nå' if timer_til | float < ml_timer | float else (a - timedelta(hours=ml_timer | float)).strftime('%d.%m kl %H:%M') }}
-avbryt_ankomst:
-  alias: Avbryt planlagt ankomst
+avbryt_planlegging:
+  alias: Avbryt planlegging (re-planlegg)
   mode: single
   sequence:
-    - action: input_boolean.turn_off
+    - action: input_select.select_option
       target:
-        entity_id: input_boolean.ankomst_planlagt
-    - action: script.forlat_hytta
-    - action: persistent_notification.create
+        entity_id: input_select.hytte_status
       data:
-        title: Ankomst avbrutt
-        message: Planlagt ankomst er avbrutt. Hytta settes i bortemodus.
+        option: ledig
+    - action: input_datetime.set_datetime
+      target:
+        entity_id: input_datetime.ankomst_tidspunkt
+      data:
+        datetime: >
+          {% set days = ((4 - now().weekday()) % 7) or 7 %}
+          {{ (now().date() + timedelta(days=days)).strftime('%Y-%m-%d') }} 19:00:00
+varme_paa_override:
+  alias: Varme på (override)
+  mode: single
+  sequence:
+    - action: script.ankomst_hytta
