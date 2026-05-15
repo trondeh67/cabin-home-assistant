@@ -112,13 +112,14 @@ forlat_hytta:
       data:
         temperature: 16
         hvac_mode: heat
-    - action: climate.set_preset_mode
+    - action: climate.set_temperature
       target:
         entity_id:
           - climate.stue_hoyre
           - climate.stue_venstre
       data:
-        preset_mode: away
+        temperature: 12
+        hvac_mode: heat
 ankomst_hytta:
   alias: Ankomst hytta
   mode: single
@@ -144,10 +145,11 @@ ankomst_hytta:
       data:
         temperature: 22
         hvac_mode: heat
-    - action: climate.set_preset_mode
+    - action: climate.set_temperature
       target:
         entity_id:
           - climate.stue_hoyre
           - climate.stue_venstre
       data:
-        preset_mode: home
+        temperature: 18
+        hvac_mode: heat
