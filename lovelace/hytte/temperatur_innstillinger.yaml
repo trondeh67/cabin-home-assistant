@@ -1,0 +1,19 @@
+title: Temperaturinnstillinger
+path: temperatur
+subview: true
+icon: mdi:cog
+cards:
+  - type: vertical-stack
+    cards:
+      - type: custom:mushroom-title-card
+        title: Temperaturinnstillinger
+      - type: entities
+        entities:
+          - entity: input_number.forlat_daikin_temp
+            name: Daikin – avreise
+          - entity: input_number.ankomst_daikin_temp
+            name: Daikin – ankomst
+          - entity: input_number.forlat_mill_temp
+            name: Mill – avreise
+          - entity: input_number.ankomst_mill_temp
+            name: Mill – ankomst

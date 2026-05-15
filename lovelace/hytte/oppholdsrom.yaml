@@ -85,6 +85,11 @@ cards:
             tap_action:
               action: more-info
               entity: switch.ute_varmekabel_varmepumpe
+          - type: template
+            icon: mdi:cog
+            tap_action:
+              action: navigate
+              navigation_path: /lovelace/temperatur
 
       # KLIMA – kompakt styring + graf
       - type: custom:mushroom-title-card
@@ -123,6 +128,8 @@ cards:
             tap_action:
               action: call-service
               service: script.forlat_hytta
+              confirmation:
+                text: "Husk å sjekke Sikom-appen!\nSett hytta i bortemodus?"
           - type: custom:mushroom-template-card
             primary: Ankomst
             icon: mdi:home-import-outline
@@ -130,6 +137,8 @@ cards:
             tap_action:
               action: call-service
               service: script.ankomst_hytta
+              confirmation:
+                text: "Husk å sjekke Sikom-appen!\nSett hytta i hjemmemodus?"
 
       # LYS – sceneknapper og "kun lys som er PÅ"
       - type: custom:mushroom-title-card
@@ -243,12 +252,3 @@ cards:
                 name: ""
         show_empty: false
 
-      # TEMPERATURINNSTILLINGER – avreise/ankomst
-      - type: custom:mushroom-title-card
-        title: Temperaturinnstillinger
-      - type: entities
-        entities:
-          - entity: input_number.forlat_daikin_temp
-          - entity: input_number.ankomst_daikin_temp
-          - entity: input_number.forlat_mill_temp
-          - entity: input_number.ankomst_mill_temp

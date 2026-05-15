@@ -1,6 +1,7 @@
 title: TJUKKTØMMERN
 views:
   - !include oppholdsrom.yaml
+  - !include temperatur_innstillinger.yaml
 
   - title: Stue
     path: stue
