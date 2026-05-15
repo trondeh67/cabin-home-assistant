@@ -111,6 +111,26 @@ cards:
               labels: false
             line_width: 2
 
+      # AVREISE / ANKOMST
+      - type: grid
+        columns: 2
+        square: false
+        cards:
+          - type: custom:mushroom-template-card
+            primary: Forlat hytta
+            icon: mdi:home-export-outline
+            icon_color: red
+            tap_action:
+              action: call-service
+              service: script.forlat_hytta
+          - type: custom:mushroom-template-card
+            primary: Ankomst
+            icon: mdi:home-import-outline
+            icon_color: green
+            tap_action:
+              action: call-service
+              service: script.ankomst_hytta
+
       # LYS – sceneknapper og "kun lys som er PÅ"
       - type: custom:mushroom-title-card
         title: Lys & scener
