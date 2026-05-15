@@ -168,117 +168,85 @@ cards:
               action: call-service
               service: script.lys_alt_av
 
-      - type: conditional
-        conditions:
-          - condition: template
-            value_template: >-
-              {{ expand(area_entities('Stue')) | selectattr('domain','eq','light') | selectattr('state','eq','on') | list | count > 0 }}
+      - type: custom:mushroom-title-card
+        title: Stue
+      - type: custom:auto-entities
         card:
-          type: vertical-stack
-          cards:
-            - type: custom:mushroom-title-card
-              title: Stue
-            - type: custom:auto-entities
-              card:
-                type: grid
-                columns: 2
-                square: false
-              card_param: cards
-              filter:
-                include:
-                  - area: Stue
-                    domain: light
-                    state: "on"
-                    options:
-                      type: custom:mushroom-light-card
-                      use_light_color: true
-                      show_brightness_control: true
-                      collapsible_controls: true
-              show_empty: false
+          type: grid
+          columns: 2
+          square: false
+        card_param: cards
+        filter:
+          include:
+            - area: Stue
+              domain: light
+              state: "on"
+              options:
+                type: custom:mushroom-light-card
+                use_light_color: true
+                show_brightness_control: true
+                collapsible_controls: true
+        show_empty: false
 
-      - type: conditional
-        conditions:
-          - condition: template
-            value_template: >-
-              {{ expand(area_entities('gang')) | selectattr('domain','eq','light') | selectattr('state','eq','on') | list | count > 0 }}
+      - type: custom:mushroom-title-card
+        title: Gang
+      - type: custom:auto-entities
         card:
-          type: vertical-stack
-          cards:
-            - type: custom:mushroom-title-card
-              title: Gang
-            - type: custom:auto-entities
-              card:
-                type: grid
-                columns: 2
-                square: false
-              card_param: cards
-              filter:
-                include:
-                  - area: gang
-                    domain: light
-                    state: "on"
-                    options:
-                      type: custom:mushroom-light-card
-                      use_light_color: true
-                      show_brightness_control: true
-                      collapsible_controls: true
-              show_empty: false
+          type: grid
+          columns: 2
+          square: false
+        card_param: cards
+        filter:
+          include:
+            - area: gang
+              domain: light
+              state: "on"
+              options:
+                type: custom:mushroom-light-card
+                use_light_color: true
+                show_brightness_control: true
+                collapsible_controls: true
+        show_empty: false
 
-      - type: conditional
-        conditions:
-          - condition: template
-            value_template: >-
-              {{ expand(area_entities('kjokken')) | selectattr('domain','eq','light') | selectattr('state','eq','on') | list | count > 0 }}
+      - type: custom:mushroom-title-card
+        title: Kjøkken
+      - type: custom:auto-entities
         card:
-          type: vertical-stack
-          cards:
-            - type: custom:mushroom-title-card
-              title: Kjøkken
-            - type: custom:auto-entities
-              card:
-                type: grid
-                columns: 2
-                square: false
-              card_param: cards
-              filter:
-                include:
-                  - area: kjokken
-                    domain: light
-                    state: "on"
-                    options:
-                      type: custom:mushroom-light-card
-                      use_light_color: true
-                      show_brightness_control: true
-                      collapsible_controls: true
-              show_empty: false
+          type: grid
+          columns: 2
+          square: false
+        card_param: cards
+        filter:
+          include:
+            - area: kjokken
+              domain: light
+              state: "on"
+              options:
+                type: custom:mushroom-light-card
+                use_light_color: true
+                show_brightness_control: true
+                collapsible_controls: true
+        show_empty: false
 
-      - type: conditional
-        conditions:
-          - condition: template
-            value_template: >-
-              {{ expand(area_entities('spisestue')) | selectattr('domain','eq','light') | selectattr('state','eq','on') | list | count > 0 }}
+      - type: custom:mushroom-title-card
+        title: Spisestue
+      - type: custom:auto-entities
         card:
-          type: vertical-stack
-          cards:
-            - type: custom:mushroom-title-card
-              title: Spisestue
-            - type: custom:auto-entities
-              card:
-                type: grid
-                columns: 2
-                square: false
-              card_param: cards
-              filter:
-                include:
-                  - area: spisestue
-                    domain: light
-                    state: "on"
-                    options:
-                      type: custom:mushroom-light-card
-                      use_light_color: true
-                      show_brightness_control: true
-                      collapsible_controls: true
-              show_empty: false
+          type: grid
+          columns: 2
+          square: false
+        card_param: cards
+        filter:
+          include:
+            - area: spisestue
+              domain: light
+              state: "on"
+              options:
+                type: custom:mushroom-light-card
+                use_light_color: true
+                show_brightness_control: true
+                collapsible_controls: true
+        show_empty: false
 
       # DØRER/VINDUER – vis KUN hvis åpne (støyfritt på mobil)
       - type: custom:mushroom-title-card
