@@ -169,7 +169,7 @@ planlegg_ankomst:
   sequence:
     - variables:
         timer_til: >
-          {{ ((as_datetime(states('input_datetime.ankomst_tidspunkt')) - now()).total_seconds() / 3600) }}
+          {{ ((as_local(as_datetime(states('input_datetime.ankomst_tidspunkt'))) - now()).total_seconds() / 3600) }}
         vp_timer: "{{ states('input_number.ankomst_varmepumpe_timer') | float }}"
         sk_timer: "{{ states('input_number.ankomst_sikom_timer') | float }}"
         ml_timer: "{{ states('input_number.ankomst_mill_timer') | float }}"
