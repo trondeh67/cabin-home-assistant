@@ -18,3 +18,27 @@ cards:
             name: Mill – avreise
           - entity: input_number.ankomst_mill_temp
             name: Mill – ankomst
+
+      - type: custom:mushroom-title-card
+        title: Forhåndsoppvarming – timer før ankomst
+      - type: entities
+        entities:
+          - entity: input_number.ankomst_varmepumpe_timer
+            name: Varmepumpe
+          - entity: input_number.ankomst_sikom_timer
+            name: Sikom
+          - entity: input_number.ankomst_mill_timer
+            name: Mill
+
+      - type: custom:mushroom-title-card
+        title: Planlagte starttider
+      - type: entities
+        entities:
+          - entity: input_datetime.ankomst_tidspunkt
+            name: Ankomst
+          - entity: input_datetime.ankomst_varmepumpe_start
+            name: Varmepumpe starter
+          - entity: input_datetime.ankomst_sikom_start
+            name: Sikom starter
+          - entity: input_datetime.ankomst_mill_start
+            name: Mill starter

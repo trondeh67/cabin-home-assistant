@@ -1,3 +1,25 @@
+input_datetime:
+  ankomst_tidspunkt:
+    name: Ankomsttidspunkt
+    has_date: true
+    has_time: true
+    icon: mdi:calendar-clock
+  ankomst_varmepumpe_start:
+    name: Varmepumpe start (beregnet)
+    has_date: true
+    has_time: true
+    icon: mdi:heat-pump
+  ankomst_sikom_start:
+    name: Sikom start (beregnet)
+    has_date: true
+    has_time: true
+    icon: mdi:radiator
+  ankomst_mill_start:
+    name: Mill start (beregnet)
+    has_date: true
+    has_time: true
+    icon: mdi:radiator
+
 input_number:
   forlat_daikin_temp:
     name: Daikin – avreise
@@ -27,3 +49,24 @@ input_number:
     step: 1
     unit_of_measurement: "°C"
     icon: mdi:radiator
+  ankomst_varmepumpe_timer:
+    name: Varmepumpe – timer før ankomst
+    min: 0
+    max: 72
+    step: 1
+    unit_of_measurement: "h"
+    icon: mdi:timer
+  ankomst_sikom_timer:
+    name: Sikom – timer før ankomst
+    min: 0
+    max: 72
+    step: 1
+    unit_of_measurement: "h"
+    icon: mdi:timer
+  ankomst_mill_timer:
+    name: Mill – timer før ankomst
+    min: 0
+    max: 48
+    step: 1
+    unit_of_measurement: "h"
+    icon: mdi:timer

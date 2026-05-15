@@ -139,3 +139,59 @@
     target:
       entity_id: script.lys_dagtid_avskrudd_alarm
   mode: single
+- id: 'ankomst_varmepumpe_start'
+  alias: Ankomst – varmepumpe start
+  description: ''
+  triggers:
+    - platform: time
+      at: input_datetime.ankomst_varmepumpe_start
+  conditions: []
+  actions:
+    - action: climate.set_temperature
+      target:
+        entity_id: climate.daikinap86694
+      data:
+        temperature: "{{ states('input_number.ankomst_daikin_temp') | float(22) }}"
+        hvac_mode: heat
+  mode: single
+- id: 'ankomst_sikom_start'
+  alias: Ankomst – Sikom start
+  description: ''
+  triggers:
+    - platform: time
+      at: input_datetime.ankomst_sikom_start
+  conditions: []
+  actions:
+    - action: google_assistant_sdk.send_text_command
+      data:
+        command: "set gang to comfort mode"
+    - delay: "00:00:03"
+    - action: google_assistant_sdk.send_text_command
+      data:
+        command: "set bad to comfort mode"
+    - delay: "00:00:03"
+    - action: google_assistant_sdk.send_text_command
+      data:
+        command: "set vaskerom to comfort mode"
+    - delay: "00:00:03"
+    - action: google_assistant_sdk.send_text_command
+      data:
+        command: "set bereder to on"
+  mode: single
+- id: 'ankomst_mill_start'
+  alias: Ankomst – Mill start
+  description: ''
+  triggers:
+    - platform: time
+      at: input_datetime.ankomst_mill_start
+  conditions: []
+  actions:
+    - action: climate.set_temperature
+      target:
+        entity_id:
+          - climate.stue_hoyre
+          - climate.stue_venstre
+      data:
+        temperature: "{{ states('input_number.ankomst_mill_temp') | float(18) }}"
+        hvac_mode: heat
+  mode: single

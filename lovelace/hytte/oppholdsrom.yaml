@@ -111,6 +111,12 @@ cards:
             line_width: 2
 
       # AVREISE / ANKOMST
+      - type: custom:mushroom-title-card
+        title: Avreise / Ankomst
+      - type: entities
+        entities:
+          - entity: input_datetime.ankomst_tidspunkt
+            name: Ankomsttidspunkt
       - type: grid
         columns: 2
         square: false
@@ -125,14 +131,19 @@ cards:
               confirmation:
                 text: "Husk å sjekke Sikom-appen!\nSett hytta i bortemodus?"
           - type: custom:mushroom-template-card
-            primary: Ankomst
+            primary: Planlegg ankomst
+            secondary: >-
+              {% set dt = states('input_datetime.ankomst_tidspunkt') %}
+              {% if dt not in ['unknown','unavailable'] %}
+                {{ as_datetime(dt).strftime('%d.%m kl %H:%M') }}
+              {% else %}Ikke satt{% endif %}
             icon: mdi:home-import-outline
             icon_color: green
             tap_action:
               action: call-service
-              service: script.ankomst_hytta
+              service: script.planlegg_ankomst
               confirmation:
-                text: "Husk å sjekke Sikom-appen!\nSett hytta i hjemmemodus?"
+                text: "Planlegg oppvarming?\nHusk å sjekke Sikom-appen!"
 
       # LYS – sceneknapper og "kun lys som er PÅ"
       - type: custom:mushroom-title-card

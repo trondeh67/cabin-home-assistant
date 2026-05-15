@@ -153,3 +153,43 @@ ankomst_hytta:
       data:
         temperature: "{{ states('input_number.ankomst_mill_temp') | float(18) }}"
         hvac_mode: heat
+planlegg_ankomst:
+  alias: Planlegg ankomst
+  mode: single
+  sequence:
+    - action: input_datetime.set_datetime
+      target:
+        entity_id: input_datetime.ankomst_varmepumpe_start
+      data:
+        datetime: >
+          {{ (as_datetime(states('input_datetime.ankomst_tidspunkt'))
+              - timedelta(hours=states('input_number.ankomst_varmepumpe_timer') | int)
+             ).isoformat() }}
+    - action: input_datetime.set_datetime
+      target:
+        entity_id: input_datetime.ankomst_sikom_start
+      data:
+        datetime: >
+          {{ (as_datetime(states('input_datetime.ankomst_tidspunkt'))
+              - timedelta(hours=states('input_number.ankomst_sikom_timer') | int)
+             ).isoformat() }}
+    - action: input_datetime.set_datetime
+      target:
+        entity_id: input_datetime.ankomst_mill_start
+      data:
+        datetime: >
+          {{ (as_datetime(states('input_datetime.ankomst_tidspunkt'))
+              - timedelta(hours=states('input_number.ankomst_mill_timer') | int)
+             ).isoformat() }}
+    - action: persistent_notification.create
+      data:
+        title: Ankomst planlagt
+        message: >
+          {% set a = as_datetime(states('input_datetime.ankomst_tidspunkt')) %}
+          {% set vp = states('input_number.ankomst_varmepumpe_timer') | int %}
+          {% set sk = states('input_number.ankomst_sikom_timer') | int %}
+          {% set ml = states('input_number.ankomst_mill_timer') | int %}
+          Ankomst: {{ a.strftime('%d.%m kl %H:%M') }}
+          Varmepumpe starter: {{ (a - timedelta(hours=vp)).strftime('%d.%m kl %H:%M') }}
+          Sikom starter: {{ (a - timedelta(hours=sk)).strftime('%d.%m kl %H:%M') }}
+          Mill starter: {{ (a - timedelta(hours=ml)).strftime('%d.%m kl %H:%M') }}
