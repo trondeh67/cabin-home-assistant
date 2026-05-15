@@ -89,7 +89,7 @@ cards:
             icon: mdi:cog
             tap_action:
               action: navigate
-              navigation_path: /lovelace/temperatur
+              navigation_path: /tjukktommern-dashboard/temperatur
 
       # KLIMA – kompakt styring + graf
       - type: custom:mushroom-title-card
