@@ -1,6 +1,8 @@
 title: Temperaturinnstillinger
 path: temperatur
 icon: mdi:cog
+visible:
+  - user: f0d7a7b897f448c0acf93cabb356c822
 cards:
   - type: vertical-stack
     cards:
