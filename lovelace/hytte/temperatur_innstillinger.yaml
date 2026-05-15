@@ -1,6 +1,5 @@
 title: Temperaturinnstillinger
 path: temperatur
-subview: true
 icon: mdi:cog
 cards:
   - type: vertical-stack
