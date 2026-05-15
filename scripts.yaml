@@ -181,6 +181,18 @@ planlegg_ankomst:
         sk_timer: "{{ states('input_number.ankomst_sikom_timer') | float }}"
         ml_timer: "{{ states('input_number.ankomst_mill_timer') | float }}"
 
+    # Avvis planlegging dersom ankomsttidspunkt er i fortiden
+    - if:
+        - condition: template
+          value_template: "{{ timer_til <= 0 }}"
+      then:
+        - action: persistent_notification.create
+          data:
+            title: Ugyldig ankomsttidspunkt
+            message: Ankomsttidspunkt er i fortiden. Velg et fremtidig tidspunkt og prøv igjen.
+    - condition: template
+      value_template: "{{ timer_til > 0 }}"
+
     # Varmepumpe: start nå hvis kortere tid enn offset, ellers planlegg
     - if:
         - condition: template
@@ -203,8 +215,8 @@ planlegg_ankomst:
             entity_id: input_datetime.ankomst_varmepumpe_start
           data:
             datetime: >
-              {{ (as_datetime(states('input_datetime.ankomst_tidspunkt'))
-                  - timedelta(hours=vp_timer | float)).isoformat() }}
+              {{ (as_local(as_datetime(states('input_datetime.ankomst_tidspunkt')))
+                  - timedelta(hours=vp_timer | float)).strftime('%Y-%m-%d %H:%M:%S') }}
 
     # Sikom: start nå hvis kortere tid enn offset, ellers planlegg
     - if:
@@ -237,8 +249,8 @@ planlegg_ankomst:
             entity_id: input_datetime.ankomst_sikom_start
           data:
             datetime: >
-              {{ (as_datetime(states('input_datetime.ankomst_tidspunkt'))
-                  - timedelta(hours=sk_timer | float)).isoformat() }}
+              {{ (as_local(as_datetime(states('input_datetime.ankomst_tidspunkt')))
+                  - timedelta(hours=sk_timer | float)).strftime('%Y-%m-%d %H:%M:%S') }}
 
     # Mill: start nå hvis kortere tid enn offset, ellers planlegg
     - if:
@@ -264,8 +276,8 @@ planlegg_ankomst:
             entity_id: input_datetime.ankomst_mill_start
           data:
             datetime: >
-              {{ (as_datetime(states('input_datetime.ankomst_tidspunkt'))
-                  - timedelta(hours=ml_timer | float)).isoformat() }}
+              {{ (as_local(as_datetime(states('input_datetime.ankomst_tidspunkt')))
+                  - timedelta(hours=ml_timer | float)).strftime('%Y-%m-%d %H:%M:%S') }}
 
     - action: input_select.select_option
       target:

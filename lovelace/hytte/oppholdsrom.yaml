@@ -146,17 +146,27 @@ cards:
           square: false
           cards:
             - type: custom:mushroom-template-card
-              primary: Planlegg ankomst
-              icon: mdi:home-import-outline
-              icon_color: green
+              primary: >-
+                {% if is_state('script.planlegg_ankomst', 'on') %}Planlegger…
+                {% else %}Planlegg ankomst{% endif %}
+              icon: >-
+                {% if is_state('script.planlegg_ankomst', 'on') %}mdi:progress-clock
+                {% else %}mdi:home-import-outline{% endif %}
+              icon_color: >-
+                {% if is_state('script.planlegg_ankomst', 'on') %}amber
+                {% else %}green{% endif %}
               tap_action:
                 action: call-service
                 service: script.planlegg_ankomst
                 confirmation:
                   text: "Planlegg oppvarming?\nHusk å sjekke Sikom-appen!"
             - type: custom:mushroom-template-card
-              primary: Varme på
-              icon: mdi:fire
+              primary: >-
+                {% if is_state('script.varme_paa_override', 'on') or is_state('script.ankomst_hytta', 'on') %}Starter…
+                {% else %}Varme på{% endif %}
+              icon: >-
+                {% if is_state('script.varme_paa_override', 'on') or is_state('script.ankomst_hytta', 'on') %}mdi:progress-clock
+                {% else %}mdi:fire{% endif %}
               icon_color: amber
               tap_action:
                 action: call-service
@@ -187,9 +197,14 @@ cards:
                 confirmation:
                   text: "Avbryt gjeldende planlegging og re-planlegg?"
             - type: custom:mushroom-template-card
-              primary: Varme på
-              secondary: Overstyr planlegging
-              icon: mdi:fire
+              primary: >-
+                {% if is_state('script.varme_paa_override', 'on') or is_state('script.ankomst_hytta', 'on') %}Starter…
+                {% else %}Varme på{% endif %}
+              secondary: >-
+                {% if is_state('script.varme_paa_override', 'on') or is_state('script.ankomst_hytta', 'on') %}{% else %}Overstyr planlegging{% endif %}
+              icon: >-
+                {% if is_state('script.varme_paa_override', 'on') or is_state('script.ankomst_hytta', 'on') %}mdi:progress-clock
+                {% else %}mdi:fire{% endif %}
               icon_color: amber
               tap_action:
                 action: call-service
@@ -205,8 +220,12 @@ cards:
             state: ankommet
         card:
           type: custom:mushroom-template-card
-          primary: Forlat hytta
-          icon: mdi:home-export-outline
+          primary: >-
+            {% if is_state('script.forlat_hytta', 'on') %}Forlater…
+            {% else %}Forlat hytta{% endif %}
+          icon: >-
+            {% if is_state('script.forlat_hytta', 'on') %}mdi:progress-clock
+            {% else %}mdi:home-export-outline{% endif %}
           icon_color: red
           tap_action:
             action: call-service
