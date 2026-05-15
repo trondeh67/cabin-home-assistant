@@ -189,7 +189,7 @@ planlegg_ankomst:
           target:
             entity_id: input_datetime.ankomst_varmepumpe_start
           data:
-            datetime: "1970-01-01 00:00:00"
+            datetime: "{{ now().strftime('%Y-%m-%d %H:%M:%S') }}"
       else:
         - action: input_datetime.set_datetime
           target:
@@ -223,7 +223,7 @@ planlegg_ankomst:
           target:
             entity_id: input_datetime.ankomst_sikom_start
           data:
-            datetime: "1970-01-01 00:00:00"
+            datetime: "{{ now().strftime('%Y-%m-%d %H:%M:%S') }}"
       else:
         - action: input_datetime.set_datetime
           target:
@@ -250,7 +250,7 @@ planlegg_ankomst:
           target:
             entity_id: input_datetime.ankomst_mill_start
           data:
-            datetime: "1970-01-01 00:00:00"
+            datetime: "{{ now().strftime('%Y-%m-%d %H:%M:%S') }}"
       else:
         - action: input_datetime.set_datetime
           target:
