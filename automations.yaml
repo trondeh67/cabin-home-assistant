@@ -145,7 +145,10 @@
   triggers:
     - platform: time
       at: input_datetime.ankomst_varmepumpe_start
-  conditions: []
+  conditions:
+    - condition: state
+      entity_id: input_boolean.ankomst_planlagt
+      state: 'on'
   actions:
     - action: climate.set_temperature
       target:
@@ -160,7 +163,10 @@
   triggers:
     - platform: time
       at: input_datetime.ankomst_sikom_start
-  conditions: []
+  conditions:
+    - condition: state
+      entity_id: input_boolean.ankomst_planlagt
+      state: 'on'
   actions:
     - action: google_assistant_sdk.send_text_command
       data:
@@ -184,7 +190,10 @@
   triggers:
     - platform: time
       at: input_datetime.ankomst_mill_start
-  conditions: []
+  conditions:
+    - condition: state
+      entity_id: input_boolean.ankomst_planlagt
+      state: 'on'
   actions:
     - action: climate.set_temperature
       target:
@@ -194,4 +203,27 @@
       data:
         temperature: "{{ states('input_number.ankomst_mill_temp') | float(18) }}"
         hvac_mode: heat
+  mode: single
+- id: 'ankomst_reset_default_tidspunkt'
+  alias: Ankomst – sett standard ankomsttidspunkt ved oppstart
+  description: ''
+  triggers:
+    - platform: homeassistant
+      event: start
+  conditions:
+    - condition: template
+      value_template: >
+        {% set dt = states('input_datetime.ankomst_tidspunkt') %}
+        {{ dt in ['unknown','unavailable'] or as_datetime(dt) < now() }}
+  actions:
+    - action: input_datetime.set_datetime
+      target:
+        entity_id: input_datetime.ankomst_tidspunkt
+      data:
+        datetime: >
+          {% set days = ((4 - now().weekday()) % 7) or 7 %}
+          {{ (now().date() + timedelta(days=days)).strftime('%Y-%m-%d') }} 19:00:00
+    - action: input_boolean.turn_off
+      target:
+        entity_id: input_boolean.ankomst_planlagt
   mode: single

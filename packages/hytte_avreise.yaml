@@ -1,3 +1,8 @@
+input_boolean:
+  ankomst_planlagt:
+    name: Ankomst planlagt
+    icon: mdi:home-clock
+
 input_datetime:
   ankomst_tidspunkt:
     name: Ankomsttidspunkt
