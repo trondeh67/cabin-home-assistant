@@ -85,12 +85,6 @@ cards:
             tap_action:
               action: more-info
               entity: switch.ute_varmekabel_varmepumpe
-          - type: template
-            icon: mdi:cog
-            tap_action:
-              action: navigate
-              navigation_path: /tjukktommern-dashboard/temperatur
-
       # KLIMA – kompakt styring + graf
       - type: custom:mushroom-title-card
         title: Klima stue
