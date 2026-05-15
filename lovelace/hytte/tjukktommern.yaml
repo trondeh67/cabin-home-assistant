@@ -247,8 +247,8 @@ views:
               {{ 'blue' if is_state('switch.rele_vifte_aktuator', 'on') else 'grey' }}
             tap_action:
               action: toggle
-  - title: Soverom 1
-    path: soverom_1
+  - title: Soverom
+    path: soverom
     icon: mdi:bed-king
     cards:
       - type: custom:mushroom-title-card
@@ -267,10 +267,6 @@ views:
                 type: custom:mushroom-light-card
                 show_brightness_control: true
         show_empty: false
-  - title: Soverom 2
-    path: soverom_2
-    icon: mdi:bed-double
-    cards:
       - type: custom:mushroom-title-card
         title: Soverom 2
       - type: custom:auto-entities
@@ -287,10 +283,6 @@ views:
                 type: custom:mushroom-light-card
                 show_brightness_control: true
         show_empty: false
-  - title: Soverom 3
-    path: soverom_3
-    icon: mdi:bed-single
-    cards:
       - type: custom:mushroom-title-card
         title: Soverom 3
       - type: custom:auto-entities
