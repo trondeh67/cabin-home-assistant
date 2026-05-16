@@ -49,7 +49,7 @@
     path: sbyx/low-battery-level-detection-notification-for-all-battery-sensors.yaml
     input:
       actions:
-      - action: notify.mobile_app_sm_s928b
+      - action: notify.notify
         metadata: {}
         data:
           message: Lavt batterinivå

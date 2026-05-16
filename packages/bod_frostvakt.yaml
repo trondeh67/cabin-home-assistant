@@ -43,7 +43,7 @@ automation:
       - action: google_assistant_sdk.send_text_command
         data:
           command: "set bereder to on"
-      - action: notify.mobile_app_sm_s928b
+      - action: notify.notify
         data:
           title: Frostvakt bod – bereder på
           message: >

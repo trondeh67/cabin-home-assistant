@@ -186,7 +186,7 @@ planlegg_ankomst:
         - condition: template
           value_template: "{{ timer_til | float <= 0 }}"
       then:
-        - action: notify.mobile_app_sm_s928b
+        - action: notify.notify
           data:
             title: Ugyldig ankomsttidspunkt
             message: Ankomsttidspunkt er i fortiden. Velg et fremtidig tidspunkt og prøv igjen.
