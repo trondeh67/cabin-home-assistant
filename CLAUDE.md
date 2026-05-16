@@ -165,6 +165,27 @@ MQTT device triggers for xComfort buttons use `domain: mqtt` with `device_id` �
 
 IKEA Zigbee bulbs (`light.stue_5x_spott` etc.) may turn back on after being switched off if they lose and re-establish Zigbee connectivity, as they restore previous state on reconnect. The alarm automation includes a 2-minute delayed re-off as a workaround.
 
+### Battery Monitoring
+
+Handled by the `sbyx` blueprint (`blueprints/automation/sbyx/low-battery-level-detection-notification-for-all-battery-sensors.yaml`) configured in `automations.yaml`.
+
+**What is monitored:** All HA sensors with `device_class: battery` — includes Zigbee sensors (temperature, door contacts), xComfort wireless buttons, Netatmo rain gauge, and any other battery-reporting device.
+
+**Settings:**
+- Threshold: **40%** — intentionally higher than the blueprint default (20%) because some Zigbee sensors become unreliable well above 20% before the reported level catches up
+- Frequency: **Mondays at 10:00** (`day: 1`)
+- Excluded: all `mobile_app` entities filtered dynamically via `integration_entities('mobile_app')` in the message template — no hardcoded phone entity IDs needed
+
+**Notifications sent:** both `notify.notify` (mobile push) and `persistent_notification.create` (HA bell icon in browser).
+
+**Message format:** `"Sensor name: 36 % (Room)"` — uses `area_name(state.entity_id)` to show which room the device is in. Devices without an assigned area show name and percentage only.
+
+**Note:** The blueprint's `sensors` condition variable is computed independently of our custom message template. If only mobile phones are below threshold, the condition may still pass but the message will be empty (phones are filtered in the template, not in the blueprint's variable).
+
+### Notifications
+
+All notifications use `notify.notify` (broadcasts to all registered mobile apps) rather than device-specific `notify.mobile_app_*` targets. Persistent notifications (`persistent_notification.create`) are added alongside mobile push for anything that should also be visible in the HA browser UI.
+
 ### Secrets
 
 `secrets.yaml` is gitignored. See `secrets.example.yaml` for the expected keys (MQTT credentials, Verisure credentials). Never commit the real file.
