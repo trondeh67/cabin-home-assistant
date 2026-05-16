@@ -197,7 +197,42 @@ planlegg_ankomst:
     - condition: template
       value_template: "{{ timer_til | float > 0 }}"
 
-    # Varmepumpe: start nå hvis kortere tid enn offset, ellers planlegg
+    # Sett alle starttider umiddelbart – før varme-aksjoner kjøres
+    - action: input_datetime.set_datetime
+      target:
+        entity_id: input_datetime.ankomst_varmepumpe_start
+      data:
+        datetime: >
+          {% if timer_til | float < vp_timer | float %}
+            {{ now().strftime('%Y-%m-%d %H:%M:%S') }}
+          {% else %}
+            {{ (as_datetime(states('input_datetime.ankomst_tidspunkt'))
+                - timedelta(hours=vp_timer | float)).strftime('%Y-%m-%d %H:%M:%S') }}
+          {% endif %}
+    - action: input_datetime.set_datetime
+      target:
+        entity_id: input_datetime.ankomst_sikom_start
+      data:
+        datetime: >
+          {% if timer_til | float < sk_timer | float %}
+            {{ now().strftime('%Y-%m-%d %H:%M:%S') }}
+          {% else %}
+            {{ (as_datetime(states('input_datetime.ankomst_tidspunkt'))
+                - timedelta(hours=sk_timer | float)).strftime('%Y-%m-%d %H:%M:%S') }}
+          {% endif %}
+    - action: input_datetime.set_datetime
+      target:
+        entity_id: input_datetime.ankomst_mill_start
+      data:
+        datetime: >
+          {% if timer_til | float < ml_timer | float %}
+            {{ now().strftime('%Y-%m-%d %H:%M:%S') }}
+          {% else %}
+            {{ (as_datetime(states('input_datetime.ankomst_tidspunkt'))
+                - timedelta(hours=ml_timer | float)).strftime('%Y-%m-%d %H:%M:%S') }}
+          {% endif %}
+
+    # Varmepumpe: start nå hvis kortere tid enn offset
     - if:
         - condition: template
           value_template: "{{ timer_til | float < vp_timer | float }}"
@@ -208,30 +243,12 @@ planlegg_ankomst:
           data:
             temperature: "{{ states('input_number.ankomst_daikin_temp') | float(22) }}"
             hvac_mode: heat
-        - action: input_datetime.set_datetime
-          target:
-            entity_id: input_datetime.ankomst_varmepumpe_start
-          data:
-            datetime: "{{ now().strftime('%Y-%m-%d %H:%M:%S') }}"
-      else:
-        - action: input_datetime.set_datetime
-          target:
-            entity_id: input_datetime.ankomst_varmepumpe_start
-          data:
-            datetime: >
-              {{ (as_datetime(states('input_datetime.ankomst_tidspunkt'))
-                  - timedelta(hours=vp_timer | float)).strftime('%Y-%m-%d %H:%M:%S') }}
 
-    # Sikom: start nå hvis kortere tid enn offset, ellers planlegg
+    # Sikom: start nå hvis kortere tid enn offset
     - if:
         - condition: template
           value_template: "{{ timer_til | float < sk_timer | float }}"
       then:
-        - action: input_datetime.set_datetime
-          target:
-            entity_id: input_datetime.ankomst_sikom_start
-          data:
-            datetime: "{{ now().strftime('%Y-%m-%d %H:%M:%S') }}"
         - action: google_assistant_sdk.send_text_command
           data:
             command: "set gang to comfort mode"
@@ -247,25 +264,12 @@ planlegg_ankomst:
         - action: google_assistant_sdk.send_text_command
           data:
             command: "set bereder to on"
-      else:
-        - action: input_datetime.set_datetime
-          target:
-            entity_id: input_datetime.ankomst_sikom_start
-          data:
-            datetime: >
-              {{ (as_datetime(states('input_datetime.ankomst_tidspunkt'))
-                  - timedelta(hours=sk_timer | float)).strftime('%Y-%m-%d %H:%M:%S') }}
 
-    # Mill: start nå hvis kortere tid enn offset, ellers planlegg
+    # Mill: start nå hvis kortere tid enn offset
     - if:
         - condition: template
           value_template: "{{ timer_til | float < ml_timer | float }}"
       then:
-        - action: input_datetime.set_datetime
-          target:
-            entity_id: input_datetime.ankomst_mill_start
-          data:
-            datetime: "{{ now().strftime('%Y-%m-%d %H:%M:%S') }}"
         - action: climate.set_temperature
           target:
             entity_id:
@@ -274,14 +278,6 @@ planlegg_ankomst:
           data:
             temperature: "{{ states('input_number.ankomst_mill_temp') | float(18) }}"
             hvac_mode: heat
-      else:
-        - action: input_datetime.set_datetime
-          target:
-            entity_id: input_datetime.ankomst_mill_start
-          data:
-            datetime: >
-              {{ (as_datetime(states('input_datetime.ankomst_tidspunkt'))
-                  - timedelta(hours=ml_timer | float)).strftime('%Y-%m-%d %H:%M:%S') }}
 
     - action: input_select.select_option
       target:
