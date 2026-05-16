@@ -48,12 +48,14 @@
   use_blueprint:
     path: sbyx/low-battery-level-detection-notification-for-all-battery-sensors.yaml
     input:
+      threshold: 40
+      day: 1
       actions:
       - action: notify.notify
         metadata: {}
         data:
-          message: Lavt batterinivå
-      threshold: 90
+          title: Lavt batterinivå
+          message: "Lavt batteri: {{ sensors }}"
 - id: '1756886867339'
   alias: Bryter Kjøkken Trykk Opp
   description: ''
