@@ -55,11 +55,29 @@
         metadata: {}
         data:
           title: Lavt batterinivå
-          message: "Lavt batteri: {{ sensors }}"
+          message: >
+            {% set threshold = 40 %}
+            {% set ns = namespace(lines=[]) %}
+            {% for state in states.sensor | selectattr('attributes.device_class', '==', 'battery') %}
+              {% if 0 <= state.state | int(-1) < threshold %}
+                {% set area = area_name(state.entity_id) %}
+                {% set ns.lines = ns.lines + [state.name ~ ': ' ~ state.state ~ ' %' ~ (' (' ~ area ~ ')' if area else '')] %}
+              {% endif %}
+            {% endfor %}
+            {{ ns.lines | join('\n') }}
       - action: persistent_notification.create
         data:
           title: Lavt batterinivå
-          message: "Lavt batteri: {{ sensors }}"
+          message: >
+            {% set threshold = 40 %}
+            {% set ns = namespace(lines=[]) %}
+            {% for state in states.sensor | selectattr('attributes.device_class', '==', 'battery') %}
+              {% if 0 <= state.state | int(-1) < threshold %}
+                {% set area = area_name(state.entity_id) %}
+                {% set ns.lines = ns.lines + [state.name ~ ': ' ~ state.state ~ ' %' ~ (' (' ~ area ~ ')' if area else '')] %}
+              {% endif %}
+            {% endfor %}
+            {{ ns.lines | join('\n') }}
 - id: '1756886867339'
   alias: Bryter Kjøkken Trykk Opp
   description: ''
