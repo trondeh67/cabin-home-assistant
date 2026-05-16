@@ -1,14 +1,33 @@
+input_number:
+  bod_frostvakt_temp_pa:
+    name: Frostvakt bod – slå på under
+    min: 2
+    max: 15
+    step: 0.5
+    initial: 10
+    unit_of_measurement: "°C"
+    icon: mdi:thermometer-chevron-up
+
+  bod_frostvakt_temp_av:
+    name: Frostvakt bod – slå av over
+    min: 2
+    max: 20
+    step: 0.5
+    initial: 12
+    unit_of_measurement: "°C"
+    icon: mdi:thermometer-chevron-down
+
 automation:
   - id: bod_frostvakt_bereder_pa
     alias: Bod frostvakt – bereder på
-    description: Skrur på varmtvannsbereder når en av temperatursensorene i bod synker under 10°C
+    description: Skrur på varmtvannsbereder når en av temperatursensorene i bod synker under grenseverdien
     triggers:
       - trigger: numeric_state
         entity_id: sensor.bod_temperaturmaler_temperature
-        below: 10
+        below: input_number.bod_frostvakt_temp_pa
       - trigger: numeric_state
         entity_id: sensor.bod_temperatur
-        below: 10
+        below: input_number.bod_frostvakt_temp_pa
       - trigger: homeassistant
         event: start
     conditions:
@@ -16,10 +35,10 @@ automation:
         conditions:
           - condition: numeric_state
             entity_id: sensor.bod_temperaturmaler_temperature
-            below: 10
+            below: input_number.bod_frostvakt_temp_pa
           - condition: numeric_state
             entity_id: sensor.bod_temperatur
-            below: 10
+            below: input_number.bod_frostvakt_temp_pa
     actions:
       - action: google_assistant_sdk.send_text_command
         data:
@@ -28,37 +47,37 @@ automation:
         data:
           title: Frostvakt bod – bereder på
           message: >
-            Temperatur i bod er under 10°C – varmtvannsbereder er skrudd på.
+            Temperatur i bod er under {{ states('input_number.bod_frostvakt_temp_pa') }}°C – varmtvannsbereder er skrudd på.
             (Sensor 1: {{ states('sensor.bod_temperaturmaler_temperature') }}°C,
             Sensor 2: {{ states('sensor.bod_temperatur') }}°C)
       - action: persistent_notification.create
         data:
           title: Frostvakt bod – bereder på
           message: >
-            Temperatur i bod er under 10°C – varmtvannsbereder er skrudd på.
+            Temperatur i bod er under {{ states('input_number.bod_frostvakt_temp_pa') }}°C – varmtvannsbereder er skrudd på.
             (Sensor 1: {{ states('sensor.bod_temperaturmaler_temperature') }}°C,
             Sensor 2: {{ states('sensor.bod_temperatur') }}°C)
     mode: single
 
   - id: bod_frostvakt_bereder_av
     alias: Bod frostvakt – bereder av
-    description: Skrur av varmtvannsbereder når begge temperatursensorer i bod er over 12°C, men ikke når oppvarming er planlagt eller aktiv
+    description: Skrur av varmtvannsbereder når begge temperatursensorer i bod er over grenseverdien, men ikke når oppvarming er planlagt eller aktiv
     triggers:
       - trigger: numeric_state
         entity_id: sensor.bod_temperaturmaler_temperature
-        above: 12
+        above: input_number.bod_frostvakt_temp_av
       - trigger: numeric_state
         entity_id: sensor.bod_temperatur
-        above: 12
+        above: input_number.bod_frostvakt_temp_av
       - trigger: homeassistant
         event: start
     conditions:
       - condition: numeric_state
         entity_id: sensor.bod_temperaturmaler_temperature
-        above: 12
+        above: input_number.bod_frostvakt_temp_av
       - condition: numeric_state
         entity_id: sensor.bod_temperatur
-        above: 12
+        above: input_number.bod_frostvakt_temp_av
       - condition: state
         entity_id: input_select.hytte_status
         state: ledig
@@ -70,7 +89,7 @@ automation:
         data:
           title: Frostvakt bod – bereder av
           message: >
-            Temperatur i bod er over 12°C igjen – varmtvannsbereder er skrudd av.
+            Temperatur i bod er over {{ states('input_number.bod_frostvakt_temp_av') }}°C igjen – varmtvannsbereder er skrudd av.
             (Sensor 1: {{ states('sensor.bod_temperaturmaler_temperature') }}°C,
             Sensor 2: {{ states('sensor.bod_temperatur') }}°C)
     mode: single

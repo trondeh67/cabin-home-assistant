@@ -44,10 +44,19 @@ cards:
             name: Mill starter
 
       - type: custom:mushroom-title-card
-        title: Varmekabel – temperaturgrenser
+        title: Varmekabel drenering varmepumpe – temperaturgrenser
       - type: entities
         entities:
           - entity: input_number.varmekabel_temp_pa
             name: Slå på under
           - entity: input_number.varmekabel_temp_av
+            name: Slå av over
+
+      - type: custom:mushroom-title-card
+        title: Frostvakt bod (bereder) – temperaturgrenser
+      - type: entities
+        entities:
+          - entity: input_number.bod_frostvakt_temp_pa
+            name: Slå på under
+          - entity: input_number.bod_frostvakt_temp_av
             name: Slå av over
