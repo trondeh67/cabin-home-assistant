@@ -40,7 +40,7 @@ automation:
 
   - id: bod_frostvakt_bereder_av
     alias: Bod frostvakt – bereder av
-    description: Skrur av varmtvannsbereder når begge temperatursensorer i bod er over 12°C
+    description: Skrur av varmtvannsbereder når begge temperatursensorer i bod er over 12°C, men ikke når oppvarming er planlagt eller aktiv
     triggers:
       - trigger: numeric_state
         entity_id: sensor.bod_temperaturmaler_temperature
@@ -55,6 +55,9 @@ automation:
       - condition: numeric_state
         entity_id: sensor.bod_temperatur
         above: 12
+      - condition: state
+        entity_id: input_select.hytte_status
+        state: ledig
     actions:
       - action: google_assistant_sdk.send_text_command
         data:
