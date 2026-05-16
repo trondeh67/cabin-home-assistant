@@ -120,7 +120,38 @@ State machine with three states in `input_select.hytte_status`: `ledig` (vacant)
 
 **Time calculation:** Uses `state_attr('input_datetime.ankomst_tidspunkt', 'timestamp') - now().timestamp()` (epoch arithmetic) to avoid timezone ambiguity. Start datetimes use `strftime('%Y-%m-%d %H:%M:%S')` — never `isoformat()` which produces a T-separator that `input_datetime.set_datetime` cannot parse (causes 1970 epoch).
 
-**Sikom/bereder** (underfloor heating + hot water) is controlled via `google_assistant_sdk.send_text_command` — no direct HA entity. Commands: `"set <room> to comfort/eco mode"`, `"set bereder to on/off"`.
+**Sikom/bereder** (underfloor heating + hot water) is controlled via `google_assistant_sdk.send_text_command` — no direct HA entity. Commands: `"set <room> to comfort/eco mode"`, `"set bereder to on/off"`. See the dedicated section below for full details.
+
+### Sikom Underfloor Heating
+
+Sikom is a Norwegian underfloor heating system installed in three rooms: **gang** (hallway), **bad** (bathroom), and **vaskerom** (laundry room). The hot water heater (**bereder**) is also integrated via the same Sikom system.
+
+**Integration:** There is no native Home Assistant integration for Sikom. All control goes through `google_assistant_sdk.send_text_command` — HA sends voice commands to Google Assistant which relays them to the Sikom system. This means:
+- HA cannot read the current Sikom state (no feedback/sensor)
+- Commands are fire-and-forget — HA does not know if they succeeded
+- A **3-second delay** is required between consecutive commands or the Sikom bridge drops them
+
+**Available commands:**
+```
+"set gang to comfort mode"
+"set bad to comfort mode"
+"set vaskerom to comfort mode"
+"set gang to eco mode"
+"set bad to eco mode"
+"set vaskerom to eco mode"
+"set bereder to on"
+"set bereder to off"
+```
+
+**Modes:**
+- `comfort` — active heating to setpoint (used on arrival)
+- `eco` — reduced setback temperature (used on departure/vacancy)
+
+**Bereder** (hot water heater) is physically located in the **bod** (storage room). It is turned off by default to save electricity, and controlled by two systems: the arrival/departure scripts, and the bod frost protection (`bod_frostvakt.yaml`). The frostvakt takes priority — it turns bereder on regardless of status when bod temperature drops below threshold, and only turns it off when status is `ledig`.
+
+**Sikom app:** The Sikom app is a separate mobile app that should be checked manually after triggering comfort mode, as there is no HA confirmation that the command was received. Dashboard buttons include a reminder: *"Husk å sjekke Sikom-appen!"*.
+
+**Never call Sikom commands in rapid succession** — always insert a `delay: "00:00:03"` between each command in scripts and automations.
 
 ### xComfort Lighting
 
