@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a Home Assistant configuration repository for a Norwegian cabin called **Tjukktømmern**. It manages lighting (Eaton xComfort + Zigbee), climate (Daikin heat pump, Sensibo, Netatmo), security (Verisure alarm), and outdoor frost protection (varmekabel).
+This is a Home Assistant configuration repository for a Norwegian cabin called **Tjukktømmern**. It manages lighting (Eaton xComfort + Zigbee), climate (Daikin heat pump, Sensibo, Netatmo), security (Verisure alarm), outdoor frost protection (varmekabel), and cabin arrival/departure heating control.
 
 ## Validation & Maintenance Commands
 
@@ -40,7 +40,7 @@ If push is rejected, run `git pull --rebase` first. Snapshot commits (`addons sn
 |---|---|
 | `configuration.yaml` | Main HA config: platform setup, HTTP, template sensors, package includes |
 | `automations.yaml` | All automations (light triggers, alarm reactions, MQTT buttons) |
-| `scripts.yaml` | Reusable scripts (all-lights-off with xComfort retries, scene restoration) |
+| `scripts.yaml` | Reusable scripts: all-lights-off with xComfort retries, scene restoration, cabin arrival/departure heating control |
 | `scenes.yaml` | Lighting scenes per room (~1300 lines, Norwegian room names) |
 | `packages/` | Self-contained feature packages loaded via `homeassistant.packages` |
 | `lovelace/hytte/` | YAML-mode Lovelace dashboards (main: `tjukktommern.yaml`) |
@@ -77,7 +77,9 @@ Files in `packages/` are complete, self-contained feature slices — each define
 | Package | Purpose |
 |---|---|
 | `zigbee_offline_watchdog.yaml` | Monitors Zigbee devices by label `zigbee_watchlist`, sends persistent + mobile alerts |
-| `varmekabel.yaml` | Controls outdoor frost protection heating cable via `switch.ute_varmekabel_varmepumpe` based on outdoor temperature. Thresholds configurable via `input_number.varmekabel_temp_pa` (+2°C) and `input_number.varmekabel_temp_av` (+4°C). Locks cable ON if `sensor.ute_netatmo_korr` becomes unavailable. |
+| `varmekabel.yaml` | Controls outdoor frost protection heating cable (heat pump drainage) via `switch.ute_varmekabel_varmepumpe` based on outdoor temperature. Thresholds configurable via `input_number.varmekabel_temp_pa` (+2°C) and `input_number.varmekabel_temp_av` (+4°C). Locks cable ON if `sensor.ute_netatmo_korr` becomes unavailable. |
+| `hytte_avreise.yaml` | 3-state cabin heating machine (`input_select.hytte_status`: ledig/planlagt/ankommet). Defines all `input_number` and `input_datetime` helpers for arrival/departure. Scripts live in `scripts.yaml`. State persists across HA restarts (no `initial:` on the input_select). |
+| `bod_frostvakt.yaml` | Frost protection for storage room (bod): turns hot water heater (bereder) ON via Google Assistant when either bod sensor drops below threshold, OFF when both exceed the upper threshold and status is `ledig`. Configurable thresholds via `input_number.bod_frostvakt_temp_pa` (default 10°C) and `input_number.bod_frostvakt_temp_av` (default 12°C). Sensors: `sensor.bod_temperaturmaler_temperature` and `sensor.bod_temperatur`. |
 
 ### Lovelace Dashboards
 
@@ -86,8 +88,11 @@ Files in `packages/` are complete, self-contained feature slices — each define
 The Mobil view contains:
 - Chips row: alarm state, outdoor temperature, Yr weather, varmekabel status (VK: På/Av/Sikker)
 - Climate control (Daikin + temperature graph)
+- Avreise/Ankomst heating control (3-state: ledig → planlagt → ankommet) with script-state-aware buttons
 - Scene buttons + active lights grouped by room (Stue → Gang → Kjøkken → Spisestue)
 - Open doors/windows (auto-hidden when none open)
+
+`lovelace/hytte/temperatur_innstillinger.yaml` is a separate settings tab (only visible to a specific user). It contains sliders for departure/arrival temperatures (Daikin + Mill), pre-heating lead times (Varmepumpe/Sikom/Mill), planned start times, varmekabel drainage thresholds, and bod frost protection thresholds.
 
 ### Temperature Sensor Fusion (`configuration.yaml`)
 
@@ -97,6 +102,25 @@ A virtual stue temperature sensor (`sensor.stue_temperatur_virtuell`) blends Net
 - Fallback to simple average when sensors diverge > 3°C
 
 The virtual outdoor temperature (`sensor.ute_temperatur_virtuell`) is a passthrough of `sensor.ute_netatmo_korr` only — Daikin outdoor was removed because the heat pump's operation causes unreliable readings in cold weather.
+
+### Cabin Heating Control (Avreise/Ankomst)
+
+State machine with three states in `input_select.hytte_status`: `ledig` (vacant), `planlagt` (arrival planned), `ankommet` (arrived).
+
+**Scripts in `scripts.yaml`:**
+- `planlegg_ankomst` — validates arrival time is in the future, sets all three start datetimes upfront (Varmepumpe/Sikom/Mill), starts heating immediately if lead time has already passed, sets status to `planlagt`
+- `forlat_hytta` — sets Sikom/bereder to eco/off, sets Daikin+Mill to departure temps, sets status to `ledig`
+- `ankomst_hytta` — sets Sikom/bereder to comfort/on, sets Daikin+Mill to arrival temps, sets status to `ankommet`
+- `avbryt_planlegging` — resets status to `ledig` and resets arrival time to next Friday
+- `varme_paa_override` — calls `ankomst_hytta` directly (override from `ledig` or `planlagt`)
+
+**Scheduled start automations in `automations.yaml`:** `ankomst_varmepumpe_start`, `ankomst_sikom_start`, `ankomst_mill_start` — each triggers at its respective `input_datetime`, checks status is `planlagt`, then starts that heating system.
+
+**State persistence:** `input_select` has no `initial:` so HA restores state from recorder. The `ankomst_reset_default_tidspunkt` startup automation resets to `ledig` only when status is not `ankommet` and arrival time is past.
+
+**Time calculation:** Uses `state_attr('input_datetime.ankomst_tidspunkt', 'timestamp') - now().timestamp()` (epoch arithmetic) to avoid timezone ambiguity. Start datetimes use `strftime('%Y-%m-%d %H:%M:%S')` — never `isoformat()` which produces a T-separator that `input_datetime.set_datetime` cannot parse (causes 1970 epoch).
+
+**Sikom/bereder** (underfloor heating + hot water) is controlled via `google_assistant_sdk.send_text_command` — no direct HA entity. Commands: `"set <room> to comfort/eco mode"`, `"set bereder to on/off"`.
 
 ### xComfort Lighting
 
