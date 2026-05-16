@@ -50,6 +50,9 @@
     input:
       threshold: 40
       day: 1
+      exclude:
+        entity_id:
+          - sensor.sm_s928b_battery_level
       actions:
       - action: notify.notify
         metadata: {}
@@ -57,9 +60,10 @@
           title: Lavt batterinivå
           message: >
             {% set threshold = 40 %}
+            {% set excluded = ['sensor.sm_s928b_battery_level'] %}
             {% set ns = namespace(lines=[]) %}
             {% for state in states.sensor | selectattr('attributes.device_class', '==', 'battery') %}
-              {% if 0 <= state.state | int(-1) < threshold %}
+              {% if 0 <= state.state | int(-1) < threshold and state.entity_id not in excluded %}
                 {% set area = area_name(state.entity_id) %}
                 {% set ns.lines = ns.lines + [state.name ~ ': ' ~ state.state ~ ' %' ~ (' (' ~ area ~ ')' if area else '')] %}
               {% endif %}
@@ -70,9 +74,10 @@
           title: Lavt batterinivå
           message: >
             {% set threshold = 40 %}
+            {% set excluded = ['sensor.sm_s928b_battery_level'] %}
             {% set ns = namespace(lines=[]) %}
             {% for state in states.sensor | selectattr('attributes.device_class', '==', 'battery') %}
-              {% if 0 <= state.state | int(-1) < threshold %}
+              {% if 0 <= state.state | int(-1) < threshold and state.entity_id not in excluded %}
                 {% set area = area_name(state.entity_id) %}
                 {% set ns.lines = ns.lines + [state.name ~ ': ' ~ state.state ~ ' %' ~ (' (' ~ area ~ ')' if area else '')] %}
               {% endif %}
