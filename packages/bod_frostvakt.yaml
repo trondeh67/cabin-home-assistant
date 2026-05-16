@@ -9,6 +9,8 @@ automation:
       - trigger: numeric_state
         entity_id: sensor.bod_temperatur
         below: 10
+      - trigger: homeassistant
+        event: start
     conditions:
       - condition: or
         conditions:
@@ -48,6 +50,8 @@ automation:
       - trigger: numeric_state
         entity_id: sensor.bod_temperatur
         above: 12
+      - trigger: homeassistant
+        event: start
     conditions:
       - condition: numeric_state
         entity_id: sensor.bod_temperaturmaler_temperature
