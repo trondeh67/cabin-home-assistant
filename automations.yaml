@@ -214,7 +214,9 @@
     - condition: template
       value_template: >
         {% set dt = states('input_datetime.ankomst_tidspunkt') %}
-        {{ dt in ['unknown','unavailable'] or as_datetime(dt) < now() }}
+        {% set status = states('input_select.hytte_status') %}
+        {{ status != 'ankommet'
+           and (dt in ['unknown','unavailable'] or as_datetime(dt) < now()) }}
   actions:
     - action: input_datetime.set_datetime
       target:

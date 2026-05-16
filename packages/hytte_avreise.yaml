@@ -5,7 +5,6 @@ input_select:
       - ledig
       - planlagt
       - ankommet
-    initial: ledig
     icon: mdi:home
 
 input_datetime:
