@@ -131,6 +131,8 @@ Sikom is a Norwegian underfloor heating system installed in three rooms: **gang*
 - Commands are fire-and-forget — HA does not know if they succeeded
 - A **3-second delay** is required between consecutive commands or the Sikom bridge drops them
 
+**Google Assistant SDK** (`google_assistant_sdk`) is a built-in HA integration (not HACS). It authenticates via OAuth2 against a Google Cloud project. The access token renews automatically every hour via the stored refresh token — no manual key renewal is normally needed. `language_code` is set to `en-US`, so **all commands must be written in English**. If the integration stops working, re-authenticate in HA Settings → Devices & Services → Google Assistant SDK. The refresh token can be invalidated by Google if unused for 6+ months or if access is revoked in the Google account's security settings.
+
 **Available commands:**
 ```
 "set gang to comfort mode"
