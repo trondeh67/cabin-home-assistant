@@ -54,3 +54,4 @@ zigbee2mqtt/log/
 # Binære arkiver og eksterne verktøy
 *.tar.gz
 Sonoff-Dongle-Flasher-For-IHost/
+.claude/
