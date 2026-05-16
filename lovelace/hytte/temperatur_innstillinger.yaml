@@ -42,3 +42,12 @@ cards:
             name: Sikom starter
           - entity: input_datetime.ankomst_mill_start
             name: Mill starter
+
+      - type: custom:mushroom-title-card
+        title: Varmekabel – temperaturgrenser
+      - type: entities
+        entities:
+          - entity: input_number.varmekabel_temp_pa
+            name: Slå på under
+          - entity: input_number.varmekabel_temp_av
+            name: Slå av over

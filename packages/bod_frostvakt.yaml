@@ -1,0 +1,69 @@
+automation:
+  - id: bod_frostvakt_bereder_pa
+    alias: Bod frostvakt – bereder på
+    description: Skrur på varmtvannsbereder når en av temperatursensorene i bod synker under 10°C
+    triggers:
+      - trigger: numeric_state
+        entity_id: sensor.bod_temperaturmaler_temperature
+        below: 10
+      - trigger: numeric_state
+        entity_id: sensor.bod_temperatur
+        below: 10
+    conditions:
+      - condition: or
+        conditions:
+          - condition: numeric_state
+            entity_id: sensor.bod_temperaturmaler_temperature
+            below: 10
+          - condition: numeric_state
+            entity_id: sensor.bod_temperatur
+            below: 10
+    actions:
+      - action: google_assistant_sdk.send_text_command
+        data:
+          command: "set bereder to on"
+      - action: notify.mobile_app_sm_s928b
+        data:
+          title: Frostvakt bod – bereder på
+          message: >
+            Temperatur i bod er under 10°C – varmtvannsbereder er skrudd på.
+            (Sensor 1: {{ states('sensor.bod_temperaturmaler_temperature') }}°C,
+            Sensor 2: {{ states('sensor.bod_temperatur') }}°C)
+      - action: persistent_notification.create
+        data:
+          title: Frostvakt bod – bereder på
+          message: >
+            Temperatur i bod er under 10°C – varmtvannsbereder er skrudd på.
+            (Sensor 1: {{ states('sensor.bod_temperaturmaler_temperature') }}°C,
+            Sensor 2: {{ states('sensor.bod_temperatur') }}°C)
+    mode: single
+
+  - id: bod_frostvakt_bereder_av
+    alias: Bod frostvakt – bereder av
+    description: Skrur av varmtvannsbereder når begge temperatursensorer i bod er over 12°C
+    triggers:
+      - trigger: numeric_state
+        entity_id: sensor.bod_temperaturmaler_temperature
+        above: 12
+      - trigger: numeric_state
+        entity_id: sensor.bod_temperatur
+        above: 12
+    conditions:
+      - condition: numeric_state
+        entity_id: sensor.bod_temperaturmaler_temperature
+        above: 12
+      - condition: numeric_state
+        entity_id: sensor.bod_temperatur
+        above: 12
+    actions:
+      - action: google_assistant_sdk.send_text_command
+        data:
+          command: "set bereder to off"
+      - action: persistent_notification.create
+        data:
+          title: Frostvakt bod – bereder av
+          message: >
+            Temperatur i bod er over 12°C igjen – varmtvannsbereder er skrudd av.
+            (Sensor 1: {{ states('sensor.bod_temperaturmaler_temperature') }}°C,
+            Sensor 2: {{ states('sensor.bod_temperatur') }}°C)
+    mode: single
