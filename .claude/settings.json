@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git status*)",
+      "Bash(git diff*)",
+      "Bash(git log*)",
+      "Bash(git add *)",
+      "Bash(git commit -m *)",
+      "Bash(git push)",
+      "Bash(git push origin main)",
+      "Bash(git pull*)",
+      "Bash(git checkout HEAD -- *)",
+      "Bash(git checkout *)",
+      "Bash(bash validate_xcomfort_addon.sh)",
+      "Bash(bash tools/export_addons.sh)",
+      "Bash(ls*)"
+    ]
+  }
+}
